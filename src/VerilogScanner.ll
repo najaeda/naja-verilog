@@ -7,11 +7,12 @@
 %option noyywrap
 %option c++
 
-NAME    [_a-zA-Z][$_a-zA-Z0-9]*{0,1023}
+IDENTIFIER_TK [a-zA-Z_][a-zA-Z0-9_$]*
 
 %%
 
-module  { return TK_MODULE; }
+module      { return MODULE_KW; }
+endmodule   { return ENDMODULE_KW; }
 
  /* Last rule catches everything */
 . { yyterminate(); }
