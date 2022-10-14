@@ -1,9 +1,15 @@
-%define parse.trace
+%skeleton "lalr1.cc"
 
-%parse-param { VerilogParser* parser }
+%define parse.trace
+%define api.namespace {verilog}
+%define api.parser.class {VerilogParser}
+
+%define parse.error verbose
+
+%parse-param { VerilogConstructor* constructor }
 
 %code requires {
-  class VerilogParser* parser;
+  class VerilogConstructor* constructor;
 }
 
 
@@ -18,6 +24,9 @@
 %token OUTPUT_KW
 
 %token <text> IDENTIFIER_TK
+
+%locations 
+%start source_text
 
 %%
 
@@ -51,7 +60,7 @@ list_of_port_declarations.opt: '(' list_of_port_declarations ')';
 
 module_identifier: IDENTIFIER_TK
 {
-  parser->addModule(std::move($1));
+  constructor_->createModule(std::move($1));
 }
 ;
 
