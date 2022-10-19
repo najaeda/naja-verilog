@@ -1,5 +1,7 @@
 #include "VerilogConstructor.h"
 
+#include <fstream>
+#include "VerilogScanner.h"
 #include "VerilogParser.hpp"
 
 namespace naja { namespace verilog {
@@ -8,26 +10,24 @@ void VerilogConstructor::parse(const std::filesystem::path& path) {
   if (not std::filesystem::exists(path)) {
     return;
   }
-
-  //auto parser = new VerilogParser(this);
+  std::ifstream inFile(path);
+  if (not inFile.good()) {
+  }
+  internalParse(inFile);
 }
 
 void VerilogConstructor::parse(const VerilogConstructor::Paths& paths) {
   for (auto path: paths) {
     parse(path);
   }
-  #if 0
+}
 
-  std::ifstream ifs(p);
-
-  if(!_scanner){
-    _scanner = new VerilogScanner(&ifs);
-  }
-  if(!_parser){
-    _parser = new VerilogParser(*_scanner, this);
-  }
-  _parser->parse();
-  #endif
+void VerilogConstructor::internalParse(std::istream &stream) {
+  delete(scanner_);
+  scanner_ = new VerilogScanner(&stream);
+  delete(parser_); 
+  parser_ = new VerilogParser(*scanner_, this);
+  bool result = parser_->parse();
 }
 
 }} // namespace verilog // namespace naja

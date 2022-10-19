@@ -30,19 +30,28 @@ using token = naja::verilog::VerilogParser::token;
 %option noyywrap
 %option c++
 
+/* Predefined rules */
+NEWLINE "\n"|"\r\n"
+SPACE   " "|"\t"|"\f"
+
+IDENTIFIER [_a-zA-Z][$_a-zA-Z0-9]
+ 
 %%
 %{          /** Code executed at the beginning of yylex **/
   yylval = lval;
 %}
 
-module      { return token::MODULE_KW; }
-endmodule   { return token::ENDMODULE_KW; }
-
-\n          {
+<*>{SPACE}  { /* ignore any space */ }
+{NEWLINE}   {
               // Update line number
               loc->lines();
               return( token::NEWLINE );
             }
+
+module      { return token::MODULE_KW; }
+endmodule   { return token::ENDMODULE_KW; }
+
+{IDENTIFIER} { return token::IDENTIFIER_TK; }
 
  /* Last rule catches everything */
 .           { yyterminate(); }

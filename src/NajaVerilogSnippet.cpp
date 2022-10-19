@@ -4,10 +4,10 @@ namespace {
 
 class VerilogConstructorExample: public naja::verilog::VerilogConstructor {
   public:
-    void createModule(const char* name) override {
+    void createModule(const std::string& name) override {
 
     }
-    void createPort(const char* name) override {
+    void createPort(const std::string& name) override {
 
     }
 

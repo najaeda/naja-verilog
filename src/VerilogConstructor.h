@@ -3,6 +3,7 @@
 
 #include <list>
 #include <filesystem>
+#include <istream>
 
 namespace naja { namespace verilog {
 
@@ -17,6 +18,7 @@ class VerilogConstructor {
     virtual void createModule(const std::string& name) =0;
     virtual void createPort(const std::string& name) =0;
   private:
+    void internalParse(std::istream& stream);
     VerilogScanner* scanner_  {nullptr};
     VerilogParser*  parser_   {nullptr};
 };

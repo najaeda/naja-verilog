@@ -1,9 +1,11 @@
 %skeleton "lalr1.cc"
 %require  "3.0"
-%debug 
+%define parse.trace
 %defines 
 %define api.namespace {naja::verilog}
 %define api.parser.class {VerilogParser}
+
+%define parse.error verbose
 
 %code requires{
   namespace naja { namespace verilog {
@@ -49,14 +51,14 @@
 %token NEWLINE
 %token END
 
-%token <std::string> IDENTIFIER_TK
+%token<std::string> IDENTIFIER_TK
 
 %locations 
 %start source_text
 
 %%
 
-source_text: list_of_descriptions | /* EMPTY */;
+source_text: END | list_of_descriptions END
 
 list_of_descriptions: description | list_of_descriptions description;
 
@@ -125,5 +127,8 @@ module_declaration:
 
 
 void naja::verilog::VerilogParser::error(const location_type& l, const std::string& err_message ) {
-   std::cerr << "Error: " << err_message << " at " << l << "\n";
+  std::cerr << "Parser error: " << err_message  << '\n'
+            << "  begin at line " << l.begin.line <<  " col " << l.begin.column  << '\n' 
+            << "  end   at line " << l.end.line <<  " col " << l.end.column << "\n";
+  std::abort();
 }

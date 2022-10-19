@@ -1,2 +1,2 @@
-module test()
+module test
 endmodule
