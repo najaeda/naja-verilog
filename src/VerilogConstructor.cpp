@@ -2,12 +2,14 @@
 
 #include "VerilogParser.hpp"
 
+namespace naja { namespace verilog {
+
 void VerilogConstructor::parse(const std::filesystem::path& path) {
   if (not std::filesystem::exists(path)) {
     return;
   }
 
-  auto parser = new verilog::VerilogParser(constructor);
+  //auto parser = new VerilogParser(this);
 }
 
 void VerilogConstructor::parse(const VerilogConstructor::Paths& paths) {
@@ -27,3 +29,5 @@ void VerilogConstructor::parse(const VerilogConstructor::Paths& paths) {
   _parser->parse();
   #endif
 }
+
+}} // namespace verilog // namespace naja
