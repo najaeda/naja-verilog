@@ -14,6 +14,6 @@ set(verilog_sources
 add_library(naja_verilog STATIC ${verilog_sources})
 target_include_directories(naja_verilog
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-#
-#add_executable(naja_verilog_test NajaVerilogSnippet.cpp)
-#target_link_libraries(naja_verilog_test naja_verilog)
+
+add_executable(naja_verilog_test NajaVerilogSnippet.cpp)
+target_link_libraries(naja_verilog_test naja_verilog)

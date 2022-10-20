@@ -23,4 +23,5 @@ int main(int argc, char* argv[]) {
   VerilogConstructorExample constructor;
   std::filesystem::path filePath(argv[1]);
   constructor.parse(filePath);
+  return 0;
 }

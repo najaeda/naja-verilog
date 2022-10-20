@@ -28,13 +28,15 @@ using token = naja::verilog::VerilogParser::token;
 %option nodefault
 %option yyclass="naja::verilog::VerilogScanner"
 %option noyywrap
+%option nounput
+%option never-interactive
 %option c++
 
 /* Predefined rules */
 NEWLINE "\n"|"\r\n"
 SPACE   " "|"\t"|"\f"
 
-IDENTIFIER [_a-zA-Z][$_a-zA-Z0-9]
+IDENTIFIER [_a-zA-Z][$_a-zA-Z0-9]*
  
 %%
 %{          /** Code executed at the beginning of yylex **/
@@ -45,15 +47,28 @@ IDENTIFIER [_a-zA-Z][$_a-zA-Z0-9]
 {NEWLINE}   {
               // Update line number
               loc->lines();
-              return( token::NEWLINE );
             }
+
+"."|","|";"|"("|")" {
+  return yytext[0];
+}
 
 module      { return token::MODULE_KW; }
 endmodule   { return token::ENDMODULE_KW; }
+input       { return token::INPUT_KW; } 
+output      { return token::OUTPUT_KW; }
+inout       { return token::INOUT_KW; }
+wire        { return token::WIRE_KW; }
+supply0     { return token::SUPPLY0_KW; }
+supply1     { return token::SUPPLY1_KW; }
 
-{IDENTIFIER} { return token::IDENTIFIER_TK; }
+
+{IDENTIFIER} {  yylval->build< std::string >( yytext ); return token::IDENTIFIER_TK; }
 
  /* Last rule catches everything */
-.           { yyterminate(); }
+.           {
+              std::cerr << "Failed to match : " << yytext << '\n';
+              yyterminate(); 
+            }
 
 %%

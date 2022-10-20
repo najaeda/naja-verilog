@@ -48,8 +48,11 @@
 %token INOUT_KW
 %token INPUT_KW
 %token OUTPUT_KW
-%token NEWLINE
-%token END
+%token SUPPLY0_KW
+%token SUPPLY1_KW
+%token WIRE_KW
+%token END 0 "end of file"
+
 
 %token<std::string> IDENTIFIER_TK
 
@@ -58,7 +61,7 @@
 
 %%
 
-source_text: END | list_of_descriptions END
+source_text: list_of_descriptions
 
 list_of_descriptions: description | list_of_descriptions description;
 
@@ -66,25 +69,64 @@ description: module_declaration;
 
 identifier: IDENTIFIER_TK;
 
-list_of_port_identifiers: identifier 
-| identifier ',' list_of_port_identifiers
-;
+port_declaration: port_type_io identifier ;
 
-inout_declaration: INOUT_KW list_of_port_identifiers;
-
-input_declaration: INPUT_KW list_of_port_identifiers;
-
-output_declaration: OUTPUT_KW list_of_port_identifiers;
-
-port_declaration: inout_declaration | input_declaration | output_declaration ;
+port_type_io: INOUT_KW | INPUT_KW | OUTPUT_KW;
 
 list_of_port_declarations: port_declaration
 | list_of_port_declarations ',' port_declaration
 ; 
 
-list_of_port_declarations.opt: '(' list_of_port_declarations ')';
+list_of_port_declarations.opt: '(' ')' | %empty | '(' list_of_port_declarations ')';
 
-//module_item: ;
+//optional_comma:
+//	',' | %empty;
+
+
+list_of_non_port_module_items.opt: %empty | list_of_non_port_module_items;
+
+list_of_non_port_module_items: non_port_module_item | list_of_non_port_module_items non_port_module_item 
+
+non_port_module_item : module_or_generate_item;
+
+module_or_generate_item: module_or_generate_item_declaration;
+
+module_or_generate_item_declaration: net_declaration | module_instantiation;
+
+net_declaration: net_type list_of_net_identifiers ';' ;
+
+list_of_net_identifiers: net_identifier | list_of_net_identifiers ',' net_identifier;
+
+net_identifier: IDENTIFIER_TK;
+
+net_type: SUPPLY0_KW | SUPPLY1_KW | WIRE_KW;
+
+list_of_module_instances: module_instance | list_of_module_instances ',' module_instance;
+
+expression: IDENTIFIER_TK;
+
+ordered_port_connection: expression;
+
+list_of_ordered_port_connections: ordered_port_connection | list_of_ordered_port_connections ',' ordered_port_connection;
+
+port_identifier: IDENTIFIER_TK;
+
+named_port_connection: '.' port_identifier '(' ')' ;
+
+list_of_named_port_connections: named_port_connection | list_of_named_port_connections ',' named_port_connection;
+
+list_of_port_connections: list_of_ordered_port_connections | list_of_named_port_connections;
+
+list_of_port_connections.opt: %empty | list_of_port_connections;
+
+module_instance_identifier: IDENTIFIER_TK;
+
+name_of_module_instance: module_instance_identifier;
+
+module_instance: name_of_module_instance '(' list_of_port_connections.opt ')';
+
+//(From A.4.1) 
+module_instantiation: module_identifier list_of_module_instances ';'
 
 module_identifier: IDENTIFIER_TK
 {
@@ -92,36 +134,12 @@ module_identifier: IDENTIFIER_TK
 }
 ;
 
+
+
 /* A.1.2 */
 module_declaration:
-  MODULE_KW module_identifier list_of_port_declarations.opt /* module_item */ ENDMODULE_KW
+  MODULE_KW module_identifier list_of_port_declarations.opt ';' list_of_non_port_module_items.opt ENDMODULE_KW
   ;
-
-//%token               END    0     "end of file"
-//%token               UPPER
-//%token               LOWER
-//%token <std::string> WORD
-//%token               NEWLINE
-//%token               CHAR
-//
-//%locations
-//
-//%%
-//
-//list_option : END | list END;
-//
-//list
-//  : item
-//  | list item
-//  ;
-//
-//item
-//  : UPPER   { driver.add_upper(); }
-//  | LOWER   { driver.add_lower(); }
-//  | WORD    { driver.add_word( $1 ); }
-//  | NEWLINE { driver.add_newline(); }
-//  | CHAR    { driver.add_char(); }
-//  ;
 
 %%
 
