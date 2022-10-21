@@ -1,6 +1,7 @@
 #include "VerilogConstructor.h"
 
 #include <fstream>
+#include "VerilogException.h"
 #include "VerilogScanner.h"
 #include "VerilogParser.hpp"
 
@@ -8,10 +9,13 @@ namespace naja { namespace verilog {
 
 void VerilogConstructor::parse(const std::filesystem::path& path) {
   if (not std::filesystem::exists(path)) {
-    return;
+    std::string reason(path.string() + " does not exist");
+    throw VerilogException(reason);
   }
   std::ifstream inFile(path);
   if (not inFile.good()) {
+    std::string reason(path.string() + " is not a readable file");
+    throw VerilogException(reason);
   }
   internalParse(inFile);
 }

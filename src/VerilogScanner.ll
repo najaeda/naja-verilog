@@ -32,12 +32,29 @@ using token = naja::verilog::VerilogParser::token;
 %option never-interactive
 %option c++
 
+%x in_comment
+%x in_attribute
+%x based_const
+
 /* Predefined rules */
-NEWLINE "\n"|"\r\n"
-SPACE   " "|"\t"|"\f"
+NEWLINE       "\n"|"\r\n"
+SPACE         " "|"\t"|"\f"
+COMMENT_BEGIN "/*"
+COMMENT_END   "*/" 
+COMMENT_LINE  "//".*\n
+
+ATTRIBUTE_BEGIN "(*"
+ATTRIBUTE_END   "*)"
 
 IDENTIFIER [_a-zA-Z][$_a-zA-Z0-9]*
- 
+UNSIGNED_NUMBER [0-9][0-9_]*
+
+/* 
+  Check the escape rule inside character class 
+  https://www.regular-expressions.info/charclass.html
+*/
+ESCAPED_IDENTIFIER \\[\\^!"#$%&',()*+\-.a-zA-Z0-9/{|}~[\]_:;<=>?@]+[\t\f ]
+
 %%
 %{          /** Code executed at the beginning of yylex **/
   yylval = lval;
@@ -49,7 +66,29 @@ IDENTIFIER [_a-zA-Z][$_a-zA-Z0-9]*
               loc->lines();
             }
 
-"."|","|";"|"("|")" {
+{COMMENT_LINE}  { loc->lines(); }
+
+{COMMENT_BEGIN} { BEGIN(in_comment); }
+<in_comment><<EOF>> {
+                       BEGIN(INITIAL);
+                       std::cerr << "Unclosed comment at line " << loc->end.line << " col " << loc->end.column << '\n';
+                        yyterminate();
+                     }
+<in_comment>{NEWLINE} { loc->lines(); }
+<in_comment>. { /* ignore characters in comment */ }
+<in_comment>{COMMENT_END} { BEGIN(INITIAL); }
+
+{ATTRIBUTE_BEGIN} { BEGIN(in_attribute); }
+<in_attribute><<EOF>> { 
+                      BEGIN(INITIAL);
+                      std::cerr << "Unclosed attribute at line " << loc->end.line << " col " << loc->end.column << '\n';
+                      yyterminate();
+                    }   
+<in_attribute>{NEWLINE} { loc->lines(); }
+<in_attribute>. { /* ignore characters in comment */ }
+<in_attribute>{ATTRIBUTE_END} { BEGIN(INITIAL); }
+
+"."|","|";"|"("|")"|"#"|"["|"]"|":"|"{"|"}"|"=" {
   return yytext[0];
 }
 
@@ -61,9 +100,29 @@ inout       { return token::INOUT_KW; }
 wire        { return token::WIRE_KW; }
 supply0     { return token::SUPPLY0_KW; }
 supply1     { return token::SUPPLY1_KW; }
+assign      { return token::ASSIGN_KW; }
 
 
-{IDENTIFIER} {  yylval->build< std::string >( yytext ); return token::IDENTIFIER_TK; }
+
+{IDENTIFIER}          {  yylval->build<std::string>( yytext ); return token::IDENTIFIER_TK; }
+{ESCAPED_IDENTIFIER}  {  yylval->build<std::string>( yytext ); return token::ESCAPED_IDENTIFIER_TK; }
+
+{UNSIGNED_NUMBER} {
+	yylval->build<std::string>(yytext);
+	return token::CONSTVAL_TK;
+}
+
+\'[sS]?[bodhBODH] {
+	BEGIN(based_const);
+	yylval->build<std::string>(yytext);
+	return token::BASE_TK;
+}
+
+<based_const>[0-9a-fA-FzxZX?][0-9a-fA-FzxZX?_]* {
+	BEGIN(INITIAL);
+	yylval->build<std::string>(yytext);
+	return token::BASED_CONSTVAL_TK;
+}
 
  /* Last rule catches everything */
 .           {

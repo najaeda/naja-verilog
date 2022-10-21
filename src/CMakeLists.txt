@@ -12,8 +12,10 @@ set(verilog_sources
 )
 
 add_library(naja_verilog STATIC ${verilog_sources})
+target_link_libraries(naja_verilog PUBLIC coverage_config sanitizers_config)
 target_include_directories(naja_verilog
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(naja_verilog_test NajaVerilogSnippet.cpp)
 target_link_libraries(naja_verilog_test naja_verilog)
