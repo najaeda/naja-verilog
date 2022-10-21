@@ -8,6 +8,7 @@
 %define parse.error verbose
 
 %code requires{
+  #include "VerilogTypes.h"
   namespace naja { namespace verilog {
     class VerilogScanner;
     class VerilogConstructor;
@@ -31,8 +32,8 @@
   #include <iostream>
   #include <cstdlib>
   #include <fstream>
-  
-  /* include for all driver functions */
+
+  /* include for all driver functions */ 
   #include "VerilogConstructor.h"
   #include "VerilogScanner.h"
 
@@ -53,8 +54,12 @@
 %token WIRE_KW
 %token END 0 "end of file"
 
-
 %token<std::string> IDENTIFIER_TK
+
+%type<std::string> identifier;
+
+%type<naja::verilog::Port> port_declaration
+%type<naja::verilog::Port::Direction> port_type_io
 
 %locations 
 %start source_text
@@ -67,11 +72,21 @@ list_of_descriptions: description | list_of_descriptions description;
 
 description: module_declaration;
 
-identifier: IDENTIFIER_TK;
+identifier: IDENTIFIER_TK
+  { $$ = $1; }
+;
 
-port_declaration: port_type_io identifier ;
+port_declaration: port_type_io identifier
+  {
+    constructor->createPort(std::move($2));
+  }
+;
 
-port_type_io: INOUT_KW | INPUT_KW | OUTPUT_KW;
+port_type_io
+  : INOUT_KW  { $$ = naja::verilog::Port::Direction::Inout; } 
+  | INPUT_KW  { $$ = naja::verilog::Port::Direction::Input; }
+  | OUTPUT_KW { $$ = naja::verilog::Port::Direction::Inout; }
+  ;
 
 list_of_port_declarations: port_declaration
 | list_of_port_declarations ',' port_declaration
@@ -81,7 +96,6 @@ list_of_port_declarations.opt: '(' ')' | %empty | '(' list_of_port_declarations 
 
 //optional_comma:
 //	',' | %empty;
-
 
 list_of_non_port_module_items.opt: %empty | list_of_non_port_module_items;
 
@@ -133,8 +147,6 @@ module_identifier: IDENTIFIER_TK
   constructor->createModule(std::move($1));
 }
 ;
-
-
 
 /* A.1.2 */
 module_declaration:
