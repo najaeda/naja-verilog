@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <istream>
 
+#include "VerilogTypes.h"
+
 namespace naja { namespace verilog {
 
 class VerilogScanner;
@@ -15,8 +17,10 @@ class VerilogConstructor {
     using Paths = std::list<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
-    virtual void createModule(const std::string& name) =0;
-    virtual void createPort(const std::string& name) =0;
+    //Simple Port declaration (only name), no range, no direction in module interface
+    virtual void moduleInterfaceSimplePortDeclaration(std::string&& name) {}
+    virtual void moduleContentFullPortDeclaration(Port&& port) {}
+    virtual void startModule(std::string&& name) {}
   private:
     void internalParse(std::istream& stream);
     VerilogScanner* scanner_  {nullptr};

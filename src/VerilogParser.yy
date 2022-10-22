@@ -60,10 +60,14 @@
 %token<std::string> CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK
 
 %type<std::string> identifier;
+%type<std::string> module_identifier;
 %type<std::string> number
 
 %type<naja::verilog::Port> port_declaration
 %type<naja::verilog::Port::Direction> port_type_io
+%type<naja::verilog::Net::Type> net_type;
+%type<naja::verilog::Range> range
+%type<naja::verilog::Range> range.opt
 
 %locations 
 %start source_text
@@ -80,34 +84,44 @@ identifier: IDENTIFIER_TK | ESCAPED_IDENTIFIER_TK
   { $$ = $1; }
 ;
 
-range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']'; 
+range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']'
+  {
+    $$.valid = true;
+    $$.msb = std::stoi($2);
+    $$.lsb = std::stoi($4);
+  }
+;
 
-range.opt: %empty | range;
+range.opt: %empty { $$.valid = false; } | range { $$ = $1; }
 
 port_declaration: port_type_io range.opt identifier
   {
-    constructor->createPort(std::move($3));
+    $$.direction = $1;
+    if ($2.valid) {
+      $$.range = std::move($2);
+    }
+    $$.name = std::move($3);
   }
 ;
 
 port_type_io
-  : INOUT_KW  { $$ = naja::verilog::Port::Direction::Inout; } 
+  : INOUT_KW  { $$ = naja::verilog::Port::Direction::InOut; } 
   | INPUT_KW  { $$ = naja::verilog::Port::Direction::Input; }
-  | OUTPUT_KW { $$ = naja::verilog::Port::Direction::Inout; }
+  | OUTPUT_KW { $$ = naja::verilog::Port::Direction::Output; }
   ;
 
-list_of_port_declarations: port_declaration
-| list_of_port_declarations ',' port_declaration
-; 
+//list_of_port_declarations: port_declaration
+//| list_of_port_declarations ',' port_declaration
+//; 
 
-list_of_port_declarations.opt: '(' ')' | %empty | '(' list_of_port_declarations ')';
+//list_of_port_declarations.opt: '(' ')' | %empty | '(' list_of_port_declarations ')';
 
 //optional_comma:
 //	',' | %empty;
 
-list_of_non_port_module_items.opt: %empty | list_of_non_port_module_items;
+//list_of_non_port_module_items.opt: %empty | list_of_non_port_module_items;
 
-list_of_non_port_module_items: non_port_module_item | list_of_non_port_module_items non_port_module_item 
+//list_of_non_port_module_items: non_port_module_item | list_of_non_port_module_items non_port_module_item 
 
 non_port_module_item : module_or_generate_item;
 
@@ -139,11 +153,18 @@ net_declaration:
 | net_type range list_of_net_identifiers ';'
 ;
 
-list_of_net_identifiers: net_identifier | list_of_net_identifiers ',' net_identifier;
+list_of_net_identifiers
+: net_identifier
+| list_of_net_identifiers ',' net_identifier
+;
 
 net_identifier: identifier;
 
-net_type: SUPPLY0_KW | SUPPLY1_KW | WIRE_KW;
+net_type
+: SUPPLY0_KW { $$ = naja::verilog::Net::Type::Supply0; }
+| SUPPLY1_KW { $$ = naja::verilog::Net::Type::Supply1; }
+| WIRE_KW    { $$ = naja::verilog::Net::Type::Wire; }
+;
 
 list_of_module_instances: module_instance | list_of_module_instances ',' module_instance;
 
@@ -167,8 +188,8 @@ list_of_expressions: expression | list_of_expressions ',' expression;
 
 concatenation: '{' list_of_expressions '}';
 
-primary:
-  number
+primary
+: number
 | hierarchical_identifier range_expression.opt
 | concatenation
 ;
@@ -203,8 +224,8 @@ mintypmax_expression.opt: %empty | mintypmax_expression;
 
 named_parameter_assignment: '.' parameter_identifier '(' mintypmax_expression.opt ')';
 
-list_of_named_parameter_assignments:
-  named_parameter_assignment
+list_of_named_parameter_assignments
+: named_parameter_assignment
 | list_of_named_parameter_assignments ',' named_parameter_assignment
 ;
 
@@ -215,17 +236,19 @@ parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 //(From A.4.1) 
 module_instantiation: module_identifier parameter_value_assignment list_of_module_instances ';'
 
-module_identifier: identifier
-{
-  constructor->createModule(std::move($1));
-}
-;
+module_identifier: identifier;
 
-port: identifier;
+port: identifier {
+  constructor->moduleInterfaceSimplePortDeclaration(std::move($1));
+}
 
 list_of_ports: port | list_of_ports ',' port;
 
-module_item: port_declaration ';' | non_port_module_item;
+module_item
+: port_declaration {
+    constructor->moduleContentFullPortDeclaration(std::move($1));
+  } ';'
+| non_port_module_item;
 
 list_of_module_items: module_item | list_of_module_items module_item;
 
@@ -233,9 +256,10 @@ list_of_module_items.opt: %empty | list_of_module_items;
 
 /* A.1.2 */
 module_declaration:
-  MODULE_KW module_identifier '(' list_of_ports ')' ';' list_of_module_items.opt ENDMODULE_KW
-| MODULE_KW module_identifier list_of_port_declarations.opt ';' list_of_non_port_module_items.opt ENDMODULE_KW
-  ;
+  MODULE_KW module_identifier {
+    constructor->startModule(std::move($2));
+  } '(' list_of_ports ')' ';' list_of_module_items.opt ENDMODULE_KW
+;
 
 %%
 

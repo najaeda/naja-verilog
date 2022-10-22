@@ -8,6 +8,7 @@ ADD_FLEX_BISON_DEPENDENCY(VerilogScanner VerilogParser)
 set(verilog_sources
   ${BISON_VerilogParser_OUTPUTS}
   ${FLEX_VerilogScanner_OUTPUTS}
+  VerilogTypes.cpp
   VerilogConstructor.cpp
 )
 

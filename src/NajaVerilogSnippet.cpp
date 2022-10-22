@@ -6,11 +6,14 @@ namespace {
 
 class VerilogConstructorExample: public naja::verilog::VerilogConstructor {
   public:
-    void createModule(const std::string& name) override {
+    void startModule(std::string&& name) override {
       std::cerr << "Construct Module: " << name << std::endl;
     }
-    void createPort(const std::string& name) override {
-      std::cerr << "Construct Port: " << name << std::endl;
+    void moduleInterfaceSimplePortDeclaration(std::string&& name) override {
+      std::cerr << "Simple Port: " << name << std::endl;
+    }
+    void moduleContentFullPortDeclaration(naja::verilog::Port&& port) override {
+      std::cerr << "Construct Port: " << port.getString() << std::endl;
     }
 };
 
