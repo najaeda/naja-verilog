@@ -7,7 +7,7 @@
 
 %define parse.error verbose
 
-%code requires{
+%code requires {
   #include "VerilogTypes.h"
   namespace naja { namespace verilog {
     class VerilogScanner;
@@ -32,6 +32,9 @@
   #include <iostream>
   #include <cstdlib>
   #include <fstream>
+  #include <sstream>
+
+  #include "VerilogException.h"
 
   /* include for all driver functions */ 
   #include "VerilogConstructor.h"
@@ -61,6 +64,8 @@
 
 %type<std::string> identifier;
 %type<std::string> module_identifier;
+%type<std::string> name_of_module_instance;
+%type<std::string> module_instance_identifier;
 %type<std::string> number
 
 %type<naja::verilog::Port> port_declaration
@@ -110,11 +115,9 @@ port_type_io
   | OUTPUT_KW { $$ = naja::verilog::Port::Direction::Output; }
   ;
 
-//list_of_port_declarations: port_declaration
-//| list_of_port_declarations ',' port_declaration
-//; 
-
-//list_of_port_declarations.opt: '(' ')' | %empty | '(' list_of_port_declarations ')';
+list_of_port_declarations: port_declaration
+| list_of_port_declarations ',' port_declaration
+; 
 
 //optional_comma:
 //	',' | %empty;
@@ -196,13 +199,15 @@ primary
 
 expression: primary;
 
+expression.opt: %empty | expression;
+
 ordered_port_connection: expression;
 
 list_of_ordered_port_connections: ordered_port_connection | list_of_ordered_port_connections ',' ordered_port_connection;
 
 port_identifier: identifier;
 
-named_port_connection: '.' port_identifier '(' expression ')' ;
+named_port_connection: '.' port_identifier '(' expression.opt ')' ;
 
 list_of_named_port_connections: named_port_connection | list_of_named_port_connections ',' named_port_connection;
 
@@ -214,7 +219,9 @@ module_instance_identifier: identifier;
 
 name_of_module_instance: module_instance_identifier;
 
-module_instance: name_of_module_instance '(' list_of_port_connections.opt ')';
+module_instance: name_of_module_instance {
+  constructor->addInstance(std::move($1));
+} '(' list_of_port_connections.opt ')';
 
 parameter_identifier: identifier;
 
@@ -234,19 +241,23 @@ list_of_parameter_assignments: /* list_of_ordered_parameter_assignment | */ list
 parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 
 //(From A.4.1) 
-module_instantiation: module_identifier parameter_value_assignment list_of_module_instances ';'
+module_instantiation: module_identifier {
+    constructor->startInstantiation(std::move($1));
+  } parameter_value_assignment list_of_module_instances ';' {
+    constructor->endInstantiation();
+  }
 
 module_identifier: identifier;
 
 port: identifier {
-  constructor->moduleInterfaceSimplePortDeclaration(std::move($1));
+  constructor->moduleInterfacePort(std::move($1));
 }
 
 list_of_ports: port | list_of_ports ',' port;
 
 module_item
 : port_declaration {
-    constructor->moduleContentFullPortDeclaration(std::move($1));
+    constructor->moduleImplementationPort(std::move($1));
   } ';'
 | non_port_module_item;
 
@@ -255,18 +266,31 @@ list_of_module_items: module_item | list_of_module_items module_item;
 list_of_module_items.opt: %empty | list_of_module_items; 
 
 /* A.1.2 */
+//module_declaration:
+//  MODULE_KW module_identifier {
+//    constructor->startModule(std::move($2));
+//  } '(' list_of_ports ')' ';' list_of_module_items.opt ENDMODULE_KW {
+//    constructor->endModule();
+//  }
+//| MODULE_KW module_identifier list_of_port_declarations.opt ';' ENDMODULE_KW
+//;
+
+module_args.opt: '(' ')' | %empty | '(' list_of_port_declarations ')';
+
 module_declaration:
   MODULE_KW module_identifier {
     constructor->startModule(std::move($2));
-  } '(' list_of_ports ')' ';' list_of_module_items.opt ENDMODULE_KW
-;
+  } module_args.opt ';' list_of_module_items.opt ENDMODULE_KW
+  {
+    constructor->endModule();
+  }
 
 %%
 
-
 void naja::verilog::VerilogParser::error(const location_type& l, const std::string& err_message ) {
-  std::cerr << "Parser error: " << err_message  << '\n'
+  std::ostringstream reason;
+  reason << "Parser error: " << err_message  << '\n'
             << "  begin at line " << l.begin.line <<  " col " << l.begin.column  << '\n' 
             << "  end   at line " << l.end.line <<  " col " << l.end.column << "\n";
-  std::abort();
+  throw VerilogException(reason.str());
 }

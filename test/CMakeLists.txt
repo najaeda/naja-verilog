@@ -2,6 +2,7 @@ include(GoogleTest)
 
 set(tests
   VerilogConstructorTest.cpp
+  NajaVerilogTest012.cpp
   NajaVerilogTest3.cpp
 )
 

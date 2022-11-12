@@ -17,10 +17,14 @@ class VerilogConstructor {
     using Paths = std::list<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
-    //Simple Port declaration (only name), no range, no direction in module interface
-    virtual void moduleInterfaceSimplePortDeclaration(std::string&& name) {}
-    virtual void moduleContentFullPortDeclaration(Port&& port) {}
     virtual void startModule(std::string&& name) {}
+    //Simple Port declaration (only name), no range, no direction in module interface
+    virtual void moduleInterfacePort(std::string&& name) {}
+    virtual void moduleImplementationPort(Port&& port) {}
+    virtual void endModule() {}
+    virtual void startInstantiation(std::string&& moduleName) {}
+    virtual void addInstance(std::string&& name) {}
+    virtual void endInstantiation() {}
   private:
     void internalParse(std::istream& stream);
     VerilogScanner* scanner_  {nullptr};
