@@ -19,7 +19,9 @@ class VerilogConstructor {
     void parse(const std::filesystem::path& path);
     virtual void startModule(std::string&& name) {}
     //Simple Port declaration (only name), no range, no direction in module interface
-    virtual void moduleInterfacePort(std::string&& name) {}
+    virtual void moduleInterfaceSimplePort(std::string&& name) {}
+    //Complete Port declaration in module interface
+    virtual void moduleInterfaceCompletePort(Port&& port) {}
     virtual void moduleImplementationPort(Port&& port) {}
     virtual void endModule() {}
     virtual void startInstantiation(std::string&& moduleName) {}

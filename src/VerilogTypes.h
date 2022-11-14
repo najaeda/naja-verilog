@@ -8,9 +8,9 @@
 namespace naja { namespace verilog {
 
 struct Range {
-  bool  valid { false };
-  int   msb;
-  int   lsb;
+  bool  valid_  {false};
+  int   msb_    {0};
+  int   lsb_    {0};
 };
 
 struct Port {
@@ -28,19 +28,28 @@ struct Port {
       operator const DirectionEnum&() const {return dirEnum_;}
       std::string getString() const;
       private:
-        DirectionEnum dirEnum_ { Unknown };
+        DirectionEnum dirEnum_  { Unknown };
   };  
-  std::string name;
-  Direction   direction;
-  Range       range;
+
+  Port() = default;
+  Port(const Port&) = default;
+  
+  Port(std::string&& name, Direction direction):
+    name_(name),
+    direction_(direction)
+  {}
+
+  std::string name_       {};
+  Direction   direction_  {};
+  Range       range_      {};
 
   std::string getString() const {
     std::ostringstream stream;
-    stream << "Port: " << name;
-    if (range.valid) {
-      stream << "[" << range.msb << ":" << range.lsb << "]";
+    stream << "Port: " << name_;
+    if (range_.valid_) {
+      stream << "[" << range_.msb_ << ":" << range_.lsb_ << "]";
     }
-    stream << " " << direction.getString();
+    stream << " " << direction_.getString();
     return stream.str();
   }
 };

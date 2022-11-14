@@ -20,6 +20,23 @@ TEST(NajaVerilogTest3, test0) {
       / std::filesystem::path("benchmarks")
       / std::filesystem::path("test3.v"));
   constructor.parse(test3Path);
+  EXPECT_EQ(2, constructor.modules_.size());
+  auto mod0 = constructor.modules_[0];
+  EXPECT_EQ("mod0", mod0.name_);
+  EXPECT_EQ(2, mod0.ports_.size());
+  EXPECT_EQ("i0", mod0.ports_[0].name_);
+  EXPECT_EQ("o0", mod0.ports_[1].name_);
+  EXPECT_EQ(naja::verilog::Port::Direction::Input, mod0.ports_[0].direction_);
+  EXPECT_EQ(naja::verilog::Port::Direction::Output, mod0.ports_[1].direction_);
+  auto test = constructor.modules_[1];
+  EXPECT_EQ("test", constructor.modules_[1].name_);
+  EXPECT_EQ(3, test.ports_.size());
+  EXPECT_EQ("i", test.ports_[0].name_);
+  EXPECT_EQ("o", test.ports_[1].name_);
+  EXPECT_EQ("io", test.ports_[2].name_);
+  EXPECT_EQ(naja::verilog::Port::Direction::Input, test.ports_[0].direction_);
+  EXPECT_EQ(naja::verilog::Port::Direction::Output, test.ports_[1].direction_);
+  EXPECT_EQ(naja::verilog::Port::Direction::InOut, test.ports_[2].direction_);
 }
 
 #if 0

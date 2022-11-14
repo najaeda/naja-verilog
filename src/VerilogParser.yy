@@ -91,21 +91,22 @@ identifier: IDENTIFIER_TK | ESCAPED_IDENTIFIER_TK
 
 range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']'
   {
-    $$.valid = true;
-    $$.msb = std::stoi($2);
-    $$.lsb = std::stoi($4);
+    $$.valid_ = true;
+    $$.msb_ = std::stoi($2);
+    $$.lsb_ = std::stoi($4);
   }
 ;
 
-range.opt: %empty { $$.valid = false; } | range { $$ = $1; }
+range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
 
 port_declaration: port_type_io range.opt identifier
   {
-    $$.direction = $1;
-    if ($2.valid) {
-      $$.range = std::move($2);
-    }
-    $$.name = std::move($3);
+    //$$.direction = $1;
+    //if ($2.valid) {
+    //  $$.range = std::move($2);
+    //}
+    //$$.name = std::move($3);
+    constructor->moduleInterfaceCompletePort(Port(std::move($3), $1));
   }
 ;
 
@@ -221,7 +222,8 @@ name_of_module_instance: module_instance_identifier;
 
 module_instance: name_of_module_instance {
   constructor->addInstance(std::move($1));
-} '(' list_of_port_connections.opt ')';
+} '(' list_of_port_connections.opt ')'
+;
 
 parameter_identifier: identifier;
 
@@ -242,10 +244,10 @@ parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 
 //(From A.4.1) 
 module_instantiation: module_identifier {
-    constructor->startInstantiation(std::move($1));
-  } parameter_value_assignment list_of_module_instances ';' {
-    constructor->endInstantiation();
-  }
+  constructor->startInstantiation(std::move($1));
+} parameter_value_assignment list_of_module_instances ';' {
+  constructor->endInstantiation();
+}
 
 module_identifier: identifier;
 
@@ -257,7 +259,7 @@ list_of_ports: port | list_of_ports ',' port;
 
 module_item
 : port_declaration {
-    constructor->moduleImplementationPort(std::move($1));
+    //constructor->moduleImplementationPort(std::move($1));
   } ';'
 | non_port_module_item;
 
