@@ -13,7 +13,7 @@ void VerilogConstructorTest::moduleInterfaceSimplePort(std::string&& name) {
 
 void VerilogConstructorTest::moduleInterfaceCompletePort(naja::verilog::Port&& port) {
   std::cerr << "Interface Complete Port: " << port.getString() << std::endl;
-  modules_.back().ports_.push_back(port);
+  modules_.back().ports_.push_back(std::move(port));
 }
 
 void VerilogConstructorTest::moduleImplementationPort(naja::verilog::Port&& port) {
@@ -22,5 +22,10 @@ void VerilogConstructorTest::moduleImplementationPort(naja::verilog::Port&& port
 
 void VerilogConstructorTest::addNet(naja::verilog::Net&& net) {
   std::cerr << "Add net: " << net.getString() << std::endl;
-  modules_.back().nets_.push_back(net);
+  modules_.back().nets_.push_back(std::move(net));
+}
+
+void VerilogConstructorTest::addInstance(naja::verilog::Instance&& instance) {
+  std::cerr << "Add instance: " << instance.getString() << std::endl;
+  modules_.back().instances_.push_back(std::move(instance));
 }

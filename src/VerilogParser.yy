@@ -8,11 +8,28 @@
 %define parse.error verbose
 
 %code requires {
+
   #include "VerilogTypes.h"
   namespace naja { namespace verilog {
     class VerilogScanner;
     class VerilogConstructor;
   }}
+
+  namespace {
+  
+    struct NetIdentifier {
+      NetIdentifier() = default;
+      NetIdentifier(const NetIdentifier&) = default;
+      NetIdentifier(std::string&& name): name_(name) {}
+      NetIdentifier(std::string&& name, naja::verilog::Range&& range):
+        name_(name), range_(range) {}
+      std::string           name_   {};
+      naja::verilog::Range  range_  {};
+    };
+  
+    using NetIdentifiers = std::vector<NetIdentifier>;
+    using Instances = std::vector<std::string>;
+  }
 
 // The following definitions is missing when %locations isn't used
 # ifndef YY_NULLPTR
@@ -29,19 +46,22 @@
 %parse-param { VerilogConstructor* constructor }
 
 %code{
-  #include <iostream>
-  #include <cstdlib>
-  #include <fstream>
-  #include <sstream>
 
-  #include "VerilogException.h"
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <sstream>
 
-  /* include for all driver functions */ 
-  #include "VerilogConstructor.h"
-  #include "VerilogScanner.h"
+#include "VerilogException.h"
+
+/* include for all driver functions */ 
+#include "VerilogConstructor.h"
+#include "VerilogScanner.h"
+
 
 #undef yylex
 #define yylex scanner.yylex
+
 }
 
 %define api.value.type variant
@@ -73,8 +93,10 @@
 %type<naja::verilog::Net::Type> net_type;
 %type<naja::verilog::Range> range
 %type<naja::verilog::Range> range.opt
-%type<naja::verilog::NetIdentifier> net_identifier;
+%type<NetIdentifier> net_identifier;
 %type<NetIdentifiers> list_of_net_identifiers;
+%type<std::string> module_instance;
+%type<Instances> list_of_module_instances;
 
 %locations 
 %start source_text
@@ -166,7 +188,6 @@ list_of_net_identifiers
   $1.push_back($3);
   $$ = $1;
 }
-;
 
 net_identifier: identifier range.opt {
   if ($2.valid_) {
@@ -182,7 +203,13 @@ net_type
 | WIRE_KW    { $$ = naja::verilog::Net::Type::Wire; }
 ;
 
-list_of_module_instances: module_instance | list_of_module_instances ',' module_instance;
+list_of_module_instances: module_instance {
+  $$ = { $1 };
+}
+| list_of_module_instances ',' module_instance {
+  $1.push_back($3);
+  $$ = $1;
+}
 
 number:
   CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK;
@@ -228,14 +255,11 @@ list_of_port_connections: list_of_ordered_port_connections | list_of_named_port_
 
 list_of_port_connections.opt: %empty | list_of_port_connections;
 
-module_instance_identifier: identifier;
+name_of_module_instance: identifier;
 
-name_of_module_instance: module_instance_identifier;
-
-module_instance: name_of_module_instance {
-  constructor->addInstance(std::move($1));
-} '(' list_of_port_connections.opt ')'
-;
+module_instance: name_of_module_instance '(' list_of_port_connections.opt ')' {
+  $$ = $1; 
+}
 
 parameter_identifier: identifier;
 
@@ -255,10 +279,10 @@ list_of_parameter_assignments: /* list_of_ordered_parameter_assignment | */ list
 parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 
 //(From A.4.1) 
-module_instantiation: module_identifier {
-  constructor->startInstantiation(std::move($1));
-} parameter_value_assignment list_of_module_instances ';' {
-  constructor->endInstantiation();
+module_instantiation: module_identifier parameter_value_assignment list_of_module_instances ';' {
+  for (auto instance: $3) {
+    constructor->addInstance(Instance($1, instance));
+  }
 }
 
 module_identifier: identifier;

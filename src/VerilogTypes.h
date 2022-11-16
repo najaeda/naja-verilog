@@ -62,17 +62,6 @@ struct Port {
   }
 };
 
-struct NetIdentifier {
-  NetIdentifier() = default;
-  NetIdentifier(const NetIdentifier&) = default;
-  NetIdentifier(std::string&& name): name_(name) {}
-  NetIdentifier(std::string&& name, Range&& range): name_(name), range_(range) {}
-  std::string name_   {};
-  Range       range_  {};
-};
-
-using NetIdentifiers = std::vector<NetIdentifier>;
-
 struct Net {
   class Type {
     public:
@@ -111,6 +100,24 @@ struct Net {
       stream << "[" << range_.msb_ << ":" << range_.lsb_ << "]";
     }
     stream << " " << type_.getString();
+    return stream.str();
+  } 
+};
+
+struct Instance {
+  Instance() = default;
+  Instance(const Instance&) = default;
+
+  Instance(const std::string& model, const std::string& name):
+    model_(model), name_(name)
+  {}
+  
+  std::string model_  {};
+  std::string name_   {};
+
+  std::string getString() const {
+    std::ostringstream stream;
+    stream << "Instance: (" << model_ << ") " << name_;
     return stream.str();
   } 
 };

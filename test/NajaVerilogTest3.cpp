@@ -38,6 +38,7 @@ TEST(NajaVerilogTest3, test0) {
   EXPECT_EQ(naja::verilog::Port::Direction::Input, test.ports_[0].direction_);
   EXPECT_EQ(naja::verilog::Port::Direction::Output, test.ports_[1].direction_);
   EXPECT_EQ(naja::verilog::Port::Direction::InOut, test.ports_[2].direction_);
+
   EXPECT_EQ(7, test.nets_.size());
   EXPECT_EQ("net0", test.nets_[0].name_);
   EXPECT_EQ("net1", test.nets_[1].name_);
@@ -62,4 +63,8 @@ TEST(NajaVerilogTest3, test0) {
   EXPECT_FALSE(test.nets_[6].range_.valid_);
   EXPECT_EQ(31, test.nets_[4].range_.msb_);
   EXPECT_EQ(0, test.nets_[4].range_.lsb_);
+
+  EXPECT_EQ(1, test.instances_.size());
+  EXPECT_EQ("mod0", test.instances_[0].model_);
+  EXPECT_EQ("inst0", test.instances_[0].name_);
 }

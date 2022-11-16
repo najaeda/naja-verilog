@@ -10,12 +10,15 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void moduleImplementationPort(naja::verilog::Port&& port) override;
     void moduleInterfaceCompletePort(naja::verilog::Port&& port) override;
     void addNet(naja::verilog::Net&& net) override;
+    void addInstance(naja::verilog::Instance&& instance) override;
     struct Module {
       using Ports = std::vector<naja::verilog::Port>;
       using Nets = std::vector<naja::verilog::Net>;
-      std::string name_   {};
-      Ports       ports_  {};
-      Nets        nets_   {};
+      using Instances = std::vector<naja::verilog::Instance>;
+      std::string name_       {};
+      Ports       ports_      {};
+      Nets        nets_       {};
+      Instances   instances_  {};
 
       Module(const std::string& name):
         name_(name)
