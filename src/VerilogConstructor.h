@@ -23,10 +23,11 @@ class VerilogConstructor {
     //Complete Port declaration in module interface
     virtual void moduleInterfaceCompletePort(Port&& port) {}
     virtual void moduleImplementationPort(Port&& port) {}
-    virtual void endModule() {}
+    virtual void addNet(Net&& net) {}
     virtual void startInstantiation(std::string&& moduleName) {}
     virtual void addInstance(std::string&& name) {}
     virtual void endInstantiation() {}
+    virtual void endModule() {}
   private:
     void internalParse(std::istream& stream);
     VerilogScanner* scanner_  {nullptr};

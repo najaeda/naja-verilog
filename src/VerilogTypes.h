@@ -8,6 +8,8 @@
 namespace naja { namespace verilog {
 
 struct Range {
+  Range() = default;
+  Range(const Range&) = default;
   bool  valid_  {false};
   int   msb_    {0};
   int   lsb_    {0};
@@ -35,8 +37,14 @@ struct Port {
   Port(const Port&) = default;
   
   Port(std::string&& name, Direction direction):
-    name_(name),
+    name_(std::move(name)),
     direction_(direction)
+  {}
+
+  Port(std::string&& name, Direction direction, Range&& range):
+    name_(std::move(name)),
+    direction_(direction),
+    range_(std::move(range))
   {}
 
   std::string name_       {};
@@ -53,6 +61,17 @@ struct Port {
     return stream.str();
   }
 };
+
+struct NetIdentifier {
+  NetIdentifier() = default;
+  NetIdentifier(const NetIdentifier&) = default;
+  NetIdentifier(std::string&& name): name_(name) {}
+  NetIdentifier(std::string&& name, Range&& range): name_(name), range_(range) {}
+  std::string name_   {};
+  Range       range_  {};
+};
+
+using NetIdentifiers = std::vector<NetIdentifier>;
 
 struct Net {
   class Type {
@@ -71,6 +90,29 @@ struct Net {
       private:
         TypeEnum typeEnum_ { Unknown };
   };
+
+  Net() = default;
+  Net(const Net&) = default;
+  
+  Net(const std::string& name, const Range& range, Type type):
+    name_(name),
+    range_(range),
+    type_(type)
+  {}
+
+  std::string name_   {};
+  Range       range_  {};
+  Type        type_   {};
+
+  std::string getString() const {
+    std::ostringstream stream;
+    stream << "Net: " << name_;
+    if (range_.valid_) {
+      stream << "[" << range_.msb_ << ":" << range_.lsb_ << "]";
+    }
+    stream << " " << type_.getString();
+    return stream.str();
+  } 
 };
  
 }} // namespace verilog // namespace naja

@@ -19,3 +19,8 @@ void VerilogConstructorTest::moduleInterfaceCompletePort(naja::verilog::Port&& p
 void VerilogConstructorTest::moduleImplementationPort(naja::verilog::Port&& port) {
   std::cerr << "Implementation Complete Port: " << port.getString() << std::endl;
 }
+
+void VerilogConstructorTest::addNet(naja::verilog::Net&& net) {
+  std::cerr << "Add net: " << net.getString() << std::endl;
+  modules_.back().nets_.push_back(net);
+}

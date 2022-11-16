@@ -73,6 +73,8 @@
 %type<naja::verilog::Net::Type> net_type;
 %type<naja::verilog::Range> range
 %type<naja::verilog::Range> range.opt
+%type<naja::verilog::NetIdentifier> net_identifier;
+%type<NetIdentifiers> list_of_net_identifiers;
 
 %locations 
 %start source_text
@@ -89,26 +91,24 @@ identifier: IDENTIFIER_TK | ESCAPED_IDENTIFIER_TK
   { $$ = $1; }
 ;
 
-range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']'
-  {
-    $$.valid_ = true;
-    $$.msb_ = std::stoi($2);
-    $$.lsb_ = std::stoi($4);
-  }
+range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']' {
+  $$.valid_ = true;
+  $$.msb_ = std::stoi($2);
+  $$.lsb_ = std::stoi($4);
+}
 ;
 
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
 
-port_declaration: port_type_io range.opt identifier
-  {
-    //$$.direction = $1;
-    //if ($2.valid) {
-    //  $$.range = std::move($2);
-    //}
-    //$$.name = std::move($3);
+port_declaration: port_type_io range.opt identifier {
+  if ($2.valid_) {
+    constructor->moduleInterfaceCompletePort(
+      Port(std::move($3), $1, std::move($2))
+    );
+  } else {
     constructor->moduleInterfaceCompletePort(Port(std::move($3), $1));
   }
-;
+}
 
 port_type_io
   : INOUT_KW  { $$ = naja::verilog::Port::Direction::InOut; } 
@@ -152,17 +152,29 @@ module_or_generate_item:
 
 module_or_generate_item_declaration: net_declaration;
 
-net_declaration:
-  net_type list_of_net_identifiers ';'
-| net_type range list_of_net_identifiers ';'
-;
+net_declaration: net_type list_of_net_identifiers ';' {
+  for (auto netIdentifier: $2) {
+    constructor->addNet(Net(netIdentifier.name_, netIdentifier.range_, $1));
+  }
+}
 
 list_of_net_identifiers
-: net_identifier
-| list_of_net_identifiers ',' net_identifier
+: net_identifier {
+  $$ = { $1 };
+}
+| list_of_net_identifiers ',' net_identifier {
+  $1.push_back($3);
+  $$ = $1;
+}
 ;
 
-net_identifier: identifier;
+net_identifier: identifier range.opt {
+  if ($2.valid_) {
+    $$ = NetIdentifier(std::move($1), std::move($2));
+  } else {
+    $$ = NetIdentifier(std::move($1));
+  }
+}
 
 net_type
 : SUPPLY0_KW { $$ = naja::verilog::Net::Type::Supply0; }
