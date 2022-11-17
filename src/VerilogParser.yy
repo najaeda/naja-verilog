@@ -97,6 +97,7 @@
 %type<NetIdentifiers> list_of_net_identifiers;
 %type<std::string> module_instance;
 %type<Instances> list_of_module_instances;
+%type<std::string> port_identifier;
 
 %locations 
 %start source_text
@@ -190,10 +191,12 @@ list_of_net_identifiers
 }
 
 net_identifier: identifier range.opt {
-  if ($2.valid_) {
-    $$ = NetIdentifier(std::move($1), std::move($2));
-  } else {
-    $$ = NetIdentifier(std::move($1));
+  if (not constructor->inFirstPass()) {
+    if ($2.valid_) {
+      $$ = NetIdentifier(std::move($1), std::move($2));
+    } else {
+      $$ = NetIdentifier(std::move($1));
+    }
   }
 }
 
@@ -203,13 +206,8 @@ net_type
 | WIRE_KW    { $$ = naja::verilog::Net::Type::Wire; }
 ;
 
-list_of_module_instances: module_instance {
-  $$ = { $1 };
-}
-| list_of_module_instances ',' module_instance {
-  $1.push_back($3);
-  $$ = $1;
-}
+list_of_module_instances: module_instance
+| list_of_module_instances ',' module_instance;
 
 number:
   CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK;
@@ -247,7 +245,9 @@ list_of_ordered_port_connections: ordered_port_connection | list_of_ordered_port
 
 port_identifier: identifier;
 
-named_port_connection: '.' port_identifier '(' expression.opt ')' ;
+named_port_connection: '.' port_identifier '(' expression.opt ')' {
+  constructor->addInstanceConnection(std::move($2));
+}
 
 list_of_named_port_connections: named_port_connection | list_of_named_port_connections ',' named_port_connection;
 
@@ -258,7 +258,7 @@ list_of_port_connections.opt: %empty | list_of_port_connections;
 name_of_module_instance: identifier;
 
 module_instance: name_of_module_instance '(' list_of_port_connections.opt ')' {
-  $$ = $1; 
+  constructor->addInstance(std::move($1));
 }
 
 parameter_identifier: identifier;
@@ -279,9 +279,13 @@ list_of_parameter_assignments: /* list_of_ordered_parameter_assignment | */ list
 parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 
 //(From A.4.1) 
-module_instantiation: module_identifier parameter_value_assignment list_of_module_instances ';' {
-  for (auto instance: $3) {
-    constructor->addInstance(Instance($1, instance));
+module_instantiation: module_identifier {
+  if (not constructor->inFirstPass()) {
+    constructor->startInstantiation(std::move($1));
+  }
+} parameter_value_assignment list_of_module_instances ';' {
+  if (not constructor->inFirstPass()) {
+    constructor->endInstantiation();
   }
 }
 

@@ -25,7 +25,15 @@ void VerilogConstructorTest::addNet(naja::verilog::Net&& net) {
   modules_.back().nets_.push_back(std::move(net));
 }
 
-void VerilogConstructorTest::addInstance(naja::verilog::Instance&& instance) {
-  std::cerr << "Add instance: " << instance.getString() << std::endl;
-  modules_.back().instances_.push_back(std::move(instance));
+void VerilogConstructorTest::startInstantiation(std::string&& modelName) {
+  currentModelName_ = modelName;
+}
+
+void VerilogConstructorTest::endInstantiation() {
+  currentModelName_ = std::string();
+}
+
+void VerilogConstructorTest::addInstance(std::string&& instanceName) {
+  std::cerr << "Add instance: " << instanceName << std::endl;
+  modules_.back().instances_.push_back(Instance(currentModelName_, instanceName));
 }

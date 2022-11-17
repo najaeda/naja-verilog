@@ -104,23 +104,7 @@ struct Net {
   } 
 };
 
-struct Instance {
-  Instance() = default;
-  Instance(const Instance&) = default;
 
-  Instance(const std::string& model, const std::string& name):
-    model_(model), name_(name)
-  {}
-  
-  std::string model_  {};
-  std::string name_   {};
-
-  std::string getString() const {
-    std::ostringstream stream;
-    stream << "Instance: (" << model_ << ") " << name_;
-    return stream.str();
-  } 
-};
  
 }} // namespace verilog // namespace naja
 
