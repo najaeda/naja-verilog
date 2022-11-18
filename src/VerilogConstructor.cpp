@@ -22,6 +22,34 @@ std::string VerilogConstructor::Mode::getString() const {
 }
 //LCOV_EXCL_STOP
 
+void VerilogConstructor::parseFirstPass(const std::filesystem::path& path) {
+  if (not std::filesystem::exists(path)) {
+    std::string reason(path.string() + " does not exist");
+    throw VerilogException(reason);
+  }
+  std::ifstream inFile(path);
+  if (not inFile.good()) {
+    std::string reason(path.string() + " is not a readable file");
+    throw VerilogException(reason);
+  }
+  mode_ = Mode::FirstPass;
+  internalParse(inFile);
+}
+
+void VerilogConstructor::parseSecondPass(const std::filesystem::path& path) {
+  if (not std::filesystem::exists(path)) {
+    std::string reason(path.string() + " does not exist");
+    throw VerilogException(reason);
+  }
+  std::ifstream inFile(path);
+  if (not inFile.good()) {
+    std::string reason(path.string() + " is not a readable file");
+    throw VerilogException(reason);
+  }
+  mode_ = Mode::SecondPass;
+  internalParse(inFile);
+}
+
 void VerilogConstructor::parse(const std::filesystem::path& path) {
   if (not std::filesystem::exists(path)) {
     std::string reason(path.string() + " does not exist");
@@ -32,14 +60,13 @@ void VerilogConstructor::parse(const std::filesystem::path& path) {
     std::string reason(path.string() + " is not a readable file");
     throw VerilogException(reason);
   }
-  if (twoPass_) {
-    mode_ = Mode::FirstPass;
-    internalParse(inFile);
-    mode_ = Mode::SecondPass;
-    internalParse(inFile);
-  } else {
-    mode_ = Mode::FullPass;
-    internalParse(inFile);
+  mode_ = Mode::FullPass;
+  internalParse(inFile);
+}
+
+void VerilogConstructor::parseFirstPass(const VerilogConstructor::Paths& paths) {
+  for (auto path: paths) {
+    parseFirstPass(path);
   }
 }
 
@@ -51,6 +78,10 @@ void VerilogConstructor::parse(const VerilogConstructor::Paths& paths) {
 
 bool VerilogConstructor::inFirstPass() const {
   return mode_ == Mode::FirstPass;
+}
+
+bool VerilogConstructor::inFullPass() const {
+  return mode_ == Mode::FullPass;
 }
 
 void VerilogConstructor::internalParse(std::istream &stream) {

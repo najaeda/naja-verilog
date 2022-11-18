@@ -15,9 +15,14 @@ class VerilogParser;
 class VerilogConstructor {
   public:
     using Paths = std::list<std::filesystem::path>;
+    void parseFirstPass(const Paths& paths);
+    void parseSecondPass(const Paths& paths);
     void parse(const Paths& paths);
+    void parseFirstPass(const std::filesystem::path& path);
+    void parseSecondPass(const std::filesystem::path& path);
     void parse(const std::filesystem::path& path);
     bool inFirstPass() const;
+    bool inFullPass() const;
     virtual void startModule(std::string&& name) {}
     //Simple Port declaration (only name), no range, no direction in module interface
     virtual void moduleInterfaceSimplePort(std::string&& name) {}
