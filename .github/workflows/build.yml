@@ -24,7 +24,7 @@ jobs:
         submodules: true
     # install dependencies
     - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -yq ninja-build #clang
+      run: sudo apt-get update && sudo apt-get install -yq flex ninja-build #clang
       #run: sudo apt-get update #&& sudo apt-get install -yq libboost-dev capnproto libcapnp-dev ninja-build clang
       
     - name: Configure CMake
