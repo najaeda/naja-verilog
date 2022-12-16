@@ -21,7 +21,8 @@ TEST(NajaVerilogTest012, test0) {
       / std::filesystem::path("test0.v"));
   constructor.parse(test0Path);
   EXPECT_EQ(1, constructor.modules_.size());
-  EXPECT_EQ("test", constructor.modules_[0].name_);
+  auto module = constructor.modules_.begin()->second;
+  EXPECT_EQ("test", module->name_);
 }
 
 TEST(NajaVerilogTest012, test1) {
@@ -32,7 +33,8 @@ TEST(NajaVerilogTest012, test1) {
       / std::filesystem::path("test1.v"));
   constructor.parse(test1Path);
   EXPECT_EQ(1, constructor.modules_.size());
-  EXPECT_EQ("test", constructor.modules_[0].name_);
+  auto module = constructor.modules_.begin()->second;
+  EXPECT_EQ("test", module->name_);
 }
 
 TEST(NajaVerilogTest012, test2) {
@@ -43,5 +45,6 @@ TEST(NajaVerilogTest012, test2) {
       / std::filesystem::path("test2.v"));
   constructor.parse(test1Path);
   EXPECT_EQ(1, constructor.modules_.size());
-  EXPECT_EQ("test", constructor.modules_[0].name_);
+  auto module = constructor.modules_.begin()->second;
+  EXPECT_EQ("test", module->name_);
 }

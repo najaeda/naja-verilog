@@ -11,6 +11,13 @@
             "program": "${workspaceFolder}/build/src/naja_verilog_test",
             "args": ["${workspaceFolder}/test/benchmarks/module0.v"],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "unit_tests",
+            "program": "${workspaceFolder}/build/test/naja_verilog_tests",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

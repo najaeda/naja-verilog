@@ -31,14 +31,8 @@ class VerilogParser;
 class VerilogConstructor {
   public:
     using Paths = std::list<std::filesystem::path>;
-    void parseFirstPass(const Paths& paths);
-    void parseSecondPass(const Paths& paths);
     void parse(const Paths& paths);
-    void parseFirstPass(const std::filesystem::path& path);
-    void parseSecondPass(const std::filesystem::path& path);
     void parse(const std::filesystem::path& path);
-    bool inFirstPass() const;
-    bool inFullPass() const;
     virtual void startModule(std::string&& name) {}
     //Simple Port declaration (only name), no range, no direction in module interface
     virtual void moduleInterfaceSimplePort(std::string&& name) {}
@@ -53,25 +47,7 @@ class VerilogConstructor {
     virtual void endInstantiation() {}
     virtual void endModule() {}
   private:
-    class Mode {
-      public:
-        enum ModeEnum {
-          FirstPass, SecondPass, FullPass
-        };
-        Mode() = default;
-        Mode(const ModeEnum& modeEnum);
-        Mode(const Mode&) = default;
-        Mode(Mode&&) = default;
-        Mode& operator=(const Mode&) = default;
-
-        operator const ModeEnum&() const {return modeEnum_;}
-        std::string getString() const;
-        private:
-          ModeEnum modeEnum_ { FullPass };
-    };
     void internalParse(std::istream& stream);
-    bool            twoPass_  {false};
-    Mode            mode_     {Mode::FullPass};
     VerilogScanner* scanner_  {nullptr};
     VerilogParser*  parser_   {nullptr};
 };

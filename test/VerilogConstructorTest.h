@@ -3,8 +3,13 @@
 
 #include "VerilogConstructor.h"
 
+#include <map>
+
 class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
   public:
+    ~VerilogConstructorTest();
+    bool inFirstPass() const { return firstPass_; }
+    void setFirstPass(bool mode) { firstPass_ = mode; }
     void startModule(std::string&& name) override;
     void moduleInterfaceSimplePort(std::string&& name) override;
     void moduleImplementationPort(naja::verilog::Port&& port) override;
@@ -44,8 +49,13 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
         name_(name)
       {}
     };
-    using Modules = std::vector<Module>;
+    
+    using Modules = std::map<std::string, Module*>;
+    void addModule(Module* module);
+    
+    bool        firstPass_        {true};
     Modules     modules_          {};
+    Module*     currentModule_    {nullptr};
     std::string currentModelName_ {};
 };
 

@@ -140,14 +140,12 @@ range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']' {
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
 
 port_declaration: port_type_io range.opt identifier {
-  if (constructor->inFirstPass() or constructor->inFullPass()) {
-    if ($2.valid_) {
-      constructor->moduleInterfaceCompletePort(
-        Port(std::move($3), $1, std::move($2))
-      );
-    } else {
-      constructor->moduleInterfaceCompletePort(Port(std::move($3), $1));
-    }
+  if ($2.valid_) {
+    constructor->moduleInterfaceCompletePort(
+      Port(std::move($3), $1, std::move($2))
+    );
+  } else {
+    constructor->moduleInterfaceCompletePort(Port(std::move($3), $1));
   }
 }
 
@@ -194,33 +192,25 @@ module_or_generate_item:
 module_or_generate_item_declaration: net_declaration;
 
 net_declaration: net_type list_of_net_identifiers ';' {
-  if (not constructor->inFirstPass()) {
-    for (auto netIdentifier: $2) {
-      constructor->addNet(Net(netIdentifier.name_, netIdentifier.range_, $1));
-    }
+  for (auto netIdentifier: $2) {
+    constructor->addNet(Net(netIdentifier.name_, netIdentifier.range_, $1));
   }
 }
 
 list_of_net_identifiers
 : net_identifier {
-  if (not constructor->inFirstPass()) {
-    $$ = { $1 };
-  }
+  $$ = { $1 };
 }
 | list_of_net_identifiers ',' net_identifier {
-  if (not constructor->inFirstPass()) {
-    $1.push_back($3);
-    $$ = $1;
-  }
+  $1.push_back($3);
+  $$ = $1;
 }
 
 net_identifier: identifier range.opt {
-  if (not constructor->inFirstPass()) {
-    if ($2.valid_) {
-      $$ = NetIdentifier(std::move($1), std::move($2));
-    } else {
-      $$ = NetIdentifier(std::move($1));
-    }
+  if ($2.valid_) {
+    $$ = NetIdentifier(std::move($1), std::move($2));
+  } else {
+    $$ = NetIdentifier(std::move($1));
   }
 }
 
@@ -270,9 +260,7 @@ list_of_ordered_port_connections: ordered_port_connection | list_of_ordered_port
 port_identifier: identifier;
 
 named_port_connection: '.' port_identifier '(' expression.opt ')' {
-  if (not constructor->inFirstPass()) {
-    constructor->addInstanceConnection(std::move($2));
-  }
+  constructor->addInstanceConnection(std::move($2));
 }
 
 list_of_named_port_connections: named_port_connection | list_of_named_port_connections ',' named_port_connection;
@@ -284,9 +272,7 @@ list_of_port_connections.opt: %empty | list_of_port_connections;
 name_of_module_instance: identifier;
 
 module_instance: name_of_module_instance '(' list_of_port_connections.opt ')' {
-  if (not constructor->inFirstPass()) {
-    constructor->addInstance(std::move($1));
-  }
+  constructor->addInstance(std::move($1));
 }
 
 parameter_identifier: identifier;
@@ -308,13 +294,9 @@ parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 
 //(From A.4.1) 
 module_instantiation: module_identifier {
-  if (not constructor->inFirstPass()) {
-    constructor->startInstantiation(std::move($1));
-  }
+  constructor->startInstantiation(std::move($1));
 } parameter_value_assignment list_of_module_instances ';' {
-  if (not constructor->inFirstPass()) {
-    constructor->endInstantiation();
-  }
+  constructor->endInstantiation();
 }
 
 module_identifier: identifier;
