@@ -23,6 +23,11 @@
 
 namespace naja { namespace verilog {
 
+VerilogConstructor::~VerilogConstructor() {
+  delete scanner_;
+  delete parser_;
+}
+
 void VerilogConstructor::parse(const std::filesystem::path& path) {
   if (not std::filesystem::exists(path)) {
     std::string reason(path.string() + " does not exist");

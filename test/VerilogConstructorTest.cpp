@@ -1,5 +1,6 @@
 #include "VerilogConstructorTest.h"
-
+ 
+#include <cassert>
 #include <iostream>
 
 VerilogConstructorTest::~VerilogConstructorTest() {
