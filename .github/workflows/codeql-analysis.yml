@@ -44,8 +44,8 @@ jobs:
         submodules: true
 
     # install dependencies
-    #- name: Install boost & capnproto
-    #  run: sudo apt-get update && sudo apt-get install -yq libboost-dev capnproto libcapnp-dev
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -yq libfl-dev 
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
