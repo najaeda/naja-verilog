@@ -16,6 +16,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void moduleInterfaceCompletePort(naja::verilog::Port&& port) override;
     void startInstantiation(std::string&& modelName) override;
     void addInstance(std::string&& name) override;
+    void addInstanceConnection(std::string&& portName) override;
     void endInstantiation() override;
     void addNet(naja::verilog::Net&& net) override;
 
@@ -49,7 +50,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
         name_(name)
       {}
     };
-    
+
     using Modules = std::map<std::string, Module*>;
     void addModule(Module* module);
     

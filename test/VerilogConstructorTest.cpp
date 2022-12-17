@@ -70,3 +70,9 @@ void VerilogConstructorTest::addInstance(std::string&& instanceName) {
     currentModule_->instances_.push_back(Instance(currentModelName_, instanceName));
   }
 }
+
+void VerilogConstructorTest::addInstanceConnection(std::string&& portName) {
+  if (not inFirstPass()) {
+    std::cerr << "Add instance connection: " << portName << std::endl;
+  }
+}

@@ -5,6 +5,11 @@
 ## Introduction
 This project is Under Construction.
 
+### Acknowledgement
+[<img src="https://nlnet.nl/logo/banner.png" width=100>](https://nlnet.nl/project/Naja)
+[<img src="https://nlnet.nl/image/logos/NGI0Entrust_tag.svg" width=100>](https://nlnet.nl/project/Naja)
+
+This project is supported and funded by NLNet through the [NGI0 Entrust](https://nlnet.nl/entrust) Fund.
 ## Compilation
 ### Getting sources
 ```bash
