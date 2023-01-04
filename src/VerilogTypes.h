@@ -51,7 +51,6 @@ struct Port {
 
   Port() = default;
   Port(const Port&) = default;
-  
   Port(std::string&& name, Direction direction):
     name_(std::move(name)),
     direction_(direction)
@@ -62,6 +61,8 @@ struct Port {
     direction_(direction),
     range_(std::move(range))
   {}
+
+  bool isBus() const { return range_.valid_; }
 
   std::string name_       {};
   Direction   direction_  {};
@@ -104,6 +105,8 @@ struct Net {
     range_(range),
     type_(type)
   {}
+
+  bool isBus() const { return range_.valid_; }
 
   std::string name_   {};
   Range       range_  {};

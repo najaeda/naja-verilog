@@ -13,7 +13,7 @@ set(verilog_sources
 )
 
 add_library(naja_verilog STATIC ${verilog_sources})
-target_link_libraries(naja_verilog PUBLIC coverage_config sanitizers_config)
+target_link_libraries(naja_verilog PUBLIC naja_verilog_coverage_config naja_verilog_sanitizers_config)
 target_include_directories(naja_verilog
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
