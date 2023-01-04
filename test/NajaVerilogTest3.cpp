@@ -42,7 +42,8 @@ TEST(NajaVerilogTest3, test0) {
   EXPECT_EQ(naja::verilog::Port::Direction::Input, test->ports_[0].direction_);
   EXPECT_EQ(naja::verilog::Port::Direction::Output, test->ports_[1].direction_);
   EXPECT_EQ(naja::verilog::Port::Direction::InOut, test->ports_[2].direction_);
-
+  
+  constructor.setFirstPass(false);
   constructor.parse(test3Path);
 
   ASSERT_EQ(7, test->nets_.size());
@@ -110,6 +111,7 @@ TEST(NajaVerilogTest3, test1) {
     EXPECT_TRUE(test->instances_.empty());
   }
   {
+    constructor.setFirstPass(false);
     constructor.parse(test3Path);
 
     EXPECT_EQ(2, constructor.modules_.size());
