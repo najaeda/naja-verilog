@@ -35,9 +35,10 @@ endif(ENABLE_SANITIZERS)
 
 add_subdirectory(src)
 
-if (EXISTS(thirdparty/googletest/CMakeLists.txt))
+#Build tests if googletest submodule has been added
+if(EXISTS(${PROJECT_SOURCE_DIR}/thirdparty/googletest/CMakeLists.txt))
   add_subdirectory(thirdparty)
   include(CTest)
   enable_testing()
   add_subdirectory(test)
-endif (EXISTS(thirdparty/googletest/CMakeLists.txt))
+endif(EXISTS(${PROJECT_SOURCE_DIR}/thirdparty/googletest/CMakeLists.txt))
