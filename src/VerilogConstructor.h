@@ -45,7 +45,7 @@ class VerilogConstructor {
     //virtual void addInstance(Instance&& instance) {}
     virtual void startInstantiation(std::string&& modelName) {}
     virtual void addInstance(std::string&& instanceName) {}
-    virtual void addInstanceConnection(std::string&& portName) {}
+    virtual void addInstanceConnection(std::string&& portName, Expression&& expression) {}
     virtual void endInstantiation() {}
     virtual void endModule() {}
   private:

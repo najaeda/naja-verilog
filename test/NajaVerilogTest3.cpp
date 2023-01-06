@@ -71,7 +71,7 @@ TEST(NajaVerilogTest3, test0) {
   EXPECT_EQ(31, test->nets_[4].range_.msb_);
   EXPECT_EQ(0, test->nets_[4].range_.lsb_);
 
-  ASSERT_EQ(1, test->instances_.size());
+  ASSERT_EQ(2, test->instances_.size());
   EXPECT_EQ("mod0", test->instances_[0].model_);
   EXPECT_EQ("inst0", test->instances_[0].name_);
 }
@@ -151,8 +151,10 @@ TEST(NajaVerilogTest3, test1) {
     EXPECT_EQ(31, test->nets_[4].range_.msb_);
     EXPECT_EQ(0, test->nets_[4].range_.lsb_);
 
-    ASSERT_EQ(1, test->instances_.size());
+    ASSERT_EQ(2, test->instances_.size());
     EXPECT_EQ("mod0", test->instances_[0].model_);
     EXPECT_EQ("inst0", test->instances_[0].name_);
+    EXPECT_EQ("mod0", test->instances_[1].model_);
+    EXPECT_EQ("inst1", test->instances_[1].name_);
   }
 }

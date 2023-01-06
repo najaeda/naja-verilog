@@ -26,9 +26,28 @@ namespace naja { namespace verilog {
 struct Range {
   Range() = default;
   Range(const Range&) = default;
-  bool  valid_  {false};
-  int   msb_    {0};
-  int   lsb_    {0};
+
+  std::string getString() const {
+    std::ostringstream stream;
+    if (not valid_) {
+      stream << "[not valid]";
+      return stream.str();
+    }
+    if (singleValue_) {
+      stream << "[" << msb_ << "]";
+    } else {
+      stream << "[" << msb_ << ":" << lsb_ << "]";
+    }
+    return stream.str();
+  }
+
+  //Range has been parsed
+  bool  valid_        {false};
+  //If valid_ is true and supported_ is false, then this range construction
+  //is not currently supported.
+  bool  singleValue_  {false};
+  int   msb_          {0};
+  int   lsb_          {0};
 };
 
 struct Port {
@@ -72,7 +91,7 @@ struct Port {
     std::ostringstream stream;
     stream << "Port: " << name_;
     if (range_.valid_) {
-      stream << "[" << range_.msb_ << ":" << range_.lsb_ << "]";
+      stream << range_.getString();
     }
     stream << " " << direction_.getString();
     return stream.str();
@@ -116,15 +135,36 @@ struct Net {
     std::ostringstream stream;
     stream << "Net: " << name_;
     if (range_.valid_) {
-      stream << "[" << range_.msb_ << ":" << range_.lsb_ << "]";
+      stream << range_.getString();
     }
     stream << " " << type_.getString();
     return stream.str();
   } 
 };
 
+struct Expression {
+  using Expressions = std::vector<Expression>;
+  Expression() = default;
+  Expression(const Expression&) = default;
+  bool        valid_          {false};
+  bool        supported_      {false};
+  std::string identifier_     {};
+  Range       range_          {};      
+  Expressions concatenation_  {};
+  
+  std::string getString() const {
+    std::ostringstream stream;
+    stream << "Expression: (valid: " << valid_ << " supported: " << supported_ << ") ";
+    if (range_.valid_) {
+      stream << range_.getString();
+    }
+    stream << " id: " << identifier_ << std::endl;
+    return stream.str();
+  } 
 
- 
+};
+
+
 }} // namespace verilog // namespace naja
 
 #endif /* __VERILOG_TYPES_H_ */

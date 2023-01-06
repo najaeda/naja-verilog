@@ -8,5 +8,7 @@ module test(input i, output o, inout io);
   supply0 constant0;
   supply1 constant1;
 
-  mod0 inst0(.i0(), .o0());
+  mod0 inst0(.i0(net0), .o0(/*empty*/));
+  mod0 inst1(.i0(net4[21]), .o0(net4[5]));
+
 endmodule

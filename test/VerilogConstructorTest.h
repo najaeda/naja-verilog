@@ -16,7 +16,9 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void moduleInterfaceCompletePort(naja::verilog::Port&& port) override;
     void startInstantiation(std::string&& modelName) override;
     void addInstance(std::string&& name) override;
-    void addInstanceConnection(std::string&& portName) override;
+    void addInstanceConnection(
+      std::string&& portName,
+      naja::verilog::Expression&& expression) override;
     void endInstantiation() override;
     void addNet(naja::verilog::Net&& net) override;
 

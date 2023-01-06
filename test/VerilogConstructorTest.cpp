@@ -71,8 +71,11 @@ void VerilogConstructorTest::addInstance(std::string&& instanceName) {
   }
 }
 
-void VerilogConstructorTest::addInstanceConnection(std::string&& portName) {
+void VerilogConstructorTest::addInstanceConnection(
+  std::string&& portName,
+  naja::verilog::Expression&& expression) {
   if (not inFirstPass()) {
-    std::cerr << "Add instance connection: " << portName << std::endl;
+    std::cerr << "Add instance connection: "
+      << portName << " " << expression.getString() <<  std::endl;
   }
 }

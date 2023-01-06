@@ -99,21 +99,31 @@
 %token<std::string> CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK
 
 %type<std::string> identifier;
+//no support for XMRs for the moment
+%type<std::string> hierarchical_identifier;
 %type<std::string> module_identifier;
 %type<std::string> name_of_module_instance;
-%type<std::string> module_instance_identifier;
+//%type<std::string> module_instance_identifier;
 %type<std::string> number
 
 %type<naja::verilog::Port> port_declaration
 %type<naja::verilog::Port::Direction> port_type_io
 %type<naja::verilog::Net::Type> net_type;
-%type<naja::verilog::Range> range
+%type<naja::verilog::Range> range;
 %type<naja::verilog::Range> range.opt
+%type<naja::verilog::Range> range_expression;
+%type<naja::verilog::Range> range_expression.opt;
 %type<NetIdentifier> net_identifier;
 %type<NetIdentifiers> list_of_net_identifiers;
 %type<std::string> module_instance;
-%type<Instances> list_of_module_instances;
+//%type<Instances> list_of_module_instances;
 %type<std::string> port_identifier;
+
+%type<naja::verilog::Expression> primary;
+%type<naja::verilog::Expression> expression;
+%type<naja::verilog::Expression> expression.opt;
+%type<naja::verilog::Expression::Expressions> concatenation;
+%type<naja::verilog::Expression::Expressions> list_of_expressions; 
 
 %locations 
 %start source_text
@@ -126,16 +136,15 @@ list_of_descriptions: description | list_of_descriptions description;
 
 description: module_declaration;
 
-identifier: IDENTIFIER_TK | ESCAPED_IDENTIFIER_TK
-  { $$ = $1; }
-;
+identifier: IDENTIFIER_TK | ESCAPED_IDENTIFIER_TK {
+  $$ = $1;
+}
 
 range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']' {
   $$.valid_ = true;
   $$.msb_ = std::stoi($2);
   $$.lsb_ = std::stoi($4);
 }
-;
 
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
 
@@ -228,30 +237,46 @@ number:
 | CONSTVAL_TK
 ;
 
+//no support for XMRs for the moment
 hierarchical_identifier: identifier;
 
-range_expression:
-  expression
-| CONSTVAL_TK ':' CONSTVAL_TK
-;
+//only numeric values (one bit) [4] or [4:5] are supported
+range_expression: //expression (not supported)
+CONSTVAL_TK {
+  $$.valid_ = true;
+  $$.singleValue_ = true;
+  $$.msb_ = std::stoi($1);
+}
+| CONSTVAL_TK ':' CONSTVAL_TK {
+  $$.valid_ = true;
+  $$.msb_ = std::stoi($1);
+  $$.lsb_ = std::stoi($3);
+}
 
-range_expression.opt: %empty | '[' range_expression ']';
+range_expression.opt: %empty { $$.valid_ = false; } | '[' range_expression ']' { $$ = $2; }
 
 constant_range_expression.opt: range_expression.opt; 
 
-list_of_expressions: expression | list_of_expressions ',' expression;
+list_of_expressions:
+expression {
+  $$ = { $1 };
+}
+| list_of_expressions ',' expression {
+  $1.push_back($3);
+  $$ = $1;
+}
 
-concatenation: '{' list_of_expressions '}';
+concatenation: '{' list_of_expressions '}' { $$ = $2; }
 
 primary
-: number
-| hierarchical_identifier range_expression.opt
-| concatenation
+: number { $$.valid_ = true; $$.supported_ = false; }
+| hierarchical_identifier range_expression.opt { $$.valid_ = true; $$.identifier_ = $1; $$.range_ = $2; }
+| concatenation { $$.valid_ = true; $$.concatenation_ = $1; }
 ;
 
-expression: primary;
+expression: primary { $$ = $1; }
 
-expression.opt: %empty | expression;
+expression.opt: %empty { $$.valid_ = false; } | expression { $$ = $1; }
 
 ordered_port_connection: expression;
 
@@ -260,7 +285,7 @@ list_of_ordered_port_connections: ordered_port_connection | list_of_ordered_port
 port_identifier: identifier;
 
 named_port_connection: '.' port_identifier '(' expression.opt ')' {
-  constructor->addInstanceConnection(std::move($2));
+  constructor->addInstanceConnection(std::move($2), std::move($4));
 }
 
 list_of_named_port_connections: named_port_connection | list_of_named_port_connections ',' named_port_connection;
@@ -301,11 +326,11 @@ module_instantiation: module_identifier {
 
 module_identifier: identifier;
 
-port: identifier {
-  constructor->moduleInterfacePort(std::move($1));
-}
+//port: identifier {
+//  constructor->moduleInterfacePort(std::move($1));
+//}
 
-list_of_ports: port | list_of_ports ',' port;
+//list_of_ports: port | list_of_ports ',' port;
 
 module_item
 : port_declaration {
