@@ -294,11 +294,9 @@ list_of_port_connections: list_of_ordered_port_connections | list_of_named_port_
 
 list_of_port_connections.opt: %empty | list_of_port_connections;
 
-name_of_module_instance: identifier;
+name_of_module_instance: identifier 
 
-module_instance: name_of_module_instance '(' list_of_port_connections.opt ')' {
-  constructor->addInstance(std::move($1));
-}
+module_instance: name_of_module_instance { constructor->addInstance(std::move($1)); } '(' list_of_port_connections.opt ')'
 
 parameter_identifier: identifier;
 
@@ -318,13 +316,13 @@ list_of_parameter_assignments: /* list_of_ordered_parameter_assignment | */ list
 parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 
 //(From A.4.1) 
-module_instantiation: module_identifier {
-  constructor->startInstantiation(std::move($1));
-} parameter_value_assignment list_of_module_instances ';' {
+module_instantiation: module_identifier parameter_value_assignment list_of_module_instances ';' {
   constructor->endInstantiation();
 }
 
-module_identifier: identifier;
+module_identifier: identifier {
+  constructor->startInstantiation(std::move($1));
+}
 
 //port: identifier {
 //  constructor->moduleInterfacePort(std::move($1));

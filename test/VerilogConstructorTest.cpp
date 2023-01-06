@@ -56,12 +56,16 @@ void VerilogConstructorTest::addNet(naja::verilog::Net&& net) {
 
 void VerilogConstructorTest::startInstantiation(std::string&& modelName) {
   if (not inFirstPass()) {
+    std::cerr << "startInstantiation: " << modelName << std::endl;
     currentModelName_ = modelName;
   }
 }
 
 void VerilogConstructorTest::endInstantiation() {
-  currentModelName_ = std::string();
+  if (not inFirstPass()) {
+    std::cerr << "Finish Instantiation of: " << currentModelName_ << std::endl;
+    currentModelName_ = std::string();
+  }
 }
 
 void VerilogConstructorTest::addInstance(std::string&& instanceName) {
