@@ -158,7 +158,7 @@ struct Expression {
     if (range_.valid_) {
       stream << range_.getString();
     }
-    stream << " id: " << identifier_ << std::endl;
+    stream << " id: " << identifier_;
     return stream.str();
   } 
 

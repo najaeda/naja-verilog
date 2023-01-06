@@ -316,13 +316,13 @@ list_of_parameter_assignments: /* list_of_ordered_parameter_assignment | */ list
 parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 
 //(From A.4.1) 
-module_instantiation: module_identifier parameter_value_assignment list_of_module_instances ';' {
+module_instantiation: module_identifier {
+  constructor->startInstantiation(std::move($1));
+} parameter_value_assignment list_of_module_instances ';' {
   constructor->endInstantiation();
 }
 
-module_identifier: identifier {
-  constructor->startInstantiation(std::move($1));
-}
+module_identifier: identifier 
 
 //port: identifier {
 //  constructor->moduleInterfacePort(std::move($1));
