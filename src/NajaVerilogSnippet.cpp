@@ -28,10 +28,10 @@ class VerilogConstructorExample: public naja::verilog::VerilogConstructor {
     void moduleInterfaceSimplePort(std::string&& name) override {
       std::cerr << "Simple Port: " << name << std::endl;
     }
-    void moduleInterfaceCompletePort(naja::verilog::Port&& port) override {
+    void moduleInterfaceCompletePort(const naja::verilog::Port& port) override {
       std::cerr << "Complete Port: " << port.getString() << std::endl;
     }
-    void moduleImplementationPort(naja::verilog::Port&& port) override {
+    void moduleImplementationPort(const naja::verilog::Port& port) override {
       std::cerr << "Construct Port: " << port.getString() << std::endl;
     }
 };
