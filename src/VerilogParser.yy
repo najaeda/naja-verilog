@@ -270,8 +270,10 @@ concatenation: '{' list_of_expressions '}' { $$ = $2; }
 
 primary
 : number { $$.valid_ = true; $$.supported_ = false; }
-| hierarchical_identifier range_expression.opt { $$.valid_ = true; $$.identifier_ = $1; $$.range_ = $2; }
-| concatenation { $$.valid_ = true; $$.concatenation_ = $1; }
+| hierarchical_identifier range_expression.opt { 
+  $$.valid_ = true; $$.identifier_.name_ = $1; $$.identifier_.range_ = $2;
+}
+| concatenation { $$.valid_ = true; $$.supported_ = false; }
 ;
 
 expression: primary { $$ = $1; }

@@ -142,13 +142,26 @@ struct Net {
   } 
 };
 
+struct Identifier {
+  Identifier() = default;
+  Identifier(const Identifier&) = default;
+  std::string getString() const {
+    return std::string();
+  }
+
+  std::string name_;
+  Range       range_;
+};
+
 struct Expression {
   using Expressions = std::vector<Expression>;
   Expression() = default;
   Expression(const Expression&) = default;
+  enum Type { IDENTIFIER }; 
   bool        valid_          {false};
   bool        supported_      {false};
-  std::string identifier_     {};
+  Type        type_           {Type::IDENTIFIER};
+  Identifier  identifier_     {};
   Range       range_          {};      
   Expressions concatenation_  {};
   
@@ -158,10 +171,11 @@ struct Expression {
     if (range_.valid_) {
       stream << range_.getString();
     }
-    stream << " id: " << identifier_;
+    if (type_ == Type::IDENTIFIER) {
+      stream << " id: " << identifier_.getString();
+    }
     return stream.str();
   } 
-
 };
 
 
