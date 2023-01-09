@@ -39,8 +39,8 @@ class VerilogConstructor {
     //Simple Port declaration (only name), no range, no direction in module interface
     virtual void moduleInterfaceSimplePort(std::string&& name) {}
     //Complete Port declaration in module interface
-    virtual void moduleInterfaceCompletePort(Port&& port) {}
-    virtual void moduleImplementationPort(Port&& port) {}
+    virtual void moduleInterfaceCompletePort(const Port& port) {}
+    virtual void moduleImplementationPort(const Port& port) {}
     virtual void addNet(Net&& net) {}
     //virtual void addInstance(Instance&& instance) {}
     virtual void startInstantiation(std::string&& modelName) {}

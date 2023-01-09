@@ -4,6 +4,7 @@ set(tests
   VerilogConstructorTest.cpp
   NajaVerilogTest012.cpp
   NajaVerilogTest3.cpp
+  NajaVerilogTest4.cpp
 )
 
 add_executable(naja_verilog_tests ${tests})

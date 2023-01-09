@@ -12,8 +12,8 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void setFirstPass(bool mode) { firstPass_ = mode; }
     void startModule(std::string&& name) override;
     void moduleInterfaceSimplePort(std::string&& name) override;
-    void moduleImplementationPort(naja::verilog::Port&& port) override;
-    void moduleInterfaceCompletePort(naja::verilog::Port&& port) override;
+    void moduleImplementationPort(const naja::verilog::Port& port) override;
+    void moduleInterfaceCompletePort(const naja::verilog::Port& port) override;
     void startInstantiation(std::string&& modelName) override;
     void addInstance(std::string&& name) override;
     void addInstanceConnection(

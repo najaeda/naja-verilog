@@ -41,7 +41,7 @@ using token = naja::verilog::VerilogParser::token;
 %}
 
 %option debug
-%option nodefault
+/* %option nodefault */
 %option yyclass="naja::verilog::VerilogScanner"
 %option noyywrap
 %option nounput

@@ -149,13 +149,7 @@ range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']' {
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
 
 port_declaration: port_type_io range.opt identifier {
-  if ($2.valid_) {
-    constructor->moduleInterfaceCompletePort(
-      Port(std::move($3), $1, std::move($2))
-    );
-  } else {
-    constructor->moduleInterfaceCompletePort(Port(std::move($3), $1));
-  }
+  $$ = Port(std::move($3), $1, std::move($2));
 }
 
 port_type_io
@@ -164,9 +158,12 @@ port_type_io
   | OUTPUT_KW { $$ = naja::verilog::Port::Direction::Output; }
   ;
 
-list_of_port_declarations: port_declaration
-| list_of_port_declarations ',' port_declaration
-; 
+list_of_port_declarations: port_declaration {
+  constructor->moduleInterfaceCompletePort($1);
+}
+| list_of_port_declarations ',' port_declaration {
+  constructor->moduleInterfaceCompletePort($3);
+}
 
 //optional_comma:
 //	',' | %empty;
@@ -200,9 +197,9 @@ module_or_generate_item:
 
 module_or_generate_item_declaration: net_declaration;
 
-net_declaration: net_type list_of_net_identifiers ';' {
-  for (auto netIdentifier: $2) {
-    constructor->addNet(Net(netIdentifier.name_, netIdentifier.range_, $1));
+net_declaration: net_type range.opt list_of_net_identifiers ';' {
+  for (auto netIdentifier: $3) {
+    constructor->addNet(Net(netIdentifier.name_, $2, $1));
   }
 }
 
@@ -215,13 +212,7 @@ list_of_net_identifiers
   $$ = $1;
 }
 
-net_identifier: identifier range.opt {
-  if ($2.valid_) {
-    $$ = NetIdentifier(std::move($1), std::move($2));
-  } else {
-    $$ = NetIdentifier(std::move($1));
-  }
-}
+net_identifier: identifier { $$ = NetIdentifier(std::move($1)); }
 
 net_type
 : SUPPLY0_KW { $$ = naja::verilog::Net::Type::Supply0; }
@@ -298,7 +289,9 @@ list_of_port_connections.opt: %empty | list_of_port_connections;
 
 name_of_module_instance: identifier 
 
-module_instance: name_of_module_instance { constructor->addInstance(std::move($1)); } '(' list_of_port_connections.opt ')'
+module_instance: name_of_module_instance {
+  constructor->addInstance(std::move($1));
+} '(' list_of_port_connections.opt ')'
 
 parameter_identifier: identifier;
 
@@ -326,16 +319,15 @@ module_instantiation: module_identifier {
 
 module_identifier: identifier 
 
-//port: identifier {
-//  constructor->moduleInterfacePort(std::move($1));
-//}
+port: identifier {
+  constructor->moduleInterfaceSimplePort(std::move($1));
+}
 
-//list_of_ports: port | list_of_ports ',' port;
+list_of_ports: port | list_of_ports ',' port;
 
-module_item
-: port_declaration {
-    //constructor->moduleImplementationPort(std::move($1));
-  } ';'
+module_item: port_declaration {
+  constructor->moduleImplementationPort(std::move($1));
+} ';'
 | non_port_module_item;
 
 list_of_module_items: module_item | list_of_module_items module_item;
@@ -352,15 +344,13 @@ list_of_module_items.opt: %empty | list_of_module_items;
 //| MODULE_KW module_identifier list_of_port_declarations.opt ';' ENDMODULE_KW
 //;
 
-module_args.opt: '(' ')' | %empty | '(' list_of_port_declarations ')';
+module_args.opt: '(' ')' | %empty | '(' list_of_port_declarations ')' | '(' list_of_ports ')';
 
-module_declaration:
-  MODULE_KW module_identifier {
-    constructor->startModule(std::move($2));
-  } module_args.opt ';' list_of_module_items.opt ENDMODULE_KW
-  {
-    constructor->endModule();
-  }
+module_declaration: MODULE_KW module_identifier {
+  constructor->startModule(std::move($2));
+} module_args.opt ';' list_of_module_items.opt ENDMODULE_KW {
+  constructor->endModule();
+}
 
 %%
 

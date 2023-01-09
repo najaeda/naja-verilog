@@ -34,16 +34,17 @@ void VerilogConstructorTest::moduleInterfaceSimplePort(std::string&& name) {
   }
 }
 
-void VerilogConstructorTest::moduleInterfaceCompletePort(naja::verilog::Port&& port) {
+void VerilogConstructorTest::moduleInterfaceCompletePort(const naja::verilog::Port& port) {
   if (inFirstPass()) {
     std::cerr << "Interface Complete Port: " << port.getString() << std::endl;
     currentModule_->ports_.push_back(std::move(port));
   }
 }
 
-void VerilogConstructorTest::moduleImplementationPort(naja::verilog::Port&& port) {
+void VerilogConstructorTest::moduleImplementationPort(const naja::verilog::Port& port) {
   if (inFirstPass()) {
     std::cerr << "Implementation Complete Port: " << port.getString() << std::endl;
+    currentModule_->ports_.push_back(std::move(port));
   }
 }
 
