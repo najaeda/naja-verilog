@@ -29,29 +29,52 @@ class VerilogScanner;
 class VerilogParser;
   
 class VerilogConstructor {
+  friend class VerilogParser;
   public:
     VerilogConstructor() = default;
     ~VerilogConstructor();
     using Paths = std::list<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
-    virtual void startModule(std::string&& name) {}
+    virtual void startModule(const std::string& name) {}
     //Simple Port declaration (only name), no range, no direction in module interface
-    virtual void moduleInterfaceSimplePort(std::string&& name) {}
+    virtual void moduleInterfaceSimplePort(const std::string& name) {}
     //Complete Port declaration in module interface
     virtual void moduleInterfaceCompletePort(const Port& port) {}
     virtual void moduleImplementationPort(const Port& port) {}
-    virtual void addNet(Net&& net) {}
+    virtual void addNet(const Net& net) {}
     //virtual void addInstance(Instance&& instance) {}
-    virtual void startInstantiation(std::string&& modelName) {}
-    virtual void addInstance(std::string&& instanceName) {}
-    virtual void addInstanceConnection(std::string&& portName, Expression&& expression) {}
+    virtual void startInstantiation(const std::string& modelName) {}
+    virtual void addInstance(const std::string& instanceName) {}
+    virtual void addInstanceConnection(const std::string& portName, const Expression& expression) {}
     virtual void endInstantiation() {}
     virtual void endModule() {}
   private:
+    class ModuleInterfaceType {
+      public:
+        enum ModuleInterfaceTypeEnum {
+          Unknown, PortDeclaration, Port
+        };  
+        ModuleInterfaceType(const ModuleInterfaceTypeEnum& typeEnum);
+        ModuleInterfaceType(const ModuleInterfaceType& type) = default;
+        operator const ModuleInterfaceTypeEnum&() const {return typeEnum_;}
+        std::string getString() const;
+        private:
+          ModuleInterfaceTypeEnum typeEnum_;
+    }; 
     void internalParse(std::istream& stream);
-    VerilogScanner* scanner_  {nullptr};
-    VerilogParser*  parser_   {nullptr};
+    void internalStartModule(const std::string& name);
+    void internalEndModule();
+    void internalModuleInterfaceSimplePort(const std::string& name);
+    void internalModuleInterfaceCompletePort(const Port& port);
+    void internalModuleImplementationPort(const Port& port);
+
+    ModuleInterfaceType type_           {ModuleInterfaceType::Unknown};
+    Port::Direction     lastDirection_  {Port::Direction::Unknown};
+    Range               lastRange_      {};
+    
+    VerilogScanner*     scanner_  {nullptr};
+    VerilogParser*      parser_   {nullptr};
 };
 
 }} // namespace verilog // namespace naja

@@ -70,15 +70,15 @@ struct Port {
 
   Port() = default;
   Port(const Port&) = default;
-  Port(std::string&& name, Direction direction):
-    name_(std::move(name)),
+  Port(const std::string& name, Direction direction):
+    name_(name),
     direction_(direction)
   {}
 
-  Port(std::string&& name, Direction direction, Range&& range):
-    name_(std::move(name)),
+  Port(const std::string& name, Direction direction, const Range& range):
+    name_(name),
     direction_(direction),
-    range_(std::move(range))
+    range_(range)
   {}
 
   bool isBus() const { return range_.valid_; }

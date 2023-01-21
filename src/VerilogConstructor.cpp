@@ -23,6 +23,21 @@
 
 namespace naja { namespace verilog {
 
+VerilogConstructor::ModuleInterfaceType::ModuleInterfaceType(const ModuleInterfaceTypeEnum& typeEnum):
+  typeEnum_(typeEnum)
+{}
+
+//LCOV_EXCL_START
+std::string VerilogConstructor::ModuleInterfaceType::getString() const {
+  switch (typeEnum_) {
+    case ModuleInterfaceType::Unknown: return "Standard";
+    case ModuleInterfaceType::PortDeclaration: return "PortDeclaration";
+    case ModuleInterfaceType::Port: return "Port";
+  }
+  return "Error";
+}
+//LCOV_EXCL_STOP
+
 VerilogConstructor::~VerilogConstructor() {
   delete scanner_;
   delete parser_;
@@ -54,5 +69,42 @@ void VerilogConstructor::internalParse(std::istream &stream) {
   parser_ = new VerilogParser(*scanner_, this);
   bool result = parser_->parse();
 }
+
+void VerilogConstructor::internalStartModule(const std::string& name) {
+  type_ = ModuleInterfaceType::Unknown;
+  startModule(name);
+}
+
+void VerilogConstructor::internalEndModule() {
+  endModule();
+}
+ 
+void VerilogConstructor::internalModuleInterfaceSimplePort(const std::string& name) {
+  if (type_ == ModuleInterfaceType::Unknown) {
+    type_ = ModuleInterfaceType::Port; 
+  }
+  if (type_ == ModuleInterfaceType::PortDeclaration) {
+    moduleInterfaceCompletePort(Port(name, lastDirection_, lastRange_));
+  } else {
+    moduleInterfaceSimplePort(name);
+  }
+}
+  
+void VerilogConstructor::internalModuleInterfaceCompletePort(const Port& port) {
+  if (type_ == ModuleInterfaceType::Unknown) {
+    type_ = ModuleInterfaceType::PortDeclaration;
+  }
+  if (type_ == ModuleInterfaceType::Port) {
+    //Error
+  }
+  lastDirection_ = port.direction_;
+  lastRange_ = port.range_; 
+  moduleInterfaceCompletePort(port);
+}
+
+void VerilogConstructor::internalModuleImplementationPort(const Port& port) {
+  moduleImplementationPort(port);
+}
+
 
 }} // namespace verilog // namespace naja

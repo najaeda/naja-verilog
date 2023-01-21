@@ -10,17 +10,17 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     ~VerilogConstructorTest();
     bool inFirstPass() const { return firstPass_; }
     void setFirstPass(bool mode) { firstPass_ = mode; }
-    void startModule(std::string&& name) override;
-    void moduleInterfaceSimplePort(std::string&& name) override;
+    void startModule(const std::string& name) override;
+    void moduleInterfaceSimplePort(const std::string& name) override;
     void moduleImplementationPort(const naja::verilog::Port& port) override;
     void moduleInterfaceCompletePort(const naja::verilog::Port& port) override;
-    void startInstantiation(std::string&& modelName) override;
-    void addInstance(std::string&& name) override;
+    void startInstantiation(const std::string& modelName) override;
+    void addInstance(const std::string& name) override;
     void addInstanceConnection(
-      std::string&& portName,
-      naja::verilog::Expression&& expression) override;
+      const std::string& portName,
+      const naja::verilog::Expression& expression) override;
     void endInstantiation() override;
-    void addNet(naja::verilog::Net&& net) override;
+    void addNet(const naja::verilog::Net& net) override;
 
     struct Instance {
       Instance() = default;
@@ -53,11 +53,13 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       {}
     };
 
-    using Modules = std::map<std::string, Module*>;
+    using Modules = std::vector<Module*>;
+    using ModulesMap = std::map<std::string, Module*>;
     void addModule(Module* module);
     
     bool        firstPass_        {true};
     Modules     modules_          {};
+    ModulesMap  modulesMap_       {};
     Module*     currentModule_    {nullptr};
     std::string currentModelName_ {};
 };

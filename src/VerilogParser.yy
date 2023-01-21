@@ -149,7 +149,7 @@ range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']' {
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
 
 port_declaration: port_type_io range.opt identifier {
-  $$ = Port(std::move($3), $1, std::move($2));
+  $$ = Port($3, $1, $2);
 }
 
 port_type_io
@@ -157,20 +157,6 @@ port_type_io
   | INPUT_KW  { $$ = naja::verilog::Port::Direction::Input; }
   | OUTPUT_KW { $$ = naja::verilog::Port::Direction::Output; }
   ;
-
-list_of_port_declarations: port_declaration {
-  constructor->moduleInterfaceCompletePort($1);
-}
-| list_of_port_declarations ',' port_declaration {
-  constructor->moduleInterfaceCompletePort($3);
-}
-
-//optional_comma:
-//	',' | %empty;
-
-//list_of_non_port_module_items.opt: %empty | list_of_non_port_module_items;
-
-//list_of_non_port_module_items: non_port_module_item | list_of_non_port_module_items non_port_module_item 
 
 non_port_module_item : module_or_generate_item;
 
@@ -320,13 +306,11 @@ module_instantiation: module_identifier {
 module_identifier: identifier 
 
 port: identifier {
-  constructor->moduleInterfaceSimplePort(std::move($1));
+  constructor->internalModuleInterfaceSimplePort($1);
 }
 
-list_of_ports: port | list_of_ports ',' port;
-
 module_item: port_declaration {
-  constructor->moduleImplementationPort(std::move($1));
+  constructor->internalModuleImplementationPort($1);
 } ';'
 | non_port_module_item;
 
@@ -344,12 +328,20 @@ list_of_module_items.opt: %empty | list_of_module_items;
 //| MODULE_KW module_identifier list_of_port_declarations.opt ';' ENDMODULE_KW
 //;
 
-module_args.opt: '(' ')' | %empty | '(' list_of_port_declarations ')' | '(' list_of_ports ')';
+module_arg
+: port_declaration {
+  constructor->internalModuleInterfaceCompletePort($1);
+}
+| port;
+
+list_of_module_args: module_arg | list_of_module_args ',' module_arg;
+
+list_of_module_args.opt: %empty | '(' ')' | '(' list_of_module_args ')';
 
 module_declaration: MODULE_KW module_identifier {
-  constructor->startModule(std::move($2));
-} module_args.opt ';' list_of_module_items.opt ENDMODULE_KW {
-  constructor->endModule();
+  constructor->internalStartModule(std::move($2));
+} list_of_module_args.opt ';' list_of_module_items.opt ENDMODULE_KW {
+  constructor->internalEndModule();
 }
 
 %%

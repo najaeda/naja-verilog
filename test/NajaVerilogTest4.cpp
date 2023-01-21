@@ -22,8 +22,7 @@ TEST(NajaVerilogTest4, test) {
   constructor.parse(test4Path);
   ASSERT_EQ(2, constructor.modules_.size());
 
-  ASSERT_TRUE(constructor.modules_.find("test") != constructor.modules_.end());
-  auto test = constructor.modules_.find("test")->second;
+  auto test = constructor.modules_[1];
   EXPECT_EQ("test", test->name_);
   ASSERT_EQ(3, test->ports_.size());
   EXPECT_EQ("i", test->ports_[0].name_);

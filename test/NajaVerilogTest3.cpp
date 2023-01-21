@@ -21,8 +21,7 @@ TEST(NajaVerilogTest3, test0) {
       / std::filesystem::path("test3.v"));
   constructor.parse(test3Path);
   ASSERT_EQ(2, constructor.modules_.size());
-  ASSERT_TRUE(constructor.modules_.find("mod0") != constructor.modules_.end());
-  auto mod0 = constructor.modules_.find("mod0")->second;
+  auto mod0 = constructor.modules_[0];
   EXPECT_EQ("mod0", mod0->name_);
   ASSERT_EQ(2, mod0->ports_.size());
   EXPECT_EQ("i0", mod0->ports_[0].name_);
@@ -32,8 +31,7 @@ TEST(NajaVerilogTest3, test0) {
   EXPECT_TRUE(mod0->nets_.empty());
   EXPECT_TRUE(mod0->instances_.empty());
 
-  ASSERT_TRUE(constructor.modules_.find("test") != constructor.modules_.end());
-  auto test = constructor.modules_.find("test")->second;
+  auto test = constructor.modules_[1];
   EXPECT_EQ("test", test->name_);
   EXPECT_EQ(3, test->ports_.size());
   EXPECT_EQ("i", test->ports_[0].name_);
@@ -86,8 +84,7 @@ TEST(NajaVerilogTest3, test1) {
     constructor.parse(test3Path);
 
     ASSERT_EQ(2, constructor.modules_.size());
-    ASSERT_TRUE(constructor.modules_.find("mod0") != constructor.modules_.end());
-    auto mod0 = constructor.modules_.find("mod0")->second;
+    auto mod0 = constructor.modules_[0];
     EXPECT_EQ("mod0", mod0->name_);
     ASSERT_EQ(2, mod0->ports_.size());
     EXPECT_EQ("i0", mod0->ports_[0].name_);
@@ -97,8 +94,7 @@ TEST(NajaVerilogTest3, test1) {
     EXPECT_TRUE(mod0->nets_.empty());
     EXPECT_TRUE(mod0->instances_.empty());
 
-    ASSERT_TRUE(constructor.modules_.find("test") != constructor.modules_.end());
-    auto test = constructor.modules_.find("test")->second;
+    auto test = constructor.modules_[1];
     EXPECT_EQ("test", test->name_);
     ASSERT_EQ(3, test->ports_.size());
     EXPECT_EQ("i", test->ports_[0].name_);
@@ -115,15 +111,13 @@ TEST(NajaVerilogTest3, test1) {
     constructor.parse(test3Path);
 
     EXPECT_EQ(2, constructor.modules_.size());
-    ASSERT_TRUE(constructor.modules_.find("mod0") != constructor.modules_.end());
-    auto mod0 = constructor.modules_.find("mod0")->second;
+    auto mod0 = constructor.modules_[0];
     EXPECT_EQ("mod0", mod0->name_);
     EXPECT_EQ(2, mod0->ports_.size());
     EXPECT_TRUE(mod0->nets_.empty());
     EXPECT_TRUE(mod0->instances_.empty());
 
-    ASSERT_TRUE(constructor.modules_.find("test") != constructor.modules_.end());
-    auto test = constructor.modules_.find("test")->second;
+    auto test = constructor.modules_[1];
     EXPECT_EQ("test", test->name_);
     EXPECT_EQ(3, test->ports_.size());
     ASSERT_EQ(7, test->nets_.size());
