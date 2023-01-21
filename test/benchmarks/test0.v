@@ -17,3 +17,6 @@ output o0;
 output o1;
 inout io;
 endmodule
+
+module test5(input [3:0] i0, i1, output [0:3] o0, o1, inout io);
+endmodule
