@@ -17,8 +17,10 @@
 #ifndef __VERILOG_TYPES_H_
 #define __VERILOG_TYPES_H_
 
+#include <variant>
 #include <vector>
 #include <string>
+#include <cassert>
 
 namespace naja { namespace verilog {
 
