@@ -143,6 +143,7 @@ struct Net {
 struct Identifier {
   Identifier() = default;
   Identifier(const Identifier&) = default;
+  Identifier(const std::string& name, const Range& range): name_(name), range_(range) {}
   std::string getString() const {
     std::ostringstream stream;
     stream << name_;
@@ -156,29 +157,36 @@ struct Identifier {
   Range       range_;
 };
 
+struct Number {
+  std::string getString() const {
+    return std::string();
+  }
+};
+
 struct Expression {
   using Expressions = std::vector<Expression>;
   Expression() = default;
   Expression(const Expression&) = default;
-  enum Type { IDENTIFIER }; 
+  enum Type { IDENTIFIER=0, NUMBER=1 }; 
+  using Value = std::variant<Identifier, Number>;
   //Means 
   bool        valid_          {false};
   //If valid_ is true and supported_ is false, then this expression construction
   //is not currently supported.
   bool        supported_      {true};
-  Type        type_           {Type::IDENTIFIER};
-  Identifier  identifier_     {};
-  Range       range_          {};      
-  Expressions concatenation_  {};
+  Value       value_          {};
+  //Expressions concatenation_  {};
   
   std::string getString() const {
     std::ostringstream stream;
     stream << "Expression: (valid: " << valid_ << " supported: " << supported_ << ") ";
-    if (range_.valid_) {
-      stream << range_.getString();
-    }
-    if (type_ == Type::IDENTIFIER) {
-      stream << " id: " << identifier_.getString();
+    switch (value_.index()) {
+      case Type::IDENTIFIER:
+        stream << " id: " << std::get<Type::IDENTIFIER>(value_).getString();
+        break; 
+      case Type::NUMBER:
+        stream << " number: " << std::get<Type::NUMBER>(value_).getString();
+        break; 
     }
     return stream.str();
   } 

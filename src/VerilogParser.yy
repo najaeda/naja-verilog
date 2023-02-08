@@ -104,7 +104,7 @@
 %type<std::string> module_identifier;
 %type<std::string> name_of_module_instance;
 %type<std::string> parameter_identifier;
-%type<std::string> number
+//%type<std::string> number
 
 %type<naja::verilog::Port> port_declaration
 %type<naja::verilog::Port::Direction> port_type_io
@@ -211,7 +211,9 @@ list_of_module_instances: module_instance
 | list_of_module_instances ',' module_instance;
 
 number:
-  CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK;
+CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK {
+
+}
 | CONSTVAL_TK
 ;
 
@@ -249,7 +251,7 @@ concatenation: '{' list_of_expressions '}' { $$ = $2; }
 primary
 : number { $$.valid_ = true; $$.supported_ = false; }
 | hierarchical_identifier range_expression.opt { 
-  $$.valid_ = true; $$.identifier_.name_ = $1; $$.identifier_.range_ = $2;
+  $$.valid_ = true; $$.value_ = naja::verilog::Identifier($1, $2);
 }
 | concatenation { $$.valid_ = true; $$.supported_ = false; }
 ;
