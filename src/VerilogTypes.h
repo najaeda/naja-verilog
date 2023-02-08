@@ -19,7 +19,6 @@
 
 #include <vector>
 #include <string>
-#include <sstream>
 
 namespace naja { namespace verilog {
 
@@ -27,19 +26,7 @@ struct Range {
   Range() = default;
   Range(const Range&) = default;
 
-  std::string getString() const {
-    std::ostringstream stream;
-    if (not valid_) {
-      stream << "[not valid]";
-      return stream.str();
-    }
-    if (singleValue_) {
-      stream << "[" << msb_ << "]";
-    } else {
-      stream << "[" << msb_ << ":" << lsb_ << "]";
-    }
-    return stream.str();
-  }
+  std::string getString() const;
 
   //Range has been parsed
   bool  valid_        {false};
@@ -85,15 +72,7 @@ struct Port {
   Direction   direction_  {};
   Range       range_      {};
 
-  std::string getString() const {
-    std::ostringstream stream;
-    stream << "Port: " << name_;
-    if (range_.valid_) {
-      stream << range_.getString();
-    }
-    stream << " " << direction_.getString();
-    return stream.str();
-  }
+  std::string getString() const;
 };
 
 struct Net {
@@ -129,69 +108,82 @@ struct Net {
   Range       range_  {};
   Type        type_   {};
 
-  std::string getString() const {
-    std::ostringstream stream;
-    stream << "Net: " << name_;
-    if (range_.valid_) {
-      stream << range_.getString();
-    }
-    stream << " " << type_.getString();
-    return stream.str();
-  } 
+  std::string getString() const;
 };
 
 struct Identifier {
   Identifier() = default;
   Identifier(const Identifier&) = default;
   Identifier(const std::string& name, const Range& range): name_(name), range_(range) {}
-  std::string getString() const {
-    std::ostringstream stream;
-    stream << name_;
-    if (range_.valid_) {
-      stream << range_.getString();
-    }
-    return stream.str();
-  }
+  std::string getString() const;
 
   std::string name_;
   Range       range_;
 };
 
-struct Number {
-  std::string getString() const {
-    return std::string();
+struct BasedNumber {
+  BasedNumber() = default;
+  BasedNumber(const std::string& size, const std::string& base, const std::string& digits) {
+    size_ = static_cast<unsigned>(std::stoul(size));
+    assert(base.size() == 1);
+    char baseChar = base[0];
+    switch (baseChar) {
+      case 'b': case 'B': 
+        base_ = BINARY;
+        break;
+      case 'o': case 'O':
+        base_ = OCTAL;
+        break;
+      case 'h': case 'H':
+        base_ = HEX;
+        break;
+      case 'd': case 'D':
+        base_ = DECIMAL;
+        break;
+    }
+    digits_ = digits;
   }
+  enum Base { BINARY, OCTAL, HEX, DECIMAL };
+
+  std::string getString() const;
+ 
+  unsigned    size_   {0};
+  Base        base_   {};
+  std::string digits_ {};
+};
+
+struct Number {
+  Number() = default;
+  Number(const Number&) = default;
+  Number(const std::string& value) {
+    value_ = static_cast<unsigned>(std::stoul(value));
+  }
+  Number(const std::string& size, const std::string& base, const std::string& value) {
+    value_ = BasedNumber(size, base, value);
+  }
+  std::string getString() const;
+  enum Type { BASED, UNSIGNED };
+  using Value = std::variant<BasedNumber, unsigned>;
+
+  Value value_  {};
 };
 
 struct Expression {
   using Expressions = std::vector<Expression>;
   Expression() = default;
   Expression(const Expression&) = default;
+  std::string getString() const;
+
   enum Type { IDENTIFIER=0, NUMBER=1 }; 
   using Value = std::variant<Identifier, Number>;
-  //Means 
+
   bool        valid_          {false};
   //If valid_ is true and supported_ is false, then this expression construction
   //is not currently supported.
   bool        supported_      {true};
   Value       value_          {};
   //Expressions concatenation_  {};
-  
-  std::string getString() const {
-    std::ostringstream stream;
-    stream << "Expression: (valid: " << valid_ << " supported: " << supported_ << ") ";
-    switch (value_.index()) {
-      case Type::IDENTIFIER:
-        stream << " id: " << std::get<Type::IDENTIFIER>(value_).getString();
-        break; 
-      case Type::NUMBER:
-        stream << " number: " << std::get<Type::NUMBER>(value_).getString();
-        break; 
-    }
-    return stream.str();
-  } 
 };
-
 
 }} // namespace verilog // namespace naja
 

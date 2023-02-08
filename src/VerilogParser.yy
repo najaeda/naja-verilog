@@ -118,6 +118,7 @@
 %type<std::string> module_instance;
 %type<std::string> port_identifier;
 
+%type<naja::verilog::Number> number;
 %type<naja::verilog::Expression> primary;
 %type<naja::verilog::Expression> expression;
 %type<naja::verilog::Expression> expression.opt;
@@ -210,11 +211,13 @@ net_type
 list_of_module_instances: module_instance
 | list_of_module_instances ',' module_instance;
 
-number:
-CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK {
-
+number 
+: CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK {
+  $$ = Number($1, $2, $3);
 }
-| CONSTVAL_TK
+| CONSTVAL_TK {
+  $$ = Number($1);
+}
 ;
 
 //no support for XMRs for the moment
@@ -249,7 +252,8 @@ expression {
 concatenation: '{' list_of_expressions '}' { $$ = $2; }
 
 primary
-: number { $$.valid_ = true; $$.supported_ = false; }
+: number {
+  $$.valid_ = true; $$.value_ = $1; }
 | hierarchical_identifier range_expression.opt { 
   $$.valid_ = true; $$.value_ = naja::verilog::Identifier($1, $2);
 }

@@ -3,6 +3,7 @@
 
 #include "VerilogConstructor.h"
 
+#include <sstream>
 #include <map>
 
 class VerilogConstructorTest: public naja::verilog::VerilogConstructor {

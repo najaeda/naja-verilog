@@ -16,7 +16,25 @@
 
 #include "VerilogTypes.h"
 
+#include <sstream>
+
 namespace naja { namespace verilog {
+
+//LCOV_EXCL_START
+std::string Range::getString() const {
+  std::ostringstream stream;
+  if (not valid_) {
+    stream << "[not valid]";
+    return stream.str();
+  }
+  if (singleValue_) {
+    stream << "[" << msb_ << "]";
+  } else {
+    stream << "[" << msb_ << ":" << lsb_ << "]";
+  }
+  return stream.str();
+}
+//LCOV_EXCL_STOP
 
 Port::Direction::Direction(const DirectionEnum& dirEnum):
   dirEnum_(dirEnum)
@@ -34,6 +52,18 @@ std::string Port::Direction::getString() const {
 }
 //LCOV_EXCL_STOP
 
+//LCOV_EXCL_START
+std::string Port::getString() const {
+  std::ostringstream stream;
+  stream << "Port: " << name_;
+  if (range_.valid_) {
+    stream << range_.getString();
+  }
+  stream << " " << direction_.getString();
+  return stream.str();
+}
+//LCOV_EXCL_STOP
+
 Net::Type::Type(const TypeEnum& typeEnum):
   typeEnum_(typeEnum)
 {}
@@ -48,6 +78,83 @@ std::string Net::Type::getString() const {
   }
   return "Error";
 }
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
+std::string Net::getString() const {
+  std::ostringstream stream;
+  stream << "Net: " << name_;
+  if (range_.valid_) {
+    stream << range_.getString();
+  }
+  stream << " " << type_.getString();
+  return stream.str();
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
+std::string Identifier::getString() const {
+  std::ostringstream stream;
+  stream << name_;
+  if (range_.valid_) {
+    stream << range_.getString();
+  }
+  return stream.str();
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
+std::string BasedNumber::getString() const {
+  std::ostringstream stream;
+  stream << size_ << "'";
+  switch (base_) {
+    case BINARY:
+      stream << "b";
+      break;
+    case OCTAL:
+      stream << "o";
+      break;
+    case HEX:
+      stream << "h";
+      break;
+    case DECIMAL:
+      stream << "d";
+      break;
+  }
+  stream << digits_;
+  return stream.str();
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
+std::string Number::getString() const {
+  std::ostringstream stream;
+  switch (value_.index()) {
+    case Type::BASED:
+      stream << " based number: " << std::get<Type::BASED>(value_).getString();
+      break; 
+    case Type::UNSIGNED:
+      stream << "unsigned: " << std::get<Type::UNSIGNED>(value_);
+      break; 
+  }
+  return stream.str();
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
+std::string Expression::getString() const {
+  std::ostringstream stream;
+  stream << "Expression: (valid: " << valid_ << " supported: " << supported_ << ") ";
+  switch (value_.index()) {
+    case Type::IDENTIFIER:
+      stream << " id: " << std::get<Type::IDENTIFIER>(value_).getString();
+      break; 
+    case Type::NUMBER:
+      stream << " number: " << std::get<Type::NUMBER>(value_).getString();
+      break; 
+  }
+  return stream.str();
+} 
 //LCOV_EXCL_STOP
 
 }} // namespace verilog // namespace naja
