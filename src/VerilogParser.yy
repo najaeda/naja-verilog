@@ -103,7 +103,7 @@
 %type<std::string> hierarchical_identifier;
 %type<std::string> module_identifier;
 %type<std::string> name_of_module_instance;
-//%type<std::string> module_instance_identifier;
+%type<std::string> parameter_identifier;
 %type<std::string> number
 
 %type<naja::verilog::Port> port_declaration
@@ -116,12 +116,13 @@
 %type<NetIdentifier> net_identifier;
 %type<NetIdentifiers> list_of_net_identifiers;
 %type<std::string> module_instance;
-//%type<Instances> list_of_module_instances;
 %type<std::string> port_identifier;
 
 %type<naja::verilog::Expression> primary;
 %type<naja::verilog::Expression> expression;
 %type<naja::verilog::Expression> expression.opt;
+%type<naja::verilog::Expression> mintypmax_expression;
+%type<naja::verilog::Expression> mintypmax_expression.opt;
 %type<naja::verilog::Expression::Expressions> concatenation;
 %type<naja::verilog::Expression::Expressions> list_of_expressions; 
 
@@ -283,9 +284,11 @@ parameter_identifier: identifier;
 
 mintypmax_expression: expression;
 
-mintypmax_expression.opt: %empty | mintypmax_expression;
+mintypmax_expression.opt: %empty { $$.valid_ = false; } | mintypmax_expression { $$ = $1; }
 
-named_parameter_assignment: '.' parameter_identifier '(' mintypmax_expression.opt ')';
+named_parameter_assignment: '.' parameter_identifier '(' mintypmax_expression.opt ')' {
+  constructor->addParameterAssignment($2, $4);
+}
 
 list_of_named_parameter_assignments
 : named_parameter_assignment

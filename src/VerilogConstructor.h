@@ -43,11 +43,11 @@ class VerilogConstructor {
     virtual void moduleInterfaceCompletePort(const Port& port) {}
     virtual void moduleImplementationPort(const Port& port) {}
     virtual void addNet(const Net& net) {}
-    //virtual void addInstance(Instance&& instance) {}
     virtual void startInstantiation(const std::string& modelName) {}
     virtual void addInstance(const std::string& instanceName) {}
     virtual void addInstanceConnection(const std::string& portName, const Expression& expression) {}
     virtual void endInstantiation() {}
+    virtual void addParameterAssignment(const std::string& parameterName, const Expression& expression) {}
     virtual void endModule() {}
   private:
     class ModuleInterfaceType {

@@ -34,6 +34,24 @@ class VerilogConstructorExample: public naja::verilog::VerilogConstructor {
     void moduleImplementationPort(const naja::verilog::Port& port) override {
       std::cerr << "Construct Port: " << port.getString() << std::endl;
     }
+    void startInstantiation(const std::string& modelName) override {
+      std::cerr << "startInstantiation: " << modelName << std::endl;
+    }
+    void addInstance(const std::string& instanceName) override {
+      std::cerr << "addInstance: " << instanceName << std::endl;
+    }
+    void addInstanceConnection(const std::string& portName, const naja::verilog::Expression& expression) override {
+      std::cerr << "addInstanceConnection: " << portName << ": " << expression.getString() << std::endl;
+    }
+    void endInstantiation() override {
+      std::cerr << "endInstantiation" << std::endl; 
+    }
+    void addParameterAssignment(const std::string& parameterName, const naja::verilog::Expression& expression) override {
+      std::cerr << "addParameterAssignment: " << parameterName << ": " <<  expression.getString() << std::endl;
+    }
+    void endModule() override {
+      std::cerr << "endModule" << std::endl; 
+    }
 };
 
 }

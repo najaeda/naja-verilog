@@ -43,8 +43,6 @@ struct Range {
 
   //Range has been parsed
   bool  valid_        {false};
-  //If valid_ is true and supported_ is false, then this range construction
-  //is not currently supported.
   bool  singleValue_  {false};
   int   msb_          {0};
   int   lsb_          {0};
@@ -146,7 +144,12 @@ struct Identifier {
   Identifier() = default;
   Identifier(const Identifier&) = default;
   std::string getString() const {
-    return std::string();
+    std::ostringstream stream;
+    stream << name_;
+    if (range_.valid_) {
+      stream << range_.getString();
+    }
+    return stream.str();
   }
 
   std::string name_;
@@ -158,8 +161,11 @@ struct Expression {
   Expression() = default;
   Expression(const Expression&) = default;
   enum Type { IDENTIFIER }; 
+  //Means 
   bool        valid_          {false};
-  bool        supported_      {false};
+  //If valid_ is true and supported_ is false, then this expression construction
+  //is not currently supported.
+  bool        supported_      {true};
   Type        type_           {Type::IDENTIFIER};
   Identifier  identifier_     {};
   Range       range_          {};      
