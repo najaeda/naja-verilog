@@ -36,6 +36,8 @@ class VerilogConstructor {
     using Paths = std::list<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
+    
+    //LCOV_EXCL_START
     virtual void startModule(const std::string& name) {}
     //Simple Port declaration (only name), no range, no direction in module interface
     virtual void moduleInterfaceSimplePort(const std::string& name) {}
@@ -49,6 +51,7 @@ class VerilogConstructor {
     virtual void endInstantiation() {}
     virtual void addParameterAssignment(const std::string& parameterName, const Expression& expression) {}
     virtual void endModule() {}
+    //LCOV_EXCL_STOP
   private:
     class ModuleInterfaceType {
       public:
