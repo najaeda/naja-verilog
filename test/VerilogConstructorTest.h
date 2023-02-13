@@ -23,22 +23,30 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void endInstantiation() override;
     void addNet(const naja::verilog::Net& net) override;
 
+    struct InstanceConnection {
+      InstanceConnection() = default;
+      InstanceConnection(const InstanceConnection&) = default;
+      InstanceConnection(const std::string& port): port_(port) {}
+      
+      std::string port_;
+    };
     struct Instance {
+      using Connections = std::vector<InstanceConnection>;
       Instance() = default;
       Instance(const Instance&) = default;
-
       Instance(const std::string& model, const std::string& name):
         model_(model), name_(name)
       {}
-  
-      std::string model_  {};
-      std::string name_   {};
 
       std::string getString() const {
         std::ostringstream stream;
         stream << "Instance: (" << model_ << ") " << name_;
         return stream.str();
-      } 
+      }
+  
+      std::string model_        {};
+      std::string name_         {};
+      Connections connections_  {};
     };
     struct Module {
       using Ports = std::vector<naja::verilog::Port>;

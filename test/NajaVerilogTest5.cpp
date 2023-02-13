@@ -48,6 +48,13 @@ TEST(NajaVerilogTest5, test) {
   EXPECT_FALSE(test->nets_[3].range_.valid_);
 
   EXPECT_EQ(1, test->instances_.size());
-  EXPECT_EQ("_4370_", test->instances_[0].name_);
-  EXPECT_EQ("LUT4", test->instances_[0].model_);
+  const VerilogConstructorTest::Instance& instance = test->instances_[0];
+  EXPECT_EQ("_4370_", instance.name_);
+  EXPECT_EQ("LUT4", instance.model_);
+  EXPECT_EQ(5, instance.connections_.size());
+  EXPECT_EQ("I0", instance.connections_[0].port_);
+  EXPECT_EQ("I1", instance.connections_[1].port_);
+  EXPECT_EQ("I2", instance.connections_[2].port_);
+  EXPECT_EQ("I3", instance.connections_[3].port_);
+  EXPECT_EQ("Q", instance.connections_[4].port_);
 }
