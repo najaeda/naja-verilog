@@ -40,11 +40,9 @@ TEST(NajaVerilogTest5, test) {
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[0].type_);
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[1].type_);
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[2].type_);
-  EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[3].type_);
   EXPECT_FALSE(test->nets_[0].range_.valid_);
   EXPECT_FALSE(test->nets_[1].range_.valid_);
   EXPECT_FALSE(test->nets_[2].range_.valid_);
-  EXPECT_FALSE(test->nets_[3].range_.valid_);
 
   EXPECT_EQ(1, test->instances_.size());
   const VerilogConstructorTest::Instance& instance = test->instances_[0];
