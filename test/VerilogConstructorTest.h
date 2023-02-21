@@ -26,10 +26,24 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     struct InstanceConnection {
       InstanceConnection() = default;
       InstanceConnection(const InstanceConnection&) = default;
-      InstanceConnection(const std::string& port): port_(port) {}
+      InstanceConnection(
+        const std::string& port,
+        const naja::verilog::Expression& expression):
+        port_(port),
+        expression_(expression)
+      {}
+
+      std::string getString() const {
+        std::ostringstream stream;
+        stream << "InstanceConnection - port: "
+          << port_ << " : " << expression_.getString();
+        return stream.str();
+      }
       
-      std::string port_;
+      std::string               port_       {};
+      naja::verilog::Expression expression_ {};
     };
+
     struct Instance {
       using Connections = std::vector<InstanceConnection>;
       Instance() = default;

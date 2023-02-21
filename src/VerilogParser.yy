@@ -271,7 +271,7 @@ list_of_ordered_port_connections: ordered_port_connection | list_of_ordered_port
 port_identifier: identifier;
 
 named_port_connection: '.' port_identifier '(' expression.opt ')' {
-  constructor->addInstanceConnection(std::move($2), std::move($4));
+  constructor->addInstanceConnection($2, $4);
 }
 
 list_of_named_port_connections: named_port_connection | list_of_named_port_connections ',' named_port_connection;
