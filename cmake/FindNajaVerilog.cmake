@@ -4,7 +4,7 @@ FindNajaVerilog
 
 Find the naja libraries.
 
-``Naja::NajaVerilog``
+``NajaVerilog::NajaVerilog``
   Naja Verilog libraries
 
 ^^^^^^^^^^^^^^^^
@@ -50,8 +50,8 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(NajaVerilog
 mark_as_advanced(NAJA_VERILOG_INCLUDE_DIR NAJA_VERILOG_LIBRARY)
 
 if(Naja_Verilog_FOUND AND NOT TARGET Naja::NajaVerilog)
-  add_library(Naja::NajaVerilog UNKNOWN IMPORTED)
-  set_target_properties(Naja::NajaVerilog PROPERTIES
+  add_library(NajaVerilog::NajaVerilog UNKNOWN IMPORTED)
+  set_target_properties(NajaVerilog::NajaVerilog PROPERTIES
     IMPORTED_LOCATION "${NAJA_VERILOG_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${NAJA_VERILOG_INCLUDE_DIRS}")
 endif()
