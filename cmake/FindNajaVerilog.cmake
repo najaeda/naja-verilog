@@ -49,7 +49,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(NajaVerilog
 
 mark_as_advanced(NAJA_VERILOG_INCLUDE_DIR NAJA_VERILOG_LIBRARY)
 
-if(Naja_Verilog_FOUND AND NOT TARGET Naja::NajaVerilog)
+if(Naja_Verilog_FOUND AND NOT TARGET NajaVerilog::NajaVerilog)
   add_library(NajaVerilog::NajaVerilog UNKNOWN IMPORTED)
   set_target_properties(NajaVerilog::NajaVerilog PROPERTIES
     IMPORTED_LOCATION "${NAJA_VERILOG_LIBRARY}"
