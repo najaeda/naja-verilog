@@ -34,6 +34,7 @@ if(ENABLE_SANITIZERS)
 endif(ENABLE_SANITIZERS)
 
 add_subdirectory(src)
+add_subdirectory(cmake)
 
 #Build tests if googletest submodule has been added
 if(EXISTS ${PROJECT_SOURCE_DIR}/thirdparty/googletest/CMakeLists.txt)
