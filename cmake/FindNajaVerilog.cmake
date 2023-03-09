@@ -11,7 +11,7 @@ Find the naja libraries.
 
 This module will set the following variables in your project:
 
-``Naja_Verilog_FOUND``
+``NajaVerilog_FOUND``
   true if Naja Verilog headers and libraries were found
 ``NAJA_VERILOG_INCLUDE_DIRS``
   list of the include directories needed to use Naja Verilog
@@ -47,11 +47,11 @@ include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(NajaVerilog
   REQUIRED_VARS NAJA_VERILOG_INCLUDE_DIR NAJA_VERILOG_LIBRARY)
 
-mark_as_advanced(NAJA_VERILOG_INCLUDE_DIR NAJA_VERILOG_LIBRARY)
-
-if(Naja_Verilog_FOUND AND NOT TARGET NajaVerilog::NajaVerilog)
+if(NajaVerilog_FOUND AND NOT TARGET NajaVerilog::NajaVerilog)
   add_library(NajaVerilog::NajaVerilog UNKNOWN IMPORTED)
   set_target_properties(NajaVerilog::NajaVerilog PROPERTIES
     IMPORTED_LOCATION "${NAJA_VERILOG_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${NAJA_VERILOG_INCLUDE_DIRS}")
 endif()
+
+mark_as_advanced(NAJA_VERILOG_INCLUDE_DIR NAJA_VERILOG_LIBRARY)
