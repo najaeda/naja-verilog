@@ -142,6 +142,14 @@ std::string Number::getString() const {
 //LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
+std::string Concatenation::getString() const {
+  std::ostringstream stream;
+  stream << "Concatenation";
+  return stream.str(); 
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
 std::string Expression::getString() const {
   std::ostringstream stream;
   stream << "Expression: (valid: " << valid_ << " supported: " << supported_ << ") ";
@@ -152,6 +160,9 @@ std::string Expression::getString() const {
     case Type::NUMBER:
       stream << " number: " << std::get<Type::NUMBER>(value_).getString();
       break; 
+    case Type::CONCATENATION:
+      stream << " concatenation: " << std::get<Type::CONCATENATION>(value_).getString();
+      break;
   }
   return stream.str();
 } 

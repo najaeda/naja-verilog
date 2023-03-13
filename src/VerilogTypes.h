@@ -170,22 +170,35 @@ struct Number {
   Value value_  {};
 };
 
+struct Expression;
+
+struct Concatenation {
+  using Expressions = std::vector<Expression>;
+  Concatenation() = default;
+  Concatenation(const Concatenation&) = default;
+  Concatenation(const Expressions& expressions): expressions_(expressions) {}
+  std::string getString() const;
+
+  Expressions expressions_  {};
+};
+
 struct Expression {
   using Expressions = std::vector<Expression>;
   Expression() = default;
   Expression(const Expression&) = default;
   std::string getString() const;
 
-  enum Type { IDENTIFIER=0, NUMBER=1 }; 
-  using Value = std::variant<Identifier, Number>;
+  enum Type { IDENTIFIER=0, NUMBER=1, CONCATENATION=2 }; 
+  using Value = std::variant<Identifier, Number, Concatenation>;
 
   bool        valid_          {false};
   //If valid_ is true and supported_ is false, then this expression construction
   //is not currently supported.
-  bool        supported_      {true};
-  Value       value_          {};
-  //Expressions concatenation_  {};
+  bool          supported_      {true};
+  Value         value_          {};
+  Concatenation concatenation_  {};
 };
+
 
 }} // namespace verilog // namespace naja
 

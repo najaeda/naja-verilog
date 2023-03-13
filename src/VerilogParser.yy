@@ -257,7 +257,7 @@ primary
 | hierarchical_identifier range_expression.opt { 
   $$.valid_ = true; $$.value_ = naja::verilog::Identifier($1, $2);
 }
-| concatenation { $$.valid_ = true; $$.supported_ = false; }
+| concatenation { $$.valid_ = true; $$.value_ = naja::verilog::Concatenation($1); }
 ;
 
 expression: primary { $$ = $1; }
