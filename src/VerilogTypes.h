@@ -164,9 +164,11 @@ struct Number {
     value_ = BasedNumber(size, base, value);
   }
   std::string getString() const;
+  int getInt() const;
   enum Type { BASED, UNSIGNED };
   using Value = std::variant<BasedNumber, unsigned>;
 
+  bool  sign_   {true}; //true positive, false negative
   Value value_  {};
 };
 

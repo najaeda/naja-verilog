@@ -97,6 +97,7 @@
 %token<std::string> IDENTIFIER_TK
 %token<std::string> ESCAPED_IDENTIFIER_TK
 %token<std::string> CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK
+%token<std::string> SIGN_TK
 
 %type<std::string> identifier;
 //no support for XMRs for the moment
@@ -104,21 +105,22 @@
 %type<std::string> module_identifier;
 %type<std::string> name_of_module_instance;
 %type<std::string> parameter_identifier;
-//%type<std::string> number
 
 %type<naja::verilog::Port> port_declaration
 %type<naja::verilog::Port::Direction> port_type_io
 %type<naja::verilog::Net::Type> net_type;
 %type<naja::verilog::Range> range;
 %type<naja::verilog::Range> range.opt
-%type<naja::verilog::Range> range_expression;
-%type<naja::verilog::Range> range_expression.opt;
+%type<naja::verilog::Range> constant_range_expression.opt;
 %type<NetIdentifier> net_identifier;
 %type<NetIdentifiers> list_of_net_identifiers;
 %type<std::string> module_instance;
 %type<std::string> port_identifier;
 
 %type<naja::verilog::Number> number;
+%type<naja::verilog::Number> constant_primary;
+%type<naja::verilog::Number> constant_expression;
+%type<std::string> unary_operator;
 %type<naja::verilog::Expression> primary;
 %type<naja::verilog::Expression> expression;
 %type<naja::verilog::Expression> expression.opt;
@@ -142,10 +144,22 @@ identifier: IDENTIFIER_TK | ESCAPED_IDENTIFIER_TK {
   $$ = $1;
 }
 
-range: '[' CONSTVAL_TK ':' CONSTVAL_TK ']' {
+constant_primary: number
+
+unary_operator: SIGN_TK; 
+
+constant_expression: constant_primary { 
+  $$ = $1;
+} 
+| unary_operator constant_primary {
+  $$ = $2;
+  if ($1 == "-") { $$.sign_ = false; }
+}
+
+range: '[' constant_expression ':' constant_expression ']' {
   $$.valid_ = true;
-  $$.msb_ = std::stoi($2);
-  $$.lsb_ = std::stoi($4);
+  $$.msb_ = $2.getInt();
+  $$.lsb_ = $4.getInt();
 }
 
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
@@ -224,21 +238,15 @@ number
 hierarchical_identifier: identifier;
 
 //only numeric values (one bit) [4] or [4:5] are supported
-range_expression: //expression (not supported)
-CONSTVAL_TK {
+constant_range_expression.opt: %empty { $$.valid_ = false; } 
+| '[' constant_expression ']' {
   $$.valid_ = true;
   $$.singleValue_ = true;
-  $$.msb_ = std::stoi($1);
+  $$.msb_ = $2.getInt();
 }
-| CONSTVAL_TK ':' CONSTVAL_TK {
-  $$.valid_ = true;
-  $$.msb_ = std::stoi($1);
-  $$.lsb_ = std::stoi($3);
+| range {
+  $$ = $1;
 }
-
-range_expression.opt: %empty { $$.valid_ = false; } | '[' range_expression ']' { $$ = $2; }
-
-constant_range_expression.opt: range_expression.opt; 
 
 list_of_expressions:
 expression {
@@ -254,7 +262,7 @@ concatenation: '{' list_of_expressions '}' { $$ = $2; }
 primary
 : number {
   $$.valid_ = true; $$.value_ = $1; }
-| hierarchical_identifier range_expression.opt { 
+| hierarchical_identifier constant_range_expression.opt { 
   $$.valid_ = true; $$.value_ = naja::verilog::Identifier($1, $2);
 }
 | concatenation { $$.valid_ = true; $$.value_ = naja::verilog::Concatenation($1); }
@@ -328,15 +336,6 @@ list_of_module_items: module_item | list_of_module_items module_item;
 list_of_module_items.opt: %empty | list_of_module_items; 
 
 /* A.1.2 */
-//module_declaration:
-//  MODULE_KW module_identifier {
-//    constructor->startModule(std::move($2));
-//  } '(' list_of_ports ')' ';' list_of_module_items.opt ENDMODULE_KW {
-//    constructor->endModule();
-//  }
-//| MODULE_KW module_identifier list_of_port_declarations.opt ';' ENDMODULE_KW
-//;
-
 module_arg
 : port_declaration {
   constructor->internalModuleInterfaceCompletePort($1);

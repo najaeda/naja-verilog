@@ -15,6 +15,7 @@
  */
 
 #include "VerilogTypes.h"
+#include "VerilogException.h"
 
 #include <sstream>
 
@@ -125,6 +126,19 @@ std::string BasedNumber::getString() const {
   return stream.str();
 }
 //LCOV_EXCL_STOP
+
+int Number::getInt() const {
+  switch (value_.index()) {
+    case Type::UNSIGNED: {
+      int value = std::get<Type::UNSIGNED>(value_);
+      return sign_?value:-value;
+    }
+    default: {
+      throw VerilogException("Unsupported number");
+    }
+  }
+  return 0;
+}
 
 //LCOV_EXCL_START
 std::string Number::getString() const {

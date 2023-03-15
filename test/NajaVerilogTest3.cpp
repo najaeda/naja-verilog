@@ -14,67 +14,6 @@ using namespace naja::verilog;
 #endif
 
 TEST(NajaVerilogTest3, test0) {
-  VerilogConstructorTest constructor;
-  std::filesystem::path test3Path(
-      std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
-      / std::filesystem::path("test3.v"));
-  constructor.parse(test3Path);
-  ASSERT_EQ(2, constructor.modules_.size());
-  auto mod0 = constructor.modules_[0];
-  EXPECT_EQ("mod0", mod0->name_);
-  ASSERT_EQ(2, mod0->ports_.size());
-  EXPECT_EQ("i0", mod0->ports_[0].name_);
-  EXPECT_EQ("o0", mod0->ports_[1].name_);
-  EXPECT_EQ(naja::verilog::Port::Direction::Input, mod0->ports_[0].direction_);
-  EXPECT_EQ(naja::verilog::Port::Direction::Output, mod0->ports_[1].direction_);
-  EXPECT_TRUE(mod0->nets_.empty());
-  EXPECT_TRUE(mod0->instances_.empty());
-
-  auto test = constructor.modules_[1];
-  EXPECT_EQ("test", test->name_);
-  EXPECT_EQ(3, test->ports_.size());
-  EXPECT_EQ("i", test->ports_[0].name_);
-  EXPECT_EQ("o", test->ports_[1].name_);
-  EXPECT_EQ("io", test->ports_[2].name_);
-  EXPECT_EQ(naja::verilog::Port::Direction::Input, test->ports_[0].direction_);
-  EXPECT_EQ(naja::verilog::Port::Direction::Output, test->ports_[1].direction_);
-  EXPECT_EQ(naja::verilog::Port::Direction::InOut, test->ports_[2].direction_);
-  
-  constructor.setFirstPass(false);
-  constructor.parse(test3Path);
-
-  ASSERT_EQ(7, test->nets_.size());
-  EXPECT_EQ("net0", test->nets_[0].name_);
-  EXPECT_EQ("net1", test->nets_[1].name_);
-  EXPECT_EQ("net2", test->nets_[2].name_);
-  EXPECT_EQ("net3", test->nets_[3].name_);
-  EXPECT_EQ("net4", test->nets_[4].name_);
-  EXPECT_EQ("constant0", test->nets_[5].name_);
-  EXPECT_EQ("constant1", test->nets_[6].name_);
-  EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[0].type_);
-  EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[1].type_);
-  EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[2].type_);
-  EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[3].type_);
-  EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[4].type_);
-  EXPECT_EQ(naja::verilog::Net::Type::Supply0, test->nets_[5].type_);
-  EXPECT_EQ(naja::verilog::Net::Type::Supply1, test->nets_[6].type_);
-  EXPECT_FALSE(test->nets_[0].range_.valid_);
-  EXPECT_FALSE(test->nets_[1].range_.valid_);
-  EXPECT_FALSE(test->nets_[2].range_.valid_);
-  EXPECT_FALSE(test->nets_[3].range_.valid_);
-  EXPECT_TRUE(test->nets_[4].range_.valid_);
-  EXPECT_FALSE(test->nets_[5].range_.valid_);
-  EXPECT_FALSE(test->nets_[6].range_.valid_);
-  EXPECT_EQ(31, test->nets_[4].range_.msb_);
-  EXPECT_EQ(0, test->nets_[4].range_.lsb_);
-
-  ASSERT_EQ(2, test->instances_.size());
-  EXPECT_EQ("mod0", test->instances_[0].model_);
-  EXPECT_EQ("inst0", test->instances_[0].name_);
-}
-
-TEST(NajaVerilogTest3, test1) {
   std::filesystem::path test3Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
       / std::filesystem::path("benchmarks")
@@ -83,7 +22,7 @@ TEST(NajaVerilogTest3, test1) {
   {
     constructor.parse(test3Path);
 
-    ASSERT_EQ(2, constructor.modules_.size());
+    ASSERT_EQ(3, constructor.modules_.size());
     auto mod0 = constructor.modules_[0];
     EXPECT_EQ("mod0", mod0->name_);
     ASSERT_EQ(2, mod0->ports_.size());
@@ -94,7 +33,17 @@ TEST(NajaVerilogTest3, test1) {
     EXPECT_TRUE(mod0->nets_.empty());
     EXPECT_TRUE(mod0->instances_.empty());
 
-    auto test = constructor.modules_[1];
+    auto mod1 = constructor.modules_[1];
+    EXPECT_EQ("mod1", mod1->name_);
+    ASSERT_EQ(2, mod1->ports_.size());
+    EXPECT_EQ("i0", mod1->ports_[0].name_);
+    EXPECT_EQ("o0", mod1->ports_[1].name_);
+    EXPECT_EQ(naja::verilog::Port::Direction::Input, mod1->ports_[0].direction_);
+    EXPECT_EQ(naja::verilog::Port::Direction::Output, mod1->ports_[1].direction_);
+    EXPECT_TRUE(mod1->nets_.empty());
+    EXPECT_TRUE(mod1->instances_.empty());
+
+    auto test = constructor.modules_[2];
     EXPECT_EQ("test", test->name_);
     ASSERT_EQ(3, test->ports_.size());
     EXPECT_EQ("i", test->ports_[0].name_);
@@ -110,45 +59,160 @@ TEST(NajaVerilogTest3, test1) {
     constructor.setFirstPass(false);
     constructor.parse(test3Path);
 
-    EXPECT_EQ(2, constructor.modules_.size());
+    EXPECT_EQ(3, constructor.modules_.size());
     auto mod0 = constructor.modules_[0];
     EXPECT_EQ("mod0", mod0->name_);
     EXPECT_EQ(2, mod0->ports_.size());
     EXPECT_TRUE(mod0->nets_.empty());
     EXPECT_TRUE(mod0->instances_.empty());
 
-    auto test = constructor.modules_[1];
+    auto mod1 = constructor.modules_[1];
+    EXPECT_EQ("mod1", mod1->name_);
+    EXPECT_EQ(2, mod1->ports_.size());
+    EXPECT_TRUE(mod1->nets_.empty());
+    EXPECT_TRUE(mod1->instances_.empty());
+
+    auto test = constructor.modules_[2];
     EXPECT_EQ("test", test->name_);
     EXPECT_EQ(3, test->ports_.size());
-    ASSERT_EQ(7, test->nets_.size());
+    ASSERT_EQ(8, test->nets_.size());
     EXPECT_EQ("net0", test->nets_[0].name_);
     EXPECT_EQ("net1", test->nets_[1].name_);
     EXPECT_EQ("net2", test->nets_[2].name_);
     EXPECT_EQ("net3", test->nets_[3].name_);
     EXPECT_EQ("net4", test->nets_[4].name_);
-    EXPECT_EQ("constant0", test->nets_[5].name_);
-    EXPECT_EQ("constant1", test->nets_[6].name_);
+    EXPECT_EQ("net5", test->nets_[5].name_);
+    EXPECT_EQ("constant0", test->nets_[6].name_);
+    EXPECT_EQ("constant1", test->nets_[7].name_);
     EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[0].type_);
     EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[1].type_);
     EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[2].type_);
     EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[3].type_);
     EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[4].type_);
-    EXPECT_EQ(naja::verilog::Net::Type::Supply0, test->nets_[5].type_);
-    EXPECT_EQ(naja::verilog::Net::Type::Supply1, test->nets_[6].type_);
+    EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[5].type_);
+    EXPECT_EQ(naja::verilog::Net::Type::Supply0, test->nets_[6].type_);
+    EXPECT_EQ(naja::verilog::Net::Type::Supply1, test->nets_[7].type_);
     EXPECT_FALSE(test->nets_[0].range_.valid_);
     EXPECT_FALSE(test->nets_[1].range_.valid_);
     EXPECT_FALSE(test->nets_[2].range_.valid_);
     EXPECT_FALSE(test->nets_[3].range_.valid_);
     EXPECT_TRUE(test->nets_[4].range_.valid_);
-    EXPECT_FALSE(test->nets_[5].range_.valid_);
+    EXPECT_TRUE(test->nets_[5].range_.valid_);
     EXPECT_FALSE(test->nets_[6].range_.valid_);
+    EXPECT_FALSE(test->nets_[7].range_.valid_);
     EXPECT_EQ(31, test->nets_[4].range_.msb_);
     EXPECT_EQ(0, test->nets_[4].range_.lsb_);
+    EXPECT_EQ(-2, test->nets_[5].range_.msb_);
+    EXPECT_EQ(1, test->nets_[5].range_.lsb_);
 
-    ASSERT_EQ(2, test->instances_.size());
+    ASSERT_EQ(4, test->instances_.size());
     EXPECT_EQ("mod0", test->instances_[0].model_);
     EXPECT_EQ("inst0", test->instances_[0].name_);
     EXPECT_EQ("mod0", test->instances_[1].model_);
     EXPECT_EQ("inst1", test->instances_[1].name_);
+    EXPECT_EQ("mod1", test->instances_[2].model_);
+    EXPECT_EQ("inst2", test->instances_[2].name_);
+    EXPECT_EQ("mod1", test->instances_[3].model_);
+    EXPECT_EQ("inst3", test->instances_[3].name_);
+
+    auto inst0 = test->instances_[0];
+    ASSERT_EQ(2, inst0.connections_.size());
+    EXPECT_EQ("i0", inst0.connections_[0].port_);
+    EXPECT_TRUE(inst0.connections_[0].expression_.valid_);
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      inst0.connections_[0].expression_.value_.index());
+    auto identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(inst0.connections_[0].expression_.value_);
+    EXPECT_FALSE(identifier.range_.valid_);
+    EXPECT_EQ("net0", identifier.name_);
+    EXPECT_EQ("o0", inst0.connections_[1].port_);
+    EXPECT_FALSE(inst0.connections_[1].expression_.valid_);
+
+    auto inst1 = test->instances_[1];
+    ASSERT_EQ(2, inst1.connections_.size());
+    EXPECT_EQ("i0", inst1.connections_[0].port_);
+    EXPECT_TRUE(inst1.connections_[0].expression_.valid_);
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      inst1.connections_[0].expression_.value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(inst1.connections_[0].expression_.value_);
+    EXPECT_TRUE(identifier.range_.valid_);
+    EXPECT_EQ("net4", identifier.name_);
+    EXPECT_TRUE(identifier.range_.singleValue_);
+    EXPECT_EQ(21, identifier.range_.msb_);
+
+    EXPECT_EQ("o0", inst1.connections_[1].port_);
+    EXPECT_TRUE(inst1.connections_[1].expression_.valid_);
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      inst1.connections_[1].expression_.value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(inst1.connections_[1].expression_.value_);
+    EXPECT_TRUE(identifier.range_.valid_);
+    EXPECT_EQ("net4", identifier.name_);
+    EXPECT_TRUE(identifier.range_.singleValue_);
+    EXPECT_EQ(5, identifier.range_.msb_);
+
+    auto inst2 = test->instances_[2];
+    ASSERT_EQ(2, inst2.connections_.size());
+    EXPECT_EQ("i0", inst2.connections_[0].port_);
+    EXPECT_TRUE(inst2.connections_[0].expression_.valid_);
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      inst2.connections_[0].expression_.value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(inst2.connections_[0].expression_.value_);
+    EXPECT_TRUE(identifier.range_.valid_);
+    EXPECT_EQ("net4", identifier.name_);
+    EXPECT_FALSE(identifier.range_.singleValue_);
+    EXPECT_EQ(3, identifier.range_.msb_);
+    EXPECT_EQ(6, identifier.range_.lsb_);
+
+    EXPECT_EQ("o0", inst2.connections_[1].port_);
+    EXPECT_TRUE(inst2.connections_[1].expression_.valid_);
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      inst2.connections_[1].expression_.value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(inst2.connections_[1].expression_.value_);
+    EXPECT_FALSE(identifier.range_.valid_);
+    EXPECT_EQ("net5", identifier.name_);
+
+    auto inst3 = test->instances_[3];
+    ASSERT_EQ(2, inst3.connections_.size());
+    EXPECT_EQ("i0", inst3.connections_[0].port_);
+    EXPECT_TRUE(inst3.connections_[0].expression_.valid_);
+    ASSERT_EQ(naja::verilog::Expression::Type::CONCATENATION,
+      inst3.connections_[0].expression_.value_.index());
+    auto concatenation =
+      std::get<naja::verilog::Expression::Type::CONCATENATION>(inst3.connections_[0].expression_.value_);
+    ASSERT_EQ(4, concatenation.expressions_.size());
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      concatenation.expressions_[0].value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(concatenation.expressions_[0].value_);
+    EXPECT_FALSE(identifier.range_.valid_);
+    EXPECT_EQ("net0", identifier.name_);
+
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      concatenation.expressions_[1].value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(concatenation.expressions_[1].value_);
+    EXPECT_FALSE(identifier.range_.valid_);
+    EXPECT_EQ("net1", identifier.name_);
+
+    
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      concatenation.expressions_[2].value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(concatenation.expressions_[2].value_);
+    EXPECT_FALSE(identifier.range_.valid_);
+    EXPECT_EQ("net2", identifier.name_);
+
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      concatenation.expressions_[3].value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(concatenation.expressions_[3].value_);
+    EXPECT_TRUE(identifier.range_.valid_);
+    EXPECT_EQ("net5", identifier.name_);
+    EXPECT_TRUE(identifier.range_.singleValue_);
+    EXPECT_EQ(-2, identifier.range_.msb_);
   }
 }

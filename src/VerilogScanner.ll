@@ -108,6 +108,8 @@ ESCAPED_IDENTIFIER \\[\\^!"#$%&',()*+\-.a-zA-Z0-9/{|}~[\]_:;<=>?@]+[\t\f ]
   return yytext[0];
 }
 
+"+"|"-"     { yylval->build<std::string>( yytext ); return token::SIGN_TK; }
+
 module      { return token::MODULE_KW; }
 endmodule   { return token::ENDMODULE_KW; }
 input       { return token::INPUT_KW; } 
@@ -117,8 +119,6 @@ wire        { return token::WIRE_KW; }
 supply0     { return token::SUPPLY0_KW; }
 supply1     { return token::SUPPLY1_KW; }
 assign      { return token::ASSIGN_KW; }
-
-
 
 {IDENTIFIER}          {  yylval->build<std::string>( yytext ); return token::IDENTIFIER_TK; }
 {ESCAPED_IDENTIFIER}  {  yylval->build<std::string>( yytext ); return token::ESCAPED_IDENTIFIER_TK; }
@@ -142,9 +142,9 @@ assign      { return token::ASSIGN_KW; }
 }
 
  /* Last rule catches everything */
-.           {
-              std::cerr << "Failed to match : " << yytext << '\n';
-              yyterminate(); 
-            }
+. {
+  std::cerr << "Failed to match : " << yytext << '\n';
+  yyterminate();
+}
 
 %%

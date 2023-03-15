@@ -6,7 +6,7 @@
 module mod0(input i0, output o0);
 endmodule
 
-module mod1(input i0[3:0], output o0[0:3]);
+module mod1(input[3:0] i0, output[0:3] o0);
 endmodule
 
 module test(input i, output o, inout io);
@@ -19,6 +19,7 @@ module test(input i, output o, inout io);
 
   mod0 inst0(.i0(net0), .o0(/*empty*/));
   mod0 inst1(.i0(net4[21]), .o0(net4[5]));
-  mod1 inst2(.i0(net4[:]), .o0(net5));
+  mod1 inst2(.i0(net4[3:6]), .o0(net5));
+  mod1 inst3(.i0({net0, net1, net2, net5[-2]}), .o0(net5));
 
 endmodule
