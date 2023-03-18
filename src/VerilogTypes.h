@@ -149,7 +149,7 @@ struct BasedNumber {
 
   std::string getString() const;
  
-  unsigned    size_   {0};
+  size_t      size_   {0};
   Base        base_   {};
   std::string digits_ {};
 };
@@ -193,7 +193,7 @@ struct Expression {
   enum Type { IDENTIFIER=0, NUMBER=1, CONCATENATION=2 }; 
   using Value = std::variant<Identifier, Number, Concatenation>;
 
-  bool        valid_          {false};
+  bool          valid_          {false};
   //If valid_ is true and supported_ is false, then this expression construction
   //is not currently supported.
   bool          supported_      {true};
