@@ -32,18 +32,6 @@
   }}
 
   namespace {
-  
-    struct NetIdentifier {
-      NetIdentifier() = default;
-      NetIdentifier(const NetIdentifier&) = default;
-      NetIdentifier(std::string&& name): name_(name) {}
-      NetIdentifier(std::string&& name, naja::verilog::Range&& range):
-        name_(name), range_(range) {}
-      std::string           name_   {};
-      naja::verilog::Range  range_  {};
-    };
-  
-    using NetIdentifiers = std::vector<NetIdentifier>;
     using Instances = std::vector<std::string>;
   }
 
@@ -102,6 +90,7 @@
 %type<std::string> identifier;
 //no support for XMRs for the moment
 %type<std::string> hierarchical_identifier;
+%type<std::string> hierarchical_net_identifier;
 %type<std::string> module_identifier;
 %type<std::string> name_of_module_instance;
 %type<std::string> parameter_identifier;
@@ -112,8 +101,10 @@
 %type<naja::verilog::Range> range;
 %type<naja::verilog::Range> range.opt
 %type<naja::verilog::Range> constant_range_expression.opt;
-%type<NetIdentifier> net_identifier;
-%type<NetIdentifiers> list_of_net_identifiers;
+%type<naja::verilog::Identifier> net_identifier;
+%type<naja::verilog::Identifiers> list_of_net_identifiers;
+%type<naja::verilog::Identifiers> net_lvalue;
+%type<naja::verilog::Identifiers> list_of_net_lvalues;
 %type<std::string> module_instance;
 %type<std::string> port_identifier;
 
@@ -178,14 +169,25 @@ non_port_module_item : module_or_generate_item;
 
 hierarchical_net_identifier: identifier;
 
-net_lvalue: 
-  hierarchical_net_identifier constant_range_expression.opt;
-| '{' list_of_net_lvalues '}';
-;
+net_lvalue: hierarchical_net_identifier constant_range_expression.opt {
+  $$ = { naja::verilog::Identifier($1, $2) };
+}
+| '{' list_of_net_lvalues '}' {
+  $$ = $2;
+}
 
-list_of_net_lvalues: net_lvalue | list_of_net_lvalues ',' net_lvalue;
+//Only one level of list is supported
+list_of_net_lvalues: hierarchical_net_identifier constant_range_expression.opt {
+  $$ = { naja::verilog::Identifier($1, $2) };
+}
+| list_of_net_lvalues ',' hierarchical_net_identifier constant_range_expression.opt {
+  $1.push_back(naja::verilog::Identifier($3, $4));
+  $$ = $1;
+}
 
-net_assignment: net_lvalue '=' expression;
+net_assignment: net_lvalue '=' expression {
+  constructor->addAssignment($1, $3);
+}
 
 list_of_net_assignments: net_assignment | list_of_net_assignments ',' net_assignment;
 
@@ -214,7 +216,7 @@ list_of_net_identifiers
   $$ = $1;
 }
 
-net_identifier: identifier { $$ = NetIdentifier(std::move($1)); }
+net_identifier: identifier { $$ = naja::verilog::Identifier($1); }
 
 net_type
 : SUPPLY0_KW { $$ = naja::verilog::Net::Type::Supply0; }
