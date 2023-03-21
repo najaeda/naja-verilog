@@ -148,6 +148,7 @@ struct BasedNumber {
   enum Base { BINARY, OCTAL, HEX, DECIMAL };
 
   std::string getString() const;
+  std::string getDescription() const;
  
   size_t      size_   {0};
   Base        base_   {};
@@ -164,6 +165,8 @@ struct Number {
     value_ = BasedNumber(size, base, value);
   }
   std::string getString() const;
+  std::string getDescription() const;
+
   int getInt() const;
   enum Type { BASED, UNSIGNED };
   using Value = std::variant<BasedNumber, unsigned>;
@@ -180,6 +183,7 @@ struct Concatenation {
   Concatenation(const Concatenation&) = default;
   Concatenation(const Expressions& expressions): expressions_(expressions) {}
   std::string getString() const;
+  std::string getDescription() const;
 
   Expressions expressions_  {};
 };
@@ -189,6 +193,7 @@ struct Expression {
   Expression() = default;
   Expression(const Expression&) = default;
   std::string getString() const;
+  std::string getDescription() const;
 
   enum Type { IDENTIFIER=0, NUMBER=1, CONCATENATION=2 }; 
   using Value = std::variant<Identifier, Number, Concatenation>;

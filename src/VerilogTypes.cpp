@@ -127,6 +127,12 @@ std::string BasedNumber::getString() const {
 }
 //LCOV_EXCL_STOP
 
+//LCOV_EXCL_START
+std::string BasedNumber::getDescription() const {
+  return "BasedNumber: " + getString();
+}
+//LCOV_EXCL_STOP
+
 int Number::getInt() const {
   switch (value_.index()) {
     case Type::UNSIGNED: {
@@ -142,10 +148,22 @@ int Number::getInt() const {
 
 //LCOV_EXCL_START
 std::string Number::getString() const {
+  switch (value_.index()) {
+    case Type::BASED:
+      return std::get<Type::BASED>(value_).getString();
+    case Type::UNSIGNED:
+      return std::to_string(std::get<Type::UNSIGNED>(value_));
+  }
+  return std::string();
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
+std::string Number::getDescription() const {
   std::ostringstream stream;
   switch (value_.index()) {
     case Type::BASED:
-      stream << " based number: " << std::get<Type::BASED>(value_).getString();
+      stream << std::get<Type::BASED>(value_).getDescription();
       break; 
     case Type::UNSIGNED:
       stream << "unsigned: " << std::get<Type::UNSIGNED>(value_);
@@ -158,13 +176,43 @@ std::string Number::getString() const {
 //LCOV_EXCL_START
 std::string Concatenation::getString() const {
   std::ostringstream stream;
-  stream << "Concatenation";
+  stream << "{ ";
+  bool first = false;
+  for (auto expression: expressions_) {
+    if (not first) {
+      stream << ", ";
+    }
+    stream << expression.getString();
+    first = false;
+  }
+  stream << " }";
   return stream.str(); 
 }
 //LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
+std::string Concatenation::getDescription() const {
+  return "Concatenation: " + getString();
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
 std::string Expression::getString() const {
+  std::ostringstream stream;
+  switch (value_.index()) {
+    case Type::IDENTIFIER:
+      return std::get<Type::IDENTIFIER>(value_).getString();
+    case Type::NUMBER:
+      return std::get<Type::NUMBER>(value_).getString();
+    case Type::CONCATENATION:
+      return std::get<Type::CONCATENATION>(value_).getString();
+  }
+  return std::string();
+} 
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
+std::string Expression::getDescription() const {
   std::ostringstream stream;
   stream << "Expression: (valid: " << valid_ << " supported: " << supported_ << ") ";
   switch (value_.index()) {
