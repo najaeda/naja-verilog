@@ -25,6 +25,9 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       const naja::verilog::Expression& expression) override;
     void endInstantiation() override;
     void addNet(const naja::verilog::Net& net) override;
+    void addAssignment(
+      const naja::verilog::Identifiers& identifiers,
+      const naja::verilog::Expression& expression) override;
 
     struct InstanceConnection {
       InstanceConnection() = default;
@@ -49,6 +52,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
 
     struct Instance {
       using Connections = std::vector<InstanceConnection>;
+      using ParameterAssignments = std::map<std::string, std::string>;
       Instance() = default;
       Instance(const Instance&) = default;
       Instance(const std::string& model, const std::string& name):
@@ -61,9 +65,10 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
         return stream.str();
       }
   
-      std::string model_        {};
-      std::string name_         {};
-      Connections connections_  {};
+      std::string           model_                {};
+      std::string           name_                 {};
+      ParameterAssignments  parameterAssignments_ {};
+      Connections           connections_          {};
     };
 
     struct Assign {
@@ -75,11 +80,12 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       using Nets = std::vector<naja::verilog::Net>;
       using Instances = std::vector<Instance>;
       using Assigns = std::vector<Assign>;
-      std::string name_       {};
-      Ports       ports_      {};
-      Nets        nets_       {};
-      Assigns     assigns_    {};
-      Instances   instances_  {};
+      std::string                     name_                                 {};
+      Ports                           ports_                                {};
+      Nets                            nets_                                 {};
+      Assigns                         assigns_                              {};
+      Instances                       instances_                            {};
+      Instance::ParameterAssignments  currentInstanceParameterAssignments_  {};
 
       Module(const std::string& name):
         name_(name)

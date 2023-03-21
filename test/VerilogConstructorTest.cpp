@@ -66,6 +66,8 @@ void VerilogConstructorTest::startInstantiation(const std::string& modelName) {
 void VerilogConstructorTest::endInstantiation() {
   if (not inFirstPass()) {
     std::cerr << "Finish Instantiation of: " << currentModelName_ << std::endl;
+    Instance& instance = currentModule_->instances_.back();
+    instance.parameterAssignments_.swap(currentModule_->currentInstanceParameterAssignments_);
     currentModelName_ = std::string();
   }
 }
@@ -91,5 +93,17 @@ void VerilogConstructorTest::addInstanceConnection(
 void VerilogConstructorTest::addParameterAssignment(
   const std::string& parameterName,
   const naja::verilog::Expression& expression) {
+  if (not inFirstPass()) {
+    std::cerr << "Add parameter assignment: "
+      << parameterName << " " << expression.getString() <<  std::endl;
+    currentModule_->currentInstanceParameterAssignments_[parameterName] = expression.getString();
+  }
+}
+
+void VerilogConstructorTest::addAssignment(
+  const naja::verilog::Identifiers& identifiers,
+  const naja::verilog::Expression& expression) {
+  //currentModule_->assigns_.push_back(
+  //  Assign(naja::verilog::Identifier(parameterName), expression)
 
 }

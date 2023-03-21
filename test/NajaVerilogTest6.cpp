@@ -23,5 +23,5 @@ TEST(NajaVerilogTest6, test) {
   ASSERT_EQ(1, constructor.modules_.size());
   auto test = constructor.modules_[0];
   EXPECT_EQ("test", test->name_);
-  
+
 }
