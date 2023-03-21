@@ -20,6 +20,9 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void addInstanceConnection(
       const std::string& portName,
       const naja::verilog::Expression& expression) override;
+    void addParameterAssignment(
+      const std::string& parameterName,
+      const naja::verilog::Expression& expression) override;
     void endInstantiation() override;
     void addNet(const naja::verilog::Net& net) override;
 
@@ -62,13 +65,20 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       std::string name_         {};
       Connections connections_  {};
     };
+
+    struct Assign {
+      naja::verilog::Identifiers  identifiers_  {};
+    };
+
     struct Module {
       using Ports = std::vector<naja::verilog::Port>;
       using Nets = std::vector<naja::verilog::Net>;
       using Instances = std::vector<Instance>;
+      using Assigns = std::vector<Assign>;
       std::string name_       {};
       Ports       ports_      {};
       Nets        nets_       {};
+      Assigns     assigns_    {};
       Instances   instances_  {};
 
       Module(const std::string& name):

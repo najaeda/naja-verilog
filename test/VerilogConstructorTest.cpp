@@ -87,3 +87,9 @@ void VerilogConstructorTest::addInstanceConnection(
     instance.connections_.push_back(InstanceConnection(portName, expression));
   }
 }
+
+void VerilogConstructorTest::addParameterAssignment(
+  const std::string& parameterName,
+  const naja::verilog::Expression& expression) {
+
+}
