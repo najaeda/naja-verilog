@@ -100,10 +100,16 @@ void VerilogConstructorTest::addParameterAssignment(
   }
 }
 
-void VerilogConstructorTest::addAssignment(
+void VerilogConstructorTest::addAssign(
   const naja::verilog::Identifiers& identifiers,
   const naja::verilog::Expression& expression) {
-  //currentModule_->assigns_.push_back(
-  //  Assign(naja::verilog::Identifier(parameterName), expression)
-
+  if (not inFirstPass()) {
+    std::cerr << "Add assign: ";
+    for (auto identifier: identifiers) {
+      std::cerr << identifier.getDescription() << std::endl;
+    }
+    std::cerr << expression.getDescription() << std::endl;
+    //currentModule_->assigns_.push_back(
+    //  Assign(naja::verilog::Identifier(parameterName), expression)
+  }
 }

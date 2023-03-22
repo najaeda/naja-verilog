@@ -186,7 +186,7 @@ list_of_net_lvalues: hierarchical_net_identifier constant_range_expression.opt {
 }
 
 net_assignment: net_lvalue '=' expression {
-  constructor->addAssignment($1, $3);
+  constructor->addAssign($1, $3);
 }
 
 list_of_net_assignments: net_assignment | list_of_net_assignments ',' net_assignment;

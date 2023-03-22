@@ -24,4 +24,6 @@ TEST(NajaVerilogTest6, test) {
   auto test = constructor.modules_[0];
   EXPECT_EQ("test", test->name_);
 
+  constructor.setFirstPass(false);
+  constructor.parse(test6Path);
 }

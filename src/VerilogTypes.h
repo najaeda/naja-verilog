@@ -119,6 +119,7 @@ struct Identifier {
   Identifier(const std::string& name): name_(name) {}
   Identifier(const std::string& name, const Range& range): name_(name), range_(range) {}
   std::string getString() const;
+  std::string getDescription() const;
 
   std::string name_;
   Range       range_;

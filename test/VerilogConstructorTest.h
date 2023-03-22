@@ -25,7 +25,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       const naja::verilog::Expression& expression) override;
     void endInstantiation() override;
     void addNet(const naja::verilog::Net& net) override;
-    void addAssignment(
+    void addAssign(
       const naja::verilog::Identifiers& identifiers,
       const naja::verilog::Expression& expression) override;
 

@@ -105,6 +105,12 @@ std::string Identifier::getString() const {
 //LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
+std::string Identifier::getDescription() const {
+  return "Identifier: " + getString();
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
 std::string BasedNumber::getString() const {
   std::ostringstream stream;
   stream << size_ << "'";
@@ -177,7 +183,7 @@ std::string Number::getDescription() const {
 std::string Concatenation::getString() const {
   std::ostringstream stream;
   stream << "{ ";
-  bool first = false;
+  bool first = true;
   for (auto expression: expressions_) {
     if (not first) {
       stream << ", ";
@@ -217,13 +223,13 @@ std::string Expression::getDescription() const {
   stream << "Expression: (valid: " << valid_ << " supported: " << supported_ << ") ";
   switch (value_.index()) {
     case Type::IDENTIFIER:
-      stream << " id: " << std::get<Type::IDENTIFIER>(value_).getString();
+      stream << std::get<Type::IDENTIFIER>(value_).getDescription();
       break; 
     case Type::NUMBER:
-      stream << " number: " << std::get<Type::NUMBER>(value_).getString();
+      stream << std::get<Type::NUMBER>(value_).getDescription();
       break; 
     case Type::CONCATENATION:
-      stream << " concatenation: " << std::get<Type::CONCATENATION>(value_).getString();
+      stream << std::get<Type::CONCATENATION>(value_).getDescription();
       break;
   }
   return stream.str();
