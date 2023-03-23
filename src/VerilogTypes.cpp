@@ -111,6 +111,22 @@ std::string Identifier::getDescription() const {
 //LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
+std::string BasedNumber::getBaseString(Base base) {
+  switch (base) {
+    case BINARY:
+      return "BINARY";
+    case OCTAL:
+      return "OCTAL";
+    case HEX:
+      return "HEX";
+    case DECIMAL:
+      return "DECIMAL";
+  }
+  return "UNKNOWN";
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
 std::string BasedNumber::getString() const {
   std::ostringstream stream;
   stream << size_ << "'";

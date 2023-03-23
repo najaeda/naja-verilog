@@ -151,6 +151,7 @@ struct BasedNumber {
   }
   enum Base { BINARY, OCTAL, HEX, DECIMAL };
 
+  static std::string getBaseString(Base base);
   std::string getString() const;
   std::string getDescription() const;
  
