@@ -20,40 +20,44 @@
 
 namespace {
 
+void commandLine() {
+  std::cerr << "naja_verilog_test design.v" << std::endl;
+}
+
 class VerilogConstructorExample: public naja::verilog::VerilogConstructor {
   public:
     void startModule(const std::string& name) override {
-      std::cerr << "Construct Module: " << name << std::endl;
+      std::cout << "Construct Module: " << name << std::endl;
     }
     void moduleInterfaceSimplePort(const std::string& name) override {
-      std::cerr << "Simple Port: " << name << std::endl;
+      std::cout << "Simple Port: " << name << std::endl;
     }
     void moduleInterfaceCompletePort(const naja::verilog::Port& port) override {
-      std::cerr << "Complete Port: " << port.getString() << std::endl;
+      std::cout << "Complete Port: " << port.getString() << std::endl;
     }
     void moduleImplementationPort(const naja::verilog::Port& port) override {
-      std::cerr << "Construct Port: " << port.getString() << std::endl;
+      std::cout << "Construct Port: " << port.getString() << std::endl;
     }
     void addNet(const naja::verilog::Net& net) override {
-      std::cerr << "Construct Net: " << net.getString() << std::endl;
+      std::cout << "Construct Net: " << net.getString() << std::endl;
     }
     void startInstantiation(const std::string& modelName) override {
-      std::cerr << "startInstantiation: " << modelName << std::endl;
+      std::cout << "startInstantiation: " << modelName << std::endl;
     }
     void addInstance(const std::string& instanceName) override {
-      std::cerr << "addInstance: " << instanceName << std::endl;
+      std::cout << "addInstance: " << instanceName << std::endl;
     }
     void addInstanceConnection(const std::string& portName, const naja::verilog::Expression& expression) override {
-      std::cerr << "addInstanceConnection: " << portName << ": " << expression.getString() << std::endl;
+      std::cout << "addInstanceConnection: " << portName << ": " << expression.getString() << std::endl;
     }
     void endInstantiation() override {
-      std::cerr << "endInstantiation" << std::endl; 
+      std::cout << "endInstantiation" << std::endl; 
     }
     void addParameterAssignment(const std::string& parameterName, const naja::verilog::Expression& expression) override {
-      std::cerr << "addParameterAssignment: " << parameterName << ": " <<  expression.getString() << std::endl;
+      std::cout << "addParameterAssignment: " << parameterName << ": " <<  expression.getString() << std::endl;
     }
     void endModule() override {
-      std::cerr << "endModule" << std::endl; 
+      std::cout << "endModule" << std::endl; 
     }
 };
 
@@ -61,7 +65,8 @@ class VerilogConstructorExample: public naja::verilog::VerilogConstructor {
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {
-    return -54;
+    commandLine();
+    exit(1);
   }
 
   VerilogConstructorExample constructor;
