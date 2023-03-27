@@ -6,7 +6,7 @@
 ## Introduction
 Naja-Verilog is a structural (gate-level) Verilog parser and can be used to read synthesis generated netlists.
 
-This project primarly purpose is to offer  be used in conjunction with [Naja](https://github.com/xtofalex/naja), however both projects are not tied and Naja-Verilog can be integrated in any project needing structural verilog support.
+The main purpose of this project is to provide a verilog interface to [Naja SNL](https://github.com/xtofalex/naja), however both projects are not tied and naja-verilog can be integrated in any project needing structural verilog support.
 
 ### Acknowledgement
 [<img src="https://nlnet.nl/logo/banner.png" width=100>](https://nlnet.nl/project/Naja)
@@ -18,7 +18,7 @@ This project is supported and funded by NLNet through the [NGI0 Entrust](https:/
 This parser is dedicated to a very small part of [verilog](https://en.wikipedia.org/wiki/Verilog): the subset allowing to describe hierarchical gate level netlists. This is the format found at the output of synthesis tools such as [Yosys](https://github.com/YosysHQ/yosys).
 
 To parse complete RTL level verilog or system verilog, please use projects such as: [Verible](https://github.com/chipsalliance/verible).
-Apart the language support, the main difference with such RTL level parsing systems is that Naja-Verilog does not construct any AST but allows to construct the netlist on the fly while visiting the verilog source. Purpose is to reduce memory footprint and accelerate parsing time.
+Apart the language support, the main difference with such RTL level parsing systems is that naja-verilog does not construct any AST but allows to construct the netlist on the fly while visiting the verilog source. Purpose is to reduce memory footprint and accelerate parsing time.
 
 A comparable project can be found here: [Parser-Verilog](https://github.com/OpenTimer/Parser-Verilog). 
 ## Compilation
