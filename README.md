@@ -4,9 +4,9 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ***
 ## Introduction
-Naja-Verilog is a structural (gate-level) Verilog parser and can be used to read synthesis generated netlists (for instance Yosys or Vivado).
+Naja-Verilog is a structural (gate-level) Verilog parser and can be used to read synthesis generated netlists.
 
-This project primarly purpose is to offer  be used in conjunction with [Naja](), however both projects are not tied and Naja-Verilog can be integrated in any project needing structural verilog support.
+This project primarly purpose is to offer  be used in conjunction with [Naja](https://github.com/xtofalex/naja), however both projects are not tied and Naja-Verilog can be integrated in any project needing structural verilog support.
 
 ### Acknowledgement
 [<img src="https://nlnet.nl/logo/banner.png" width=100>](https://nlnet.nl/project/Naja)
@@ -15,9 +15,12 @@ This project primarly purpose is to offer  be used in conjunction with [Naja](),
 This project is supported and funded by NLNet through the [NGI0 Entrust](https://nlnet.nl/entrust) Fund.
 
 ### Gate level netlist
-To parse complete RTL level verilog or system verilog, please use projects such as: [Verible](https://github.com/chipsalliance/verible)
+This parser is dedicated to a very small part of [verilog](https://en.wikipedia.org/wiki/Verilog): the subset allowing to describe hierarchical gate level netlists. This is the format found at the output of synthesis tools such as [Yosys](https://github.com/YosysHQ/yosys).
 
-A comparable project is [Parser-Verilog](https://github.com/OpenTimer/Parser-Verilog). 
+To parse complete RTL level verilog or system verilog, please use projects such as: [Verible](https://github.com/chipsalliance/verible).
+Apart the language support, the main difference with such RTL level parsing systems is that Naja-Verilog does not construct any AST but allows to construct the netlist on the fly while visiting the verilog source. Purpose is to reduce memory footprint and accelerate parsing time.
+
+A comparable project can be found here: [Parser-Verilog](https://github.com/OpenTimer/Parser-Verilog). 
 ## Compilation
 ### Getting sources
 ```bash
@@ -29,11 +32,25 @@ git submodule update
 ```
 ### Dependencies
 Mandatory dependencies:
-1. cmake: at least 3.22 version.
+1. [cmake](https://cmake.org): at least 3.22 version.
 2. [Bison](https://www.gnu.org/software/bison)
 3. [Flex](https://github.com/westes/flex)
 
 Embedded dependencies, through git sub module: [google test](https://github.com/google/googletest).
+
+### Building and Installing
+```bash
+#First define an env variable that points to the directory where you want naja-verilog to be installed:
+export NAJA_INSTALL=<path_to_installation_dir>
+# Create a build dir and go inside it
+mkdir build
+cd build
+cmake <path_to_naja_sources_dir> -DCMAKE_INSTALL_PREFIX=$NAJA_INSTALL
+#For instance: cmake ~/srcs/naja-verilog -DCMAKE_INSTALL_PREFIX=$NAJA_INSTALL
+make
+make test
+make install
+```
 
 ## How to create your own parser
 Best starting point is to copy existing examples/implementations:
