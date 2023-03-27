@@ -41,7 +41,7 @@ Best starting point is to copy existing examples/implementations:
 * (VerilogConstructorTest)[https://github.com/xtofalex/naja-verilog/blob/main/test/VerilogConstructorTest.h]: Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
 * (SNLVRLConstructor)[https://github.com/xtofalex/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h]: More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
 
-The principle of the parser is straightforward: inherit from () and override methods 
+The principle of the parser is straightforward: inherit from (VerilogConstructor)[https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogConstructor.h] and override methods launched while visiting verilog source.
 
 ### Two pass Parsing
 As ordering of verilog modules in single or across multiple files is not preknown and module interfaces need to be created before instances and connectivity are created, parsing can be done in a two pass way with:
