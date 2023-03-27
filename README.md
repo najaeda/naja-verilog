@@ -60,7 +60,7 @@ Best starting point is to copy existing examples/implementations:
 
 The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogConstructor.h) and override methods launched while visiting verilog source.
 
-### Two pass Parsing
+### Two passes Parsing
 As ordering of verilog modules in single or across multiple files is not preknown and module interfaces need to be created before instances and connectivity are created, parsing can be done in a two pass way with:
 1. Parse modules, ports and parameters. Ignore instances and connectivity. Construct all interfaces.
 2. Reparse. Ignore ports and parameters. Parse instances and nets. Construct connectivity.
