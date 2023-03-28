@@ -36,6 +36,27 @@ class VerilogConstructor {
     using Paths = std::list<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
+    std::string getCurrentPath() const { return currentPath_; }
+    struct Location {
+      std::filesystem::path currentPath_  {};
+      unsigned              line_         {0};
+      unsigned              column_       {0};
+
+      Location() = delete;
+      Location(const Location&) = default;
+      Location(
+        const std::filesystem::path& currentPath,
+        unsigned line,
+        unsigned column):
+        currentPath_(currentPath),
+        line_(line),
+        column_(column)
+      {}
+    };
+    void setCurrentLocation(unsigned line, unsigned column) {
+      line_= line; column_ = column;
+    }
+    Location getCurrentLocation() const;
     
     //LCOV_EXCL_START
     virtual void startModule(const std::string& name) {}
@@ -77,8 +98,11 @@ class VerilogConstructor {
     Port::Direction     lastDirection_  {Port::Direction::Unknown};
     Range               lastRange_      {};
     
-    VerilogScanner*     scanner_  {nullptr};
-    VerilogParser*      parser_   {nullptr};
+    VerilogScanner*       scanner_      {nullptr};
+    VerilogParser*        parser_       {nullptr};
+    std::filesystem::path currentPath_  {};
+    unsigned              line_         {0};
+    unsigned              column_       {0};
 };
 
 }} // namespace verilog // namespace naja

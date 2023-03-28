@@ -38,6 +38,10 @@ std::string VerilogConstructor::ModuleInterfaceType::getString() const {
 }
 //LCOV_EXCL_STOP
 
+VerilogConstructor::Location VerilogConstructor::getCurrentLocation() const {
+  return Location(getCurrentPath(), line_, column_);
+}
+
 VerilogConstructor::~VerilogConstructor() {
   delete scanner_;
   delete parser_;
@@ -48,6 +52,7 @@ void VerilogConstructor::parse(const std::filesystem::path& path) {
     std::string reason(path.string() + " does not exist");
     throw VerilogException(reason);
   }
+  currentPath_ = path;
   std::ifstream inFile(path);
   if (not inFile.good()) {
     std::string reason(path.string() + " is not a readable file");
@@ -105,6 +110,5 @@ void VerilogConstructor::internalModuleInterfaceCompletePort(const Port& port) {
 void VerilogConstructor::internalModuleImplementationPort(const Port& port) {
   moduleImplementationPort(port);
 }
-
 
 }} // namespace verilog // namespace naja

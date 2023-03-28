@@ -186,6 +186,7 @@ list_of_net_lvalues: hierarchical_net_identifier constant_range_expression.opt {
 }
 
 net_assignment: net_lvalue '=' expression {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->addAssign($1, $3);
 }
 
@@ -203,6 +204,7 @@ module_or_generate_item_declaration: net_declaration;
 
 net_declaration: net_type range.opt list_of_net_identifiers ';' {
   for (auto netIdentifier: $3) {
+    constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
     constructor->addNet(Net(netIdentifier.name_, $2, $1));
   }
 }
@@ -281,6 +283,7 @@ list_of_ordered_port_connections: ordered_port_connection | list_of_ordered_port
 port_identifier: identifier;
 
 named_port_connection: '.' port_identifier '(' expression.opt ')' {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->addInstanceConnection($2, $4);
 }
 
@@ -293,6 +296,7 @@ list_of_port_connections.opt: %empty | list_of_port_connections;
 name_of_module_instance: identifier 
 
 module_instance: name_of_module_instance {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->addInstance(std::move($1));
 } '(' list_of_port_connections.opt ')'
 
@@ -303,6 +307,7 @@ mintypmax_expression: expression;
 mintypmax_expression.opt: %empty { $$.valid_ = false; } | mintypmax_expression { $$ = $1; }
 
 named_parameter_assignment: '.' parameter_identifier '(' mintypmax_expression.opt ')' {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->addParameterAssignment($2, $4);
 }
 
@@ -317,18 +322,22 @@ parameter_value_assignment: %empty | '#' '(' list_of_parameter_assignments ')'
 
 //(From A.4.1) 
 module_instantiation: module_identifier {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->startInstantiation(std::move($1));
 } parameter_value_assignment list_of_module_instances ';' {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->endInstantiation();
 }
 
 module_identifier: identifier 
 
 port: identifier {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->internalModuleInterfaceSimplePort($1);
 }
 
 module_item: port_declaration {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->internalModuleImplementationPort($1);
 } ';'
 | non_port_module_item;
@@ -340,6 +349,7 @@ list_of_module_items.opt: %empty | list_of_module_items;
 /* A.1.2 */
 module_arg
 : port_declaration {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->internalModuleInterfaceCompletePort($1);
 }
 | port;
@@ -349,14 +359,18 @@ list_of_module_args: module_arg | list_of_module_args ',' module_arg;
 list_of_module_args.opt: %empty | '(' ')' | '(' list_of_module_args ')';
 
 module_declaration: MODULE_KW module_identifier {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->internalStartModule(std::move($2));
 } list_of_module_args.opt ';' list_of_module_items.opt ENDMODULE_KW {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->internalEndModule();
 }
 
 %%
 
-void naja::verilog::VerilogParser::error(const location_type& l, const std::string& err_message ) {
+void naja::verilog::VerilogParser::error(
+  const location_type& l,
+  const std::string& err_message ) {
   std::ostringstream reason;
   reason << "Parser error: " << err_message  << '\n'
             << "  begin at line " << l.begin.line <<  " col " << l.begin.column  << '\n' 
