@@ -36,6 +36,8 @@ class VerilogConstructor {
     using Paths = std::list<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
+
+    //LCOV_EXCL_START
     std::string getCurrentPath() const { return currentPath_; }
     struct Location {
       std::filesystem::path currentPath_  {};
@@ -53,10 +55,11 @@ class VerilogConstructor {
         column_(column)
       {}
     };
+    Location getCurrentLocation() const;
+    //LCOV_EXCL_STOP
     void setCurrentLocation(unsigned line, unsigned column) {
       line_= line; column_ = column;
     }
-    Location getCurrentLocation() const;
     
     //LCOV_EXCL_START
     virtual void startModule(const std::string& name) {}
