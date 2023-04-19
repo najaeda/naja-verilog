@@ -129,11 +129,10 @@ using Identifiers = std::vector<Identifier>;
 
 struct BasedNumber {
   BasedNumber() = default;
-  BasedNumber(const std::string& size, const std::string& base, const std::string& digits) {
+  BasedNumber(const std::string& size, bool isSigned, char base, const std::string& digits) {
     size_ = static_cast<unsigned>(std::stoul(size));
-    assert(base.size() == 1);
-    char baseChar = base[0];
-    switch (baseChar) {
+    signed_ = isSigned;
+    switch (base) {
       case 'b': case 'B': 
         base_ = BINARY;
         break;
@@ -156,6 +155,7 @@ struct BasedNumber {
   std::string getDescription() const;
  
   size_t      size_   {0};
+  bool        signed_ {false};
   Base        base_   {};
   std::string digits_ {};
 };
@@ -166,8 +166,8 @@ struct Number {
   Number(const std::string& value) {
     value_ = static_cast<unsigned>(std::stoul(value));
   }
-  Number(const std::string& size, const std::string& base, const std::string& value) {
-    value_ = BasedNumber(size, base, value);
+  Number(const std::string& size, bool isSigned, char base, const std::string& value) {
+    value_ = BasedNumber(size, isSigned, base, value);
   }
   std::string getString() const;
   std::string getDescription() const;
@@ -200,8 +200,8 @@ struct Expression {
   std::string getString() const;
   std::string getDescription() const;
 
-  enum Type { IDENTIFIER=0, NUMBER=1, CONCATENATION=2 }; 
-  using Value = std::variant<Identifier, Number, Concatenation>;
+  enum Type { IDENTIFIER=0, NUMBER=1, STRING=2, CONCATENATION=3 }; 
+  using Value = std::variant<Identifier, Number, std::string, Concatenation>;
 
   bool          valid_          {false};
   //If valid_ is true and supported_ is false, then this expression construction

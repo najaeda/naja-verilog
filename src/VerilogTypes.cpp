@@ -130,6 +130,9 @@ std::string BasedNumber::getBaseString(Base base) {
 std::string BasedNumber::getString() const {
   std::ostringstream stream;
   stream << size_ << "'";
+  if (signed_) {
+    stream << 's';
+  }
   switch (base_) {
     case BINARY:
       stream << "b";
@@ -226,6 +229,8 @@ std::string Expression::getString() const {
       return std::get<Type::IDENTIFIER>(value_).getString();
     case Type::NUMBER:
       return std::get<Type::NUMBER>(value_).getString();
+    case Type::STRING:
+      return std::get<Type::STRING>(value_);
     case Type::CONCATENATION:
       return std::get<Type::CONCATENATION>(value_).getString();
   }

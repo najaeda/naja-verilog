@@ -64,6 +64,8 @@ ATTRIBUTE_END   "*)"
 
 IDENTIFIER [_a-zA-Z][$_a-zA-Z0-9]*
 UNSIGNED_NUMBER [0-9][0-9_]*
+STRING \"[^\"]*\"
+
 
 /* 
   Check the escape rule inside character class 
@@ -120,8 +122,9 @@ supply0     { return token::SUPPLY0_KW; }
 supply1     { return token::SUPPLY1_KW; }
 assign      { return token::ASSIGN_KW; }
 
-{IDENTIFIER}          {  yylval->build<std::string>( yytext ); return token::IDENTIFIER_TK; }
-{ESCAPED_IDENTIFIER}  {  yylval->build<std::string>( yytext ); return token::ESCAPED_IDENTIFIER_TK; }
+{IDENTIFIER}          { yylval->build<std::string>( yytext ); return token::IDENTIFIER_TK; }
+{ESCAPED_IDENTIFIER}  { yylval->build<std::string>( yytext ); return token::ESCAPED_IDENTIFIER_TK; }
+{STRING}              { yylval->build<std::string>( yytext ); return token::STRING_TK; }
 
 {UNSIGNED_NUMBER} {
 	yylval->build<std::string>(yytext);
