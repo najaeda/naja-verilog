@@ -84,11 +84,11 @@
 
 %token<std::string> IDENTIFIER_TK
 %token<std::string> ESCAPED_IDENTIFIER_TK
+%token<std::string> STRING_TK
 %token<std::string> CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK
 %token<std::string> SIGN_TK
 
 %type<std::string> identifier;
-%type<std::string> vstring;
 //no support for XMRs for the moment
 %type<std::string> hierarchical_identifier;
 %type<std::string> hierarchical_net_identifier;
@@ -251,8 +251,6 @@ number
   $$ = Number($1);
 }
 
-vstring: '"' IDENTIFIER_TK '"' { $$ = $2; }  
-
 //no support for XMRs for the moment
 hierarchical_identifier: identifier;
 
@@ -283,7 +281,7 @@ primary
   $$.valid_ = true; $$.value_ = $1; }
 | hierarchical_identifier constant_range_expression.opt { 
   $$.valid_ = true; $$.value_ = naja::verilog::Identifier($1, $2); }
-| vstring { $$.valid_ = true; $$.value_ = std::string($1); } 
+| STRING_TK { $$.valid_ = true; $$.value_ = $1.substr(1, $1.size()-2); } 
 | concatenation { $$.valid_ = true; $$.value_ = naja::verilog::Concatenation($1); }
 ;
 

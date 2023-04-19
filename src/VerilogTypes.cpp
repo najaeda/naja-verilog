@@ -229,6 +229,8 @@ std::string Expression::getString() const {
       return std::get<Type::IDENTIFIER>(value_).getString();
     case Type::NUMBER:
       return std::get<Type::NUMBER>(value_).getString();
+    case Type::STRING:
+      return std::get<Type::STRING>(value_);
     case Type::CONCATENATION:
       return std::get<Type::CONCATENATION>(value_).getString();
   }
