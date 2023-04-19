@@ -8,6 +8,7 @@ set(tests
   NajaVerilogTest5.cpp
   NajaVerilogTest6.cpp
   NajaVerilogTest7.cpp
+  NajaVerilogTestErrors.cpp
 )
 
 add_executable(naja_verilog_tests ${tests})

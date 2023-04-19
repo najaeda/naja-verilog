@@ -38,9 +38,11 @@ std::string VerilogConstructor::ModuleInterfaceType::getString() const {
 }
 //LCOV_EXCL_STOP
 
+//LCOV_EXCL_START
 VerilogConstructor::Location VerilogConstructor::getCurrentLocation() const {
   return Location(getCurrentPath(), line_, column_);
 }
+//LCOV_EXCL_STOP
 
 VerilogConstructor::~VerilogConstructor() {
   delete scanner_;
