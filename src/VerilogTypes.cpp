@@ -130,6 +130,9 @@ std::string BasedNumber::getBaseString(Base base) {
 std::string BasedNumber::getString() const {
   std::ostringstream stream;
   stream << size_ << "'";
+  if (signed_) {
+    stream << 's';
+  }
   switch (base_) {
     case BINARY:
       stream << "b";
