@@ -26,7 +26,7 @@ A comparable project can be found here: [Parser-Verilog](https://github.com/Open
 ```bash
 # First clone the repository and go inside it
 git clone https://github.com/xtofalex/naja-verilog.git
-cd naja
+cd naja-verilog
 git submodule init
 git submodule update
 ```
