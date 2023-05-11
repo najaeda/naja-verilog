@@ -14,8 +14,38 @@ using namespace naja::verilog;
 #define NAJA_VERILOG_BENCHMARKS "Undefined"
 #endif
 
-TEST(NajaVerilogTestErrors, test) {
+TEST(NajaVerilogTestErrors, testErrorPath) {
   VerilogConstructorTest constructor;
   std::filesystem::path errorPath("does_not_exist.v");
   EXPECT_THROW(constructor.parse(errorPath), VerilogException);
+}
+
+TEST(NajaVerilogTestErrors, test0) {
+  std::filesystem::path error0Path(
+      std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+      / std::filesystem::path("benchmarks")
+      / std::filesystem::path("errors")
+      / std::filesystem::path("error0.v"));
+  VerilogConstructorTest constructor;
+  EXPECT_THROW(constructor.parse(error0Path), VerilogException);
+}
+
+TEST(NajaVerilogTestErrors, test1) {
+  std::filesystem::path error1Path(
+      std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+      / std::filesystem::path("benchmarks")
+      / std::filesystem::path("errors")
+      / std::filesystem::path("error1.v"));
+  VerilogConstructorTest constructor;
+  EXPECT_THROW(constructor.parse(error1Path), VerilogException);
+}
+
+TEST(NajaVerilogTestErrors, test2) {
+  std::filesystem::path error2Path(
+      std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+      / std::filesystem::path("benchmarks")
+      / std::filesystem::path("errors")
+      / std::filesystem::path("error2.v"));
+  VerilogConstructorTest constructor;
+  EXPECT_THROW(constructor.parse(error2Path), VerilogException);
 }

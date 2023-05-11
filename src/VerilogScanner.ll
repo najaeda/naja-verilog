@@ -17,6 +17,9 @@
 %{
 /* C++ string header, for string ops below */
 #include <string>
+#include <sstream>
+
+#include "VerilogException.h"
 
 /* Implementation of yyFlexScanner */ 
 #include "VerilogScanner.h"
@@ -88,20 +91,26 @@ ESCAPED_IDENTIFIER \\[\\^!"#$%&',()*+\-.a-zA-Z0-9/{|}~[\]_:;<=>?@]+[\t\f ]
 
 {COMMENT_BEGIN} { BEGIN(in_comment); }
 <in_comment><<EOF>> {
-                       BEGIN(INITIAL);
-                       std::cerr << "Unclosed comment at line " << loc->end.line << " col " << loc->end.column << '\n';
-                        yyterminate();
-                     }
+  BEGIN(INITIAL);
+  std::ostringstream reason;
+  reason << "Unclosed comment at line " 
+    << loc->end.line << " col " << loc->end.column;
+  throw VerilogException(reason.str());
+}
+
 <in_comment>{NEWLINE} { loc->lines(); }
 <in_comment>. { /* ignore characters in comment */ }
 <in_comment>{COMMENT_END} { BEGIN(INITIAL); }
 
 {ATTRIBUTE_BEGIN} { BEGIN(in_attribute); }
 <in_attribute><<EOF>> { 
-                      BEGIN(INITIAL);
-                      std::cerr << "Unclosed attribute at line " << loc->end.line << " col " << loc->end.column << '\n';
-                      yyterminate();
-                    }   
+  BEGIN(INITIAL);
+  std::ostringstream reason;
+  reason << "Unclosed attribute at line " 
+    << loc->end.line << " col " << loc->end.column;
+  throw VerilogException(reason.str());
+}
+
 <in_attribute>{NEWLINE} { loc->lines(); }
 <in_attribute>. { /* ignore characters in comment */ }
 <in_attribute>{ATTRIBUTE_END} { BEGIN(INITIAL); }
@@ -134,6 +143,7 @@ assign      { return token::ASSIGN_KW; }
 \'[sS]?[bodhBODH] {
 	BEGIN(based_const);
   //we don't need the "'" first character and we are sure that yytext is 's?b|o|...
+  std::cerr << "LEX: " << std::string(yytext+1) << std::endl;
 	yylval->build<std::string>(yytext+1);
 	return token::BASE_TK;
 }
@@ -145,9 +155,13 @@ assign      { return token::ASSIGN_KW; }
 }
 
  /* Last rule catches everything */
+ /* LCOV_EXCL_START */
 . {
-  std::cerr << "Failed to match : " << yytext << '\n';
-  yyterminate();
+  std::ostringstream reason;
+  reason << "Failed to match: " << yytext << " at line "
+    << loc->end.line << " col " << loc->end.column;
+  throw VerilogException(reason.str());
 }
+ /* LCOV_EXCL_STOP */
 
 %%
