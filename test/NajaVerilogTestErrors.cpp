@@ -39,3 +39,13 @@ TEST(NajaVerilogTestErrors, test1) {
   VerilogConstructorTest constructor;
   EXPECT_THROW(constructor.parse(error1Path), VerilogException);
 }
+
+TEST(NajaVerilogTestErrors, test2) {
+  std::filesystem::path error2Path(
+      std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+      / std::filesystem::path("benchmarks")
+      / std::filesystem::path("errors")
+      / std::filesystem::path("error2.v"));
+  VerilogConstructorTest constructor;
+  EXPECT_THROW(constructor.parse(error2Path), VerilogException);
+}

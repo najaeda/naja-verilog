@@ -154,11 +154,13 @@ assign      { return token::ASSIGN_KW; }
 }
 
  /* Last rule catches everything */
+ /* LCOV_EXCL_START */
 . {
   std::ostringstream reason;
   reason << "Failed to match: " << yytext << " at line "
     << loc->end.line << " col " << loc->end.column;
   throw VerilogException(reason.str());
 }
+ /* LCOV_EXCL_STOP */
 
 %%
