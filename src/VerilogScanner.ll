@@ -143,6 +143,7 @@ assign      { return token::ASSIGN_KW; }
 \'[sS]?[bodhBODH] {
 	BEGIN(based_const);
   //we don't need the "'" first character and we are sure that yytext is 's?b|o|...
+  std::cerr << "LEX: " << std::string(yytext+1) << std::endl;
 	yylval->build<std::string>(yytext+1);
 	return token::BASE_TK;
 }

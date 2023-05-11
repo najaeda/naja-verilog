@@ -233,7 +233,17 @@ list_of_module_instances: module_instance
 number 
 : CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK {
   if ($2.size() == 2) {
-    if ($2[0] == 's' || $2[0] == 'S') {
+    if (not ($2[0] == 's' || $2[0] == 'S')) {
+      //LCOV_EXCL_START
+      //Following should not happen as long as lexer is correct
+      //should this be replaced by an assertion ?
+      std::ostringstream reason;
+      reason << "Parser error: "
+        << $1 << $2 << $3 << " is not a valid number: wrong size character.\n"
+        << "  begin at line " << @$.begin.line <<  " col " << @$.begin.column  << '\n' 
+        << "  end   at line " << @$.end.line <<  " col " << @$.end.column << "\n";
+      throw VerilogException(reason.str());
+      //LCOV_EXCL_STOP
     }
     $$ = Number($1, true, $2[1], $3);
   } else if ($2.size() == 1) {
@@ -241,9 +251,9 @@ number
   } else {
     std::ostringstream reason;
     reason << "Parser error: "
-            << $1 << $2 << $3 << " is not a valid number\n"
-            << "  begin at line " << @$.begin.line <<  " col " << @$.begin.column  << '\n' 
-            << "  end   at line " << @$.end.line <<  " col " << @$.end.column << "\n";
+      << $1 << $2 << $3 << " is not a valid number\n"
+      << "  begin at line " << @$.begin.line <<  " col " << @$.begin.column  << '\n' 
+      << "  end   at line " << @$.end.line <<  " col " << @$.end.column << "\n";
     throw VerilogException(reason.str());
   }
 }

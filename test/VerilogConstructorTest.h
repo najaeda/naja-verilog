@@ -72,7 +72,14 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     };
 
     struct Assign {
+      Assign(
+        const naja::verilog::Identifiers& identifiers,
+        const naja::verilog::Expression& expression):
+        identifiers_(identifiers),
+        expression_(expression)
+      {}
       naja::verilog::Identifiers  identifiers_  {};
+      naja::verilog::Expression   expression_   {};
     };
 
     struct Module {
