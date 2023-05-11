@@ -233,8 +233,8 @@ list_of_module_instances: module_instance
 number 
 : CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK {
   if ($2.size() == 2) {
+    //LCOV_EXCL_START
     if (not ($2[0] == 's' || $2[0] == 'S')) {
-      //LCOV_EXCL_START
       //Following should not happen as long as lexer is correct
       //should this be replaced by an assertion ?
       std::ostringstream reason;
@@ -243,18 +243,21 @@ number
         << "  begin at line " << @$.begin.line <<  " col " << @$.begin.column  << '\n' 
         << "  end   at line " << @$.end.line <<  " col " << @$.end.column << "\n";
       throw VerilogException(reason.str());
-      //LCOV_EXCL_STOP
     }
+    //LCOV_EXCL_STOP
     $$ = Number($1, true, $2[1], $3);
   } else if ($2.size() == 1) {
     $$ = Number($1, false, $2[0], $3);
   } else {
+    //LCOV_EXCL_START
+    //Same as previously: should not be accessible, as this is filtered by lexer.
     std::ostringstream reason;
     reason << "Parser error: "
       << $1 << $2 << $3 << " is not a valid number\n"
       << "  begin at line " << @$.begin.line <<  " col " << @$.begin.column  << '\n' 
       << "  end   at line " << @$.end.line <<  " col " << @$.end.column << "\n";
     throw VerilogException(reason.str());
+    //LCOV_EXCL_STOP
   }
 }
 | CONSTVAL_TK {

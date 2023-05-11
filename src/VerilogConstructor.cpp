@@ -56,10 +56,12 @@ void VerilogConstructor::parse(const std::filesystem::path& path) {
   }
   currentPath_ = path;
   std::ifstream inFile(path);
+  //LCOV_EXCL_START
   if (not inFile.good()) {
     std::string reason(path.string() + " is not a readable file");
     throw VerilogException(reason);
   }
+  //LCOV_EXCL_STOP
   internalParse(inFile);
 }
 
