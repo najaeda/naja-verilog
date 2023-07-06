@@ -73,6 +73,7 @@ class VerilogConstructor {
     virtual void startInstantiation(const std::string& modelName) {}
     virtual void addInstance(const std::string& instanceName) {}
     virtual void addInstanceConnection(const std::string& portName, const Expression& expression) {}
+    virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
     virtual void endInstantiation() {}
     virtual void addParameterAssignment(const std::string& parameterName, const Expression& expression) {}
     virtual void endModule() {}

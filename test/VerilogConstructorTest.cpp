@@ -90,6 +90,17 @@ void VerilogConstructorTest::addInstanceConnection(
   }
 }
 
+void VerilogConstructorTest::addOrderedInstanceConnection(
+  size_t portIndex,
+  const naja::verilog::Expression& expression) {
+  if (not inFirstPass()) {
+    std::cerr << "Add ordered instance connection: "
+      << portIndex << " " << expression.getString() <<  std::endl;
+    Instance& instance = currentModule_->instances_.back();
+    instance.orderedConnections_.push_back(OrderedInstanceConnection(portIndex, expression));
+  }
+}
+
 void VerilogConstructorTest::addParameterAssignment(
   const std::string& parameterName,
   const naja::verilog::Expression& expression) {

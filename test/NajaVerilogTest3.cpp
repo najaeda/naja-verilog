@@ -105,7 +105,7 @@ TEST(NajaVerilogTest3, test0) {
     EXPECT_EQ(-2, test->nets_[5].range_.msb_);
     EXPECT_EQ(1, test->nets_[5].range_.lsb_);
 
-    ASSERT_EQ(4, test->instances_.size());
+    ASSERT_EQ(6, test->instances_.size());
     EXPECT_EQ("mod0", test->instances_[0].model_);
     EXPECT_EQ("inst0", test->instances_[0].name_);
     EXPECT_EQ("mod0", test->instances_[1].model_);
@@ -114,6 +114,10 @@ TEST(NajaVerilogTest3, test0) {
     EXPECT_EQ("inst2", test->instances_[2].name_);
     EXPECT_EQ("mod1", test->instances_[3].model_);
     EXPECT_EQ("inst3", test->instances_[3].name_);
+    EXPECT_EQ("mod1", test->instances_[4].model_);
+    EXPECT_EQ("inst4", test->instances_[4].name_);
+    EXPECT_EQ("mod1", test->instances_[5].model_);
+    EXPECT_EQ("inst5", test->instances_[5].name_);
 
     auto inst0 = test->instances_[0];
     ASSERT_EQ(2, inst0.connections_.size());
@@ -214,5 +218,41 @@ TEST(NajaVerilogTest3, test0) {
     EXPECT_EQ("net5", identifier.name_);
     EXPECT_TRUE(identifier.range_.singleValue_);
     EXPECT_EQ(-2, identifier.range_.msb_);
+
+    auto inst4 = test->instances_[4];
+    ASSERT_EQ(2, inst4.orderedConnections_.size());
+    EXPECT_EQ(0, inst4.orderedConnections_[0].portIndex_);
+    ASSERT_TRUE(inst4.orderedConnections_[0].expression_.valid_);
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      inst4.orderedConnections_[0].expression_.value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(inst4.orderedConnections_[0].expression_.value_);
+    EXPECT_TRUE(identifier.range_.valid_);
+    EXPECT_EQ("net4", identifier.name_);
+    EXPECT_FALSE(identifier.range_.singleValue_);
+    EXPECT_EQ(7, identifier.range_.msb_);
+    EXPECT_EQ(10, identifier.range_.lsb_);
+
+    EXPECT_EQ(1, inst4.orderedConnections_[1].portIndex_);
+    ASSERT_TRUE(inst4.orderedConnections_[1].expression_.valid_);
+    EXPECT_EQ(naja::verilog::Expression::Type::CONCATENATION,
+      inst4.orderedConnections_[1].expression_.value_.index());
+    concatenation =
+      std::get<naja::verilog::Expression::Type::CONCATENATION>(inst4.orderedConnections_[1].expression_.value_);
+    ASSERT_EQ(4, concatenation.expressions_.size());
+
+    auto inst5 = test->instances_[5];
+    ASSERT_EQ(1, inst5.orderedConnections_.size());
+    EXPECT_EQ(0, inst5.orderedConnections_[0].portIndex_);
+    ASSERT_TRUE(inst5.orderedConnections_[0].expression_.valid_);
+    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+      inst5.orderedConnections_[0].expression_.value_.index());
+    identifier =
+      std::get<naja::verilog::Expression::Type::IDENTIFIER>(inst5.orderedConnections_[0].expression_.value_);
+    EXPECT_TRUE(identifier.range_.valid_);
+    EXPECT_EQ("net4", identifier.name_);
+    EXPECT_FALSE(identifier.range_.singleValue_);
+    EXPECT_EQ(7, identifier.range_.msb_);
+    EXPECT_EQ(10, identifier.range_.lsb_);
   }
 }

@@ -20,6 +20,9 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void addInstanceConnection(
       const std::string& portName,
       const naja::verilog::Expression& expression) override;
+    void addOrderedInstanceConnection(
+      size_t portIndex,
+      const naja::verilog::Expression& expression) override;
     void addParameterAssignment(
       const std::string& parameterName,
       const naja::verilog::Expression& expression) override;
@@ -28,6 +31,28 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void addAssign(
       const naja::verilog::Identifiers& identifiers,
       const naja::verilog::Expression& expression) override;
+
+
+    struct OrderedInstanceConnection {
+      OrderedInstanceConnection() = default;
+      OrderedInstanceConnection(const OrderedInstanceConnection&) = default;
+      OrderedInstanceConnection(
+        const size_t portIndex,
+        const naja::verilog::Expression& expression):
+        portIndex_(portIndex),
+        expression_(expression)
+      {}
+
+      std::string getString() const {
+        std::ostringstream stream;
+        stream << "OrderedInstanceConnection - port: "
+          << portIndex_ << " : " << expression_.getString();
+        return stream.str();
+      }
+      
+      size_t                    portIndex_  {0};
+      naja::verilog::Expression expression_ {};
+    };
 
     struct InstanceConnection {
       InstanceConnection() = default;
@@ -52,6 +77,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
 
     struct Instance {
       using Connections = std::vector<InstanceConnection>;
+      using OrderedConnections = std::vector<OrderedInstanceConnection>;
       using ParameterAssignments = std::map<std::string, std::string>;
       Instance() = default;
       Instance(const Instance&) = default;
@@ -69,6 +95,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       std::string           name_                 {};
       ParameterAssignments  parameterAssignments_ {};
       Connections           connections_          {};
+      OrderedConnections    orderedConnections_   {};
     };
 
     struct Assign {

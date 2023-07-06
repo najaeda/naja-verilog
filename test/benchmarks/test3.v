@@ -21,5 +21,7 @@ module test(input i, output o, inout io);
   mod0 inst1(.i0(net4[21]), .o0(net4[5]));
   mod1 inst2(.i0(net4[3:6]), .o0(net5));
   mod1 inst3(.i0({net0, net1, net2, net5[-2]}), .o0(net5));
+  mod1 inst4(net4[7:10], {net0, net1, net2, net3});
+  mod1 inst5(net4[7:10]); //only first port is connected
 
 endmodule

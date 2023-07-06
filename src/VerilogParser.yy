@@ -66,6 +66,8 @@
 #undef yylex
 #define yylex scanner.yylex
 
+size_t portIndex = 0;
+
 }
 
 %define api.value.type variant
@@ -227,8 +229,10 @@ net_type
 | WIRE_KW    { $$ = naja::verilog::Net::Type::Wire; }
 ;
 
-list_of_module_instances: module_instance
-| list_of_module_instances ',' module_instance;
+list_of_module_instances
+: module_instance
+| list_of_module_instances ',' module_instance
+;
 
 number 
 : CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK {
@@ -302,9 +306,15 @@ expression: primary { $$ = $1; }
 
 expression.opt: %empty { $$.valid_ = false; } | expression { $$ = $1; }
 
-ordered_port_connection: expression;
+ordered_port_connection: expression {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addOrderedInstanceConnection(portIndex++, $1);
+}
 
-list_of_ordered_port_connections: ordered_port_connection | list_of_ordered_port_connections ',' ordered_port_connection;
+list_of_ordered_port_connections
+: ordered_port_connection
+| list_of_ordered_port_connections ',' ordered_port_connection
+;
 
 port_identifier: identifier;
 
@@ -315,7 +325,10 @@ named_port_connection: '.' port_identifier '(' expression.opt ')' {
 
 list_of_named_port_connections: named_port_connection | list_of_named_port_connections ',' named_port_connection;
 
-list_of_port_connections: list_of_ordered_port_connections | list_of_named_port_connections;
+list_of_port_connections
+: { portIndex = 0; } list_of_ordered_port_connections 
+| list_of_named_port_connections
+;
 
 list_of_port_connections.opt: %empty | list_of_port_connections;
 
