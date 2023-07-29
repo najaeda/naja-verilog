@@ -198,6 +198,10 @@ std::string Number::getDescription() const {
 }
 //LCOV_EXCL_STOP
 
+Concatenation::Concatenation(const Expressions& expressions)
+  :expressions_(expressions)
+{}
+
 //LCOV_EXCL_START
 std::string Concatenation::getString() const {
   std::ostringstream stream;

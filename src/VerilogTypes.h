@@ -186,7 +186,7 @@ struct Concatenation {
   using Expressions = std::vector<Expression>;
   Concatenation() = default;
   Concatenation(const Concatenation&) = default;
-  Concatenation(const Expressions& expressions): expressions_(expressions) {}
+  Concatenation(const Expressions& expressions);
   std::string getString() const;
   std::string getDescription() const;
 
