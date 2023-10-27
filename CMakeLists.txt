@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.21)
 
 project(naja-verilog LANGUAGES CXX) 
 
@@ -36,10 +36,10 @@ endif(ENABLE_SANITIZERS)
 add_subdirectory(src)
 add_subdirectory(cmake)
 
-#Build tests if googletest submodule has been added
-if(EXISTS ${PROJECT_SOURCE_DIR}/thirdparty/googletest/CMakeLists.txt)
+#Build tests only if module is top level
+if(PROJECT_IS_TOP_LEVEL)
   add_subdirectory(thirdparty)
   include(CTest)
   enable_testing()
   add_subdirectory(test)
-endif(EXISTS ${PROJECT_SOURCE_DIR}/thirdparty/googletest/CMakeLists.txt)
+endif(PROJECT_IS_TOP_LEVEL)
