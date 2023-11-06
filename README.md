@@ -1,9 +1,12 @@
 # naja-verilog
+
 ![build](https://github.com/xtofalex/naja-verilog/actions/workflows/build.yml/badge.svg)
 [![codecov](https://codecov.io/gh/xtofalex/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/xtofalex/naja-verilog)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ***
+
 ## Introduction
+
 Naja-Verilog is a structural (gate-level) Verilog parser and can be used to read synthesis generated netlists.
 
 The main purpose of this project is to provide a verilog interface to [Naja SNL](https://github.com/xtofalex/naja), however both projects are not tied and naja-verilog can be integrated in any project needing structural verilog support.
@@ -62,6 +65,52 @@ cmake <path_to_naja_sources_dir> -DCMAKE_INSTALL_PREFIX=$NAJA_INSTALL
 make
 make test
 make install
+```
+
+## Parser callbacks
+
+```c++
+void startModule(const std::string& name);
+```
+
+is called at the beginning of a module declaration:
+
+```verilog
+module foo
+```
+
+```c++
+void moduleInterfaceSimplePort(const std::string& name)
+```
+
+is called when module uses simple declaration interface ports:
+
+```verilog
+module foo(a, b, c)
+```
+
+```c++
+void moduleInterfaceCompletePort(const Port& port)
+```
+
+is called for complete interface port declaration:
+
+```verilog
+module foo(input a, output b, inout c)
+```
+
+
+```c++
+    virtual void moduleImplementationPort(const Port& port) {}
+    virtual void addNet(const Net& net) {}
+    virtual void addAssign(const Identifiers& identifiers, const Expression& expression) {}
+    virtual void startInstantiation(const std::string& modelName) {}
+    virtual void addInstance(const std::string& instanceName) {}
+    virtual void addInstanceConnection(const std::string& portName, const Expression& expression) {}
+    virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
+    virtual void endInstantiation() {}
+    virtual void addParameterAssignment(const std::string& parameterName, const Expression& expression) {}
+    virtual void endModule() {}
 ```
 
 ## How to create your own parser
