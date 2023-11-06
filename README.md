@@ -29,7 +29,12 @@ This parser is dedicated to a very small part of [verilog](https://en.wikipedia.
 To parse complete RTL level verilog or system verilog, please use projects such as: [Verible](https://github.com/chipsalliance/verible).
 Apart the language support, the main difference with such RTL level parsing systems is that naja-verilog does not construct any AST but allows to construct the netlist on the fly while visiting the verilog source. Purpose is to reduce memory footprint and accelerate parsing time.
 
-A comparable project can be found here: [Parser-Verilog](https://github.com/OpenTimer/Parser-Verilog). 
+A comparable project can be found here: [Parser-Verilog](https://github.com/OpenTimer/Parser-Verilog).
+
+
+<div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
+
+***
 
 ## Compilation
 
@@ -67,6 +72,10 @@ make test
 make install
 ```
 
+<div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
+
+***
+
 ## Parser callbacks
 
 ### Module declaration
@@ -82,7 +91,7 @@ module foo;
 endmodule //foo
 ```
 
----
+***
 
 ```c++
 void endModule();
@@ -102,11 +111,13 @@ and can be used for cleaning purposes.
 void moduleInterfaceSimplePort(const std::string& name)
 ```
 
-is called when module uses simple declaration interface ports. It will be called 3 times with **name=a,b,c** for the following declaration:
+is called when module uses simple declaration interface ports. It will be called 3 times with **name=a, b, c** for the following declaration:
 
 ```verilog
 module foo(a, b, c);
 ```
+
+***
 
 ```c++
 void moduleInterfaceCompletePort(const Port& port)
@@ -132,29 +143,75 @@ output c;
 ```
 
 ### Nets
+
 ```c++
 void addNet(const Net& net)
 ```
 
-is called 
+is called
+
+```verilog
+wire n1;
+wire n2;
+```
+
+***
 
 ```c++
 void addAssign(const Identifiers& identifiers, const Expression& expression) 
 ```
 
+```verilog
+assign n1 = n2;
+assign n2 = n[4:2];
+assign n3 = {n4[4], n5[8]};
+```
+
 ### Instances
+
 ```c++
 void startInstantiation(const std::string& modelName)
-    virtual void addInstance(const std::string& instanceName) {}
-    virtual void addInstanceConnection(const std::string& portName, const Expression& expression) {}
-    virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
-    virtual void endInstantiation() {}
-    virtual void addParameterAssignment(const std::string& parameterName, const Expression& expression) {}
 ```
+
+is called with **modelName=MODEL** for following declaration:
 
 ```verilog
 MODEL /* ins(); */
 ```
+
+```c++
+void addInstance(const std::string& instanceName)
+```
+
+will be called 3 times with **instanceName=ins1, ins2, ins3**
+
+```verilog
+/* MODEL */ ins(), ins2(), ins3();
+```
+
+```c++
+void endInstantiation();
+```
+
+is called at the end of an instance declaration and can be used for cleaning purposes.
+
+```c++
+void addInstanceConnection(const std::string& portName, const Expression& expression);
+```
+
+```c++
+void addOrderedInstanceConnection(size_t portIndex, const Expression& expression);
+```
+
+***
+
+```c++
+void addParameterAssignment(const std::string& parameterName, const Expression& expression);
+```
+
+<div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
+
+***
 
 ## How to create your own parser
 
@@ -172,3 +229,5 @@ As ordering of verilog modules in single or across multiple files is not preknow
 
 1. Parse modules, ports and parameters. Ignore instances and connectivity. Construct all interfaces.
 2. Reparse. Ignore ports and parameters. Parse instances and nets. Construct connectivity.
+
+<div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>

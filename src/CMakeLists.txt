@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 BISON_TARGET(VerilogParser VerilogParser.yy
   ${CMAKE_CURRENT_BINARY_DIR}/VerilogParser.cpp
   COMPILE_FLAGS "-Wconflicts-sr -d -v")
