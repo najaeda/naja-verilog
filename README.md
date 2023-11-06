@@ -69,24 +69,43 @@ make install
 
 ## Parser callbacks
 
+### Module declaration
+
 ```c++
 void startModule(const std::string& name);
 ```
 
-is called at the beginning of a module declaration:
+is called with **name=foo** for the following declaration:
 
 ```verilog
-module foo
+module foo;
+endmodule //foo
 ```
+
+---
+
+```c++
+void endModule();
+```
+
+is called at the end of a module:
+
+```verilog
+endmodule //foo
+```
+
+and can be used for cleaning purposes.
+
+### Ports
 
 ```c++
 void moduleInterfaceSimplePort(const std::string& name)
 ```
 
-is called when module uses simple declaration interface ports:
+is called when module uses simple declaration interface ports. It will be called 3 times with **name=a,b,c** for the following declaration:
 
 ```verilog
-module foo(a, b, c)
+module foo(a, b, c);
 ```
 
 ```c++
@@ -96,21 +115,45 @@ void moduleInterfaceCompletePort(const Port& port)
 is called for complete interface port declaration:
 
 ```verilog
-module foo(input a, output b, inout c)
+module foo(input a, output b, inout c);
 ```
 
+```c++
+void moduleImplementationPort(const Port& port)
+```
+
+is called for associated ports in implementation part:
+
+```verilog
+/* module foo(a, b, c); */
+input a;
+input b;
+output c;
+```
+
+### Nets
+```c++
+void addNet(const Net& net)
+```
+
+is called 
 
 ```c++
-    virtual void moduleImplementationPort(const Port& port) {}
-    virtual void addNet(const Net& net) {}
-    virtual void addAssign(const Identifiers& identifiers, const Expression& expression) {}
-    virtual void startInstantiation(const std::string& modelName) {}
+void addAssign(const Identifiers& identifiers, const Expression& expression) 
+```
+
+### Instances
+```c++
+void startInstantiation(const std::string& modelName)
     virtual void addInstance(const std::string& instanceName) {}
     virtual void addInstanceConnection(const std::string& portName, const Expression& expression) {}
     virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
     virtual void endInstantiation() {}
     virtual void addParameterAssignment(const std::string& parameterName, const Expression& expression) {}
-    virtual void endModule() {}
+```
+
+```verilog
+MODEL /* ins(); */
 ```
 
 ## How to create your own parser
