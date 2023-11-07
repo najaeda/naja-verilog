@@ -57,6 +57,19 @@ Mandatory dependencies:
 
 Embedded dependencies, through git sub module: [google test](https://github.com/google/googletest).
 
+On Ubuntu:
+
+```bash
+sudo apt-get install bison
+sudo apt-get install flex
+```
+
+Using nix-shell:
+
+```bash
+nix-shell -p cmake bison flex
+```
+
 ### Building and Installing
 
 ```bash
