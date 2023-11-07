@@ -207,7 +207,7 @@ void addAssign(const Identifiers& identifiers, const Expression& expression)
 
 is called for each assign statement, facilitating the capture of signal assignments.
 
-In Following verilog snippets, the corresponding constructed data stuctures are detailed in pseudo C++ code.
+Below are Verilog examples followed by pseudo C++ representations of the data structures that might be constructed by this callback.
 
 ```verilog
 assign n0 = n1;
@@ -343,6 +343,8 @@ mod1 inst4(net4[7:10], {net0, net1, net2, net3});
 ```c++
 void addParameterAssignment(const std::string& parameterName, const Expression& expression);
 ```
+
+This callback function is designed to handle parameter assignments within module instantiations.
 
 ```verilog
 module test();
