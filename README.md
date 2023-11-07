@@ -82,6 +82,7 @@ Best starting point is to copy existing examples/implementations:
 
 * [NajaVerilogSnippet](https://github.com/xtofalex/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
 * [VerilogConstructorTest](https://github.com/xtofalex/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
+* [Unit tests](https://github.com/xtofalex/naja-verilog/blob/main/test): covers trough unit testing most of the parser aspects.
 * [SNLVRLConstructor](https://github.com/xtofalex/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h): More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
 
 The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogConstructor.h) and override [callback](#callbacks) methods launched while visiting verilog source.
@@ -99,7 +100,9 @@ As ordering of verilog modules in single or across multiple files is not preknow
 
 Stuctures (Net, Port, Expression) details constructed by following callbacks can be found in [VerilogType.h](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogTypes.h) header.
 
-### Module declaration
+### Callbacks for Module
+
+#### Starting a Module
 
 ```c++
 void startModule(const std::string& name);
@@ -113,7 +116,7 @@ For instance, the callback is called with **name="foo"** for the Verilog module 
 module foo;
 ```
 
-***
+#### Ending a Module
 
 ```c++
 void endModule();
@@ -154,10 +157,14 @@ void moduleImplementationPort(const Port& port)
 is called for each port listed in the implementation section of a module.
 
 ```verilog
-/* module foo(a, b, c); */
+module foo(a, b, c);
 input a;
-input b;
-output c;
+output [3:0] b;
+inout c;
+//will invoke 3 times moduleImplementationPort with:
+//Port name_=a, direction=Input, isBus()=true, range_.msb_=3, range_.lsb_=0
+//Port name_=b, direction=Output, isBus()=true, range_.msb_=0, range_.lsb_=3
+//Port name_=c, direction=InOut, isBus()=false
 ```
 
 #### Port complete declaration in Module interface
@@ -169,7 +176,11 @@ void moduleInterfaceCompletePort(const Port& port)
 Invoked for a complete interface port declaration, detailing port direction (input/output/inout) and size.
 
 ```verilog
-module foo(input a, output b, inout c);
+module foo(input[3:0] a, output[0:3] b, inout c);
+//will invoke 3 times moduleInterfaceCompletePort with:
+//Port name_=a, direction=Input, isBus()=true, range_.msb_=3, range_.lsb_=0
+//Port name_=b, direction=Output, isBus()=true, range_.msb_=0, range_.lsb_=3
+//Port name_=c, direction=InOut, isBus()=false
 ```
 
 ### Callbacks for Nets
@@ -181,8 +192,11 @@ void addNet(const Net& net)
 This callback is invoked for each net declaration within a module and will construct **Net** structure containing net details: size (for busses) and type: Wire, Supply0 or Supply1;
 
 ```verilog
-wire n1;
-wire n2;
+wire net0, net1, net2;  // constructs 3 Net(s) named net0, net1, net2, type_=Wire, isBus()=false
+wire [31:0] net3;       // construct 1 Net named net3, type_=Wire, isBus()=true, range_.msb_=31, range_.lsb_=0 
+wire [-2:1] net4;       // construct 1 Net named net4, type_=Wire, isBus()=true, range_.msb_=-2, range_.lsb_=1 
+supply0 constant0;      // construct 1 Net named constant0, type_=Supply0, isBus()=false
+supply1 constant1;      // construct 1 Net named constant1, type_=Supply1, isBus()=false
 ```
 
 #### Assign statements
@@ -192,11 +206,54 @@ void addAssign(const Identifiers& identifiers, const Expression& expression)
 ```
 
 is called for each assign statement, facilitating the capture of signal assignments.
+In Following verilog snippets, we detail in pseudo C++ code the corresponding constructed structures.
 
 ```verilog
-assign n1 = n2;
-assign n2 = n[4:2];
-assign n3 = {n4[4], n5[8]};
+assign n0 = n1;
+//identifiers = { {name_=n0, range_.valid_=false} }
+//expressions = 
+// {
+//   { 
+//     value_.index() = naja::verilog::Expression::Type::IDENTIFIER
+//     with auto id = std::get<naja::verilog::Expression::Type::IDENTIFIER>(value_)
+//     id.name_ = "n1", id.range_.valid_ = false
+//   } 
+// }
+```
+
+```verilog
+assign n1 = 1'b0;
+//identifiers = { {name_=n1, range_.valid_=false} }
+//expressions = 
+// {
+//   { 
+//     value_.index() = naja::verilog::Expression::Type::NUMBER
+//     with auto nb = std::get<naja::verilog::Expression::Type::NUMBER>(value_)
+//     nb.base_ = naja::verilog::BasedNumber::BINARY
+//     nb.sign_ = true, nb.signed_ = false, nb.size_ = 1, nb.digits_ = "0"
+//   } 
+// }
+```
+
+```verilog
+assign { n2[3:2], n2[1:0] } = { n0, n1, 2'h2 };
+//identifiers =
+// {
+//    { name_=n2, range_.valid_=true, range_.msb_=3, range_.lsb=3 },
+//    { name_=n2, range_.valid_=true, range_.msb_=1, range_.lsb=0 },
+// }
+//expressions = 
+// {
+//   { 
+//     value_.index() = naja::verilog::Expression::Type::CONCATENATION
+//     with auto concat = std::get<naja::verilog::Expression::Type::CONCATENATION>(value_)
+//     concat[0] is an Identifier name_=n0, range_.valid_=false
+//     concat[1] is an Identifier name_=n1, range_.valid_=false
+//     concat[2] is an NUMBER with:
+//     nb.base_ = naja::verilog::BasedNumber::HEX
+//     nb.size_ = 2, nb.digits_ = "2"
+//   } 
+// }
 ```
 
 ### Callback for instances
