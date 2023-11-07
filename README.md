@@ -206,7 +206,8 @@ void addAssign(const Identifiers& identifiers, const Expression& expression)
 ```
 
 is called for each assign statement, facilitating the capture of signal assignments.
-In Following verilog snippets, we detail in pseudo C++ code the corresponding constructed structures.
+
+In Following verilog snippets, the corresponding constructed data stuctures are detailed in pseudo C++ code.
 
 ```verilog
 assign n0 = n1;
@@ -214,9 +215,9 @@ assign n0 = n1;
 //expressions = 
 // {
 //   { 
-//     value_.index() = naja::verilog::Expression::Type::IDENTIFIER
-//     with auto id = std::get<naja::verilog::Expression::Type::IDENTIFIER>(value_)
-//     id.name_ = "n1", id.range_.valid_ = false
+//     value_.index()=naja::verilog::Expression::Type::IDENTIFIER
+//     with auto id=std::get<naja::verilog::Expression::Type::IDENTIFIER>(value_)
+//     id.name_="n1", id.range_.valid_=false
 //   } 
 // }
 ```
@@ -227,10 +228,10 @@ assign n1 = 1'b0;
 //expressions = 
 // {
 //   { 
-//     value_.index() = naja::verilog::Expression::Type::NUMBER
-//     with auto nb = std::get<naja::verilog::Expression::Type::NUMBER>(value_)
-//     nb.base_ = naja::verilog::BasedNumber::BINARY
-//     nb.sign_ = true, nb.signed_ = false, nb.size_ = 1, nb.digits_ = "0"
+//     value_.index()=naja::verilog::Expression::Type::NUMBER
+//     with auto nb=std::get<naja::verilog::Expression::Type::NUMBER>(value_)
+//     nb.base_=naja::verilog::BasedNumber::BINARY
+//     nb.sign_=true, nb.signed_=false, nb.size_=1, nb.digits_="0"
 //   } 
 // }
 ```
@@ -245,13 +246,13 @@ assign { n2[3:2], n2[1:0] } = { n0, n1, 2'h2 };
 //expressions = 
 // {
 //   { 
-//     value_.index() = naja::verilog::Expression::Type::CONCATENATION
-//     with auto concat = std::get<naja::verilog::Expression::Type::CONCATENATION>(value_)
+//     value_.index()=naja::verilog::Expression::Type::CONCATENATION
+//     with auto concat=std::get<naja::verilog::Expression::Type::CONCATENATION>(value_)
 //     concat[0] is an Identifier name_=n0, range_.valid_=false
 //     concat[1] is an Identifier name_=n1, range_.valid_=false
 //     concat[2] is an NUMBER with:
-//     nb.base_ = naja::verilog::BasedNumber::HEX
-//     nb.size_ = 2, nb.digits_ = "2"
+//     nb.base_=naja::verilog::BasedNumber::HEX
+//     nb.size_=2, nb.digits_="2"
 //   } 
 // }
 ```
@@ -264,7 +265,7 @@ assign { n2[3:2], n2[1:0] } = { n0, n1, 2'h2 };
 void startInstantiation(const std::string& modelName)
 ```
 
-allows to collect module (used as a model) name for one or multiple instanciations. This method will be collect **modelName=Model** for following declarations: 
+allows to collect module (used as a model) name for one or multiple instanciations. This method will be collect `modelName=Model` for the two following declarations:
 
 ```verilog
 Model ins();
@@ -277,7 +278,7 @@ Model ins0(), ins1(), ins2();
 void addInstance(const std::string& instanceName)
 ```
 
-will be called 3 times with **instanceName=ins1, ins2, ins3** for following declaration:
+will be called 3 times with `instanceName=ins1, ins2, ins3` for following declaration:
 
 ```verilog
 Model ins(), ins2(), ins3();
@@ -302,7 +303,17 @@ void addInstanceConnection(const std::string& portName, const Expression& expres
 This function is called for each named port connection in an instance, capturing the relationship between the port and its connected net or expression.
 
 ```verilog
-Model ins(.p1(n1), .p2(n2), .p3(n3));
+mod1 inst2(.i0(net4[3:6]), .o0(net5));
+//addInstanceConnection is called 2 times with:
+//portName=i0
+//expression_.value_.index() = naja::verilog::Expression::Type::IDENTIFIER,
+//with auto id = std::get<naja::verilog::Expression::Type::IDENTIFIER>(expression.value_)
+//id.name_="net4", id.isBus=true, id.range_.msb_=3, is.range_.lsb_=6
+//and:
+//portName=o0
+//expression_.value_.index() = naja::verilog::Expression::Type::IDENTIFIER,
+//with auto id = std::get<naja::verilog::Expression::Type::IDENTIFIER>(expression.value_)
+//id.name_="net5", id.isBus=false
 ```
 
 #### Ordered Port Connection
@@ -314,7 +325,17 @@ void addOrderedInstanceConnection(size_t portIndex, const Expression& expression
 is invoked for each port connection when ports are connected by order rather than by name.
 
 ```verilog
-Model ins(n1, n2, n3);
+mod1 inst4(net4[7:10], {net0, net1, net2, net3});
+//addOrderedInstanceConnection is called 2 times with:
+//portIndex=0
+//expression_.value_.index() = naja::verilog::Expression::Type::IDENTIFIER,
+//with auto id = std::get<naja::verilog::Expression::Type::IDENTIFIER>(expression.value_)
+//id.name_="net4", id.isBus=true, id.range_.msb_=7, is.range_.lsb_=10
+//and:
+//portIndex=1
+//expression_.value_.index() = naja::verilog::Expression::Type::CONCATENATION,
+//with auto concat = std::get<naja::verilog::Expression::Type::CONCATENATION>(expression.value_)
+//concat.size()=4 and all values are simple Identifiers
 ```
 
 ### Callback for Parameter Assignment
@@ -324,7 +345,13 @@ void addParameterAssignment(const std::string& parameterName, const Expression& 
 ```
 
 ```verilog
-Model #param instance();
+module test();
+  mod #(
+    .PARAM0("VAL"),
+  ) ins();
+endmodule
+//addParameterAssignment is called one time with:
+//parameterName=PARAM0 and expression is an Identifier with name="VAL"
 ```
 
 <div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
