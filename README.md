@@ -183,10 +183,10 @@ MODEL /* ins(); */
 void addInstance(const std::string& instanceName)
 ```
 
-will be called 3 times with **instanceName=ins1, ins2, ins3**
+will be called 3 times with **instanceName=ins1, ins2, ins3** for following declaration:
 
 ```verilog
-/* MODEL */ ins(), ins2(), ins3();
+MODEL ins(), ins2(), ins3();
 ```
 
 ```c++
@@ -195,18 +195,36 @@ void endInstantiation();
 
 is called at the end of an instance declaration and can be used for cleaning purposes.
 
+***
+
 ```c++
 void addInstanceConnection(const std::string& portName, const Expression& expression);
 ```
 
+is called for 
+
+```verilog
+Model ins(.p1(n1), .p2(n2), .p3(n3));
+```
+
+***
+
 ```c++
 void addOrderedInstanceConnection(size_t portIndex, const Expression& expression);
+```
+
+```verilog
+Model ins(n1, n2, n3);
 ```
 
 ***
 
 ```c++
 void addParameterAssignment(const std::string& parameterName, const Expression& expression);
+```
+
+```verilog
+Model #param instance();
 ```
 
 <div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
