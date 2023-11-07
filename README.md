@@ -9,7 +9,7 @@
 
 Naja-Verilog is a structural (gate-level) Verilog parser and can be used to read synthesis generated netlists.
 
-The main purpose of this project is to provide a verilog interface to [Naja SNL](https://github.com/xtofalex/naja), however both projects are not tied and naja-verilog can be integrated in any project needing structural verilog support.
+This library provides a verilog interface to [Naja SNL](https://github.com/xtofalex/naja), however both projects are not tied and naja-verilog can be integrated in any project needing structural verilog support.
 
 :information_desk_person: If you have any questions, bug to report or request, please open an issue or send me a [mail](mailto:christophe.alex@gmail.com).
 
