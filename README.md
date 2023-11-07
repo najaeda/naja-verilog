@@ -186,7 +186,7 @@ inout c;
 void moduleInterfaceCompletePort(const Port& port)
 ```
 
-Invoked for a complete interface port declaration, detailing port direction (input/output/inout) and size.
+Invoked for a complete interface port declaration, detailing port direction (input/output/inout) and in case of bus: msb and lsb.
 
 ```verilog
 module foo(input[3:0] a, output[0:3] b, inout c);
@@ -202,7 +202,7 @@ module foo(input[3:0] a, output[0:3] b, inout c);
 void addNet(const Net& net)
 ```
 
-This callback is invoked for each net declaration within a module and will construct **Net** structure containing net details: size (for busses) and type: Wire, Supply0 or Supply1;
+This callback is invoked for each net declaration within a module and will construct **Net** structure containing net details: msb, lsb (for busses) and type: Wire, Supply0 or Supply1.
 
 ```verilog
 wire net0, net1, net2;  // constructs 3 Net(s) named net0, net1, net2, type_=Wire, isBus()=false
@@ -278,7 +278,7 @@ assign { n2[3:2], n2[1:0] } = { n0, n1, 2'h2 };
 void startInstantiation(const std::string& modelName)
 ```
 
-allows to collect module (used as a model) name for one or multiple instanciations. This method will be collect `modelName=Model` for the two following declarations:
+allows to collect module (used as a model) name for one or multiple instanciations. This method will collect `modelName=Model` for the two following declarations:
 
 ```verilog
 Model ins();
@@ -297,13 +297,13 @@ will be called 3 times with `instanceName=ins1, ins2, ins3` for following declar
 Model ins(), ins2(), ins3();
 ```
 
+#### Ending Instantiation
+
 ```c++
 void endInstantiation();
 ```
 
 is called at the conclusion of an instance declaration, it signals that all instances have been processed and allows for post-processing cleanup.
-
-#### Ending Instantiation
 
 ### Callbacks for Instance Connections
 
