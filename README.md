@@ -76,7 +76,28 @@ make install
 
 ***
 
-## Parser callbacks
+## Create your own parser
+
+Best starting point is to copy existing examples/implementations:
+
+* [NajaVerilogSnippet](https://github.com/xtofalex/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
+* [VerilogConstructorTest](https://github.com/xtofalex/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
+* [SNLVRLConstructor](https://github.com/xtofalex/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h): More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
+
+The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogConstructor.h) and override [callback](#callbacks) methods launched while visiting verilog source.
+
+### Two passes Parsing
+
+As ordering of verilog modules in single or across multiple files is not preknown and module interfaces need to be created before instances and connectivity are created, parsing can be done in a two pass way with:
+
+1. Parse modules, ports and parameters. Ignore instances and connectivity. Construct all interfaces.
+2. Reparse. Ignore ports and parameters. Parse instances and nets. Construct connectivity.
+
+<div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
+
+## Callbacks
+
+Stuctures (Net, Port, Expression) details constructed by following callbacks can be found in [VerilogType.h](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogTypes.h) header.
 
 ### Module declaration
 
@@ -84,11 +105,12 @@ make install
 void startModule(const std::string& name);
 ```
 
-is called with **name=foo** for the following declaration:
+This callback is invoked when a module declaration begins. It receives the name of the module as an argument.
+
+For instance, the callback is called with **name="foo"** for the Verilog module declaration below:
 
 ```verilog
 module foo;
-endmodule //foo
 ```
 
 ***
@@ -97,43 +119,39 @@ endmodule //foo
 void endModule();
 ```
 
-is called at the end of a module:
+This function is called upon reaching the end of a module declaration. It serves as a notifier for the end of the module's scope, allowing for any necessary cleanup.
+
+The corresponding verilog end declaration is:
 
 ```verilog
 endmodule //foo
 ```
 
-and can be used for cleaning purposes.
+### Callbacks for Ports
 
-### Ports
+#### Simple Port Declaration in Module Interface
 
 ```c++
 void moduleInterfaceSimplePort(const std::string& name)
 ```
 
-is called when module uses simple declaration interface ports. It will be called 3 times with **name=a, b, c** for the following declaration:
+Triggered when a module uses a simple declaration (only the port name) for ports. It will be called multiple times depending on the number of ports declared.
+
+For example, it is called with **name="a", name="b", and name="c"** for:
 
 ```verilog
 module foo(a, b, c);
 ```
 
-***
+#### Port details in module implementation
 
-```c++
-void moduleInterfaceCompletePort(const Port& port)
-```
-
-is called for complete interface port declaration:
-
-```verilog
-module foo(input a, output b, inout c);
-```
+Associated to previous method, following method collects port details: direction and size in module implementation section.
 
 ```c++
 void moduleImplementationPort(const Port& port)
 ```
 
-is called for associated ports in implementation part:
+is called for each port listed in the implementation section of a module.
 
 ```verilog
 /* module foo(a, b, c); */
@@ -142,24 +160,38 @@ input b;
 output c;
 ```
 
-### Nets
+#### Port complete declaration in Module interface
+
+```c++
+void moduleInterfaceCompletePort(const Port& port)
+```
+
+Invoked for a complete interface port declaration, detailing port direction (input/output/inout) and size.
+
+```verilog
+module foo(input a, output b, inout c);
+```
+
+### Callbacks for Nets
 
 ```c++
 void addNet(const Net& net)
 ```
 
-is called
+This callback is invoked for each net declaration within a module and will construct **Net** structure containing net details: size (for busses) and type: Wire, Supply0 or Supply1;
 
 ```verilog
 wire n1;
 wire n2;
 ```
 
-***
+#### Assign statements
 
 ```c++
 void addAssign(const Identifiers& identifiers, const Expression& expression) 
 ```
+
+is called for each assign statement, facilitating the capture of signal assignments.
 
 ```verilog
 assign n1 = n2;
@@ -167,17 +199,22 @@ assign n2 = n[4:2];
 assign n3 = {n4[4], n5[8]};
 ```
 
-### Instances
+### Callback for instances
+
+#### Starting Instantiation
 
 ```c++
 void startInstantiation(const std::string& modelName)
 ```
 
-is called with **modelName=MODEL** for following declaration:
+allows to collect module (used as a model) name for one or multiple instanciations. This method will be collect **modelName=Model** for following declarations: 
 
 ```verilog
-MODEL /* ins(); */
+Model ins();
+Model ins0(), ins1(), ins2();
 ```
+
+#### Adding an Instance
 
 ```c++
 void addInstance(const std::string& instanceName)
@@ -186,38 +223,44 @@ void addInstance(const std::string& instanceName)
 will be called 3 times with **instanceName=ins1, ins2, ins3** for following declaration:
 
 ```verilog
-MODEL ins(), ins2(), ins3();
+Model ins(), ins2(), ins3();
 ```
 
 ```c++
 void endInstantiation();
 ```
 
-is called at the end of an instance declaration and can be used for cleaning purposes.
+is called at the conclusion of an instance declaration, it signals that all instances have been processed and allows for post-processing cleanup.
 
-***
+#### Ending Instantiation
+
+### Callbacks for Instance Connections
+
+#### Named Port Connection
 
 ```c++
 void addInstanceConnection(const std::string& portName, const Expression& expression);
 ```
 
-is called for 
+This function is called for each named port connection in an instance, capturing the relationship between the port and its connected net or expression.
 
 ```verilog
 Model ins(.p1(n1), .p2(n2), .p3(n3));
 ```
 
-***
+#### Ordered Port Connection
 
 ```c++
 void addOrderedInstanceConnection(size_t portIndex, const Expression& expression);
 ```
 
+is invoked for each port connection when ports are connected by order rather than by name.
+
 ```verilog
 Model ins(n1, n2, n3);
 ```
 
-***
+### Callback for Parameter Assignment
 
 ```c++
 void addParameterAssignment(const std::string& parameterName, const Expression& expression);
@@ -226,26 +269,5 @@ void addParameterAssignment(const std::string& parameterName, const Expression& 
 ```verilog
 Model #param instance();
 ```
-
-<div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
-
-***
-
-## How to create your own parser
-
-Best starting point is to copy existing examples/implementations:
-
-* [NajaVerilogSnippet](https://github.com/xtofalex/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
-* [VerilogConstructorTest](https://github.com/xtofalex/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
-* [SNLVRLConstructor](https://github.com/xtofalex/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h): More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
-
-The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogConstructor.h) and override methods launched while visiting verilog source.
-
-### Two passes Parsing
-
-As ordering of verilog modules in single or across multiple files is not preknown and module interfaces need to be created before instances and connectivity are created, parsing can be done in a two pass way with:
-
-1. Parse modules, ports and parameters. Ignore instances and connectivity. Construct all interfaces.
-2. Reparse. Ignore ports and parameters. Parse instances and nets. Construct connectivity.
 
 <div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
