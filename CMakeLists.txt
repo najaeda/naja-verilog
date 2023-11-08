@@ -41,9 +41,10 @@ add_subdirectory(src)
 add_subdirectory(cmake)
 
 #Build tests only if module is top level
-if(PROJECT_IS_TOP_LEVEL)
+#and if googletest submodule has been added.
+if(PROJECT_IS_TOP_LEVEL AND EXISTS(thirdparty/googletest/CMakeLists.txt))
   add_subdirectory(thirdparty)
   include(CTest)
   enable_testing()
   add_subdirectory(test)
-endif(PROJECT_IS_TOP_LEVEL)
+endif(PROJECT_IS_TOP_LEVEL AND EXISTS(thirdparty/googletest/CMakeLists.txt))
