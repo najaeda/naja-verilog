@@ -122,3 +122,9 @@ void VerilogConstructorTest::addAssign(
     currentModule_->assigns_.push_back(Assign(identifiers, expression));
   }
 }
+
+void VerilogConstructorTest::addAttribute(
+  const std::string& attributeName,
+  const naja::verilog::ConstantExpression& expression) {
+  attributes_.push_back(naja::verilog::Attribute(attributeName, expression));
+}

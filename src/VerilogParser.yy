@@ -100,8 +100,8 @@ size_t portIndex = 0;
 %type<std::string> port_identifier;
 
 %type<naja::verilog::Number> number;
-%type<naja::verilog::Number> constant_primary;
-%type<naja::verilog::Number> constant_expression;
+%type<naja::verilog::ConstantExpression> constant_primary;
+%type<naja::verilog::ConstantExpression> constant_expression;
 %type<std::string> unary_operator;
 %type<naja::verilog::Expression> primary;
 %type<naja::verilog::Expression> expression;
@@ -110,6 +110,8 @@ size_t portIndex = 0;
 %type<naja::verilog::Expression> mintypmax_expression.opt;
 %type<naja::verilog::Expression::Expressions> concatenation;
 %type<naja::verilog::Expression::Expressions> list_of_expressions; 
+%type<naja::verilog::ConstantExpression> attr_spec_value;
+%type<naja::verilog::Attribute> attr_spec;
 
 %locations 
 %start source_text
@@ -126,7 +128,10 @@ identifier: IDENTIFIER_TK | ESCAPED_IDENTIFIER_TK {
   $$ = $1;
 }
 
-constant_primary: number
+//A.8.4 Primaries
+constant_primary:
+number   { $$.valid_ = true; $$.value_ = $1; }
+| STRING_TK { $$.valid_ = true; $$.value_ = $1; }
 
 unary_operator: SIGN_TK; 
 
@@ -385,13 +390,37 @@ list_of_module_args: module_arg | list_of_module_args ',' module_arg;
 
 list_of_module_args.opt: %empty | '(' ')' | '(' list_of_module_args ')';
 
-module_declaration: MODULE_KW module_identifier {
+module_declaration: list_of_attribute_instance.opt {
+} MODULE_KW module_identifier {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  constructor->internalStartModule(std::move($2));
+  constructor->internalStartModule(std::move($4));
 } list_of_module_args.opt ';' list_of_module_items.opt ENDMODULE_KW {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->internalEndModule();
 }
+
+/* 3.8 */
+attr_spec_value: %empty {
+  $$.valid_ = false;
+}
+| '=' constant_expression {
+  $$.valid_ = true;
+  $$.value_ = $2;
+}
+
+attr_spec: identifier attr_spec_value {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addAttribute($1, $2);
+}
+
+list_of_attr_spec: attr_spec | list_of_attr_spec ',' attr_spec; 
+
+//A.9.1
+attribute_instance: '(' '*' list_of_attr_spec '*' ')';
+
+list_of_attribute_instance: attribute_instance | list_of_attribute_instance attribute_instance;
+
+list_of_attribute_instance.opt: %empty | list_of_attribute_instance;
 
 %%
 

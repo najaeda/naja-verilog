@@ -64,6 +64,7 @@ class VerilogConstructor {
     virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
     virtual void endInstantiation() {}
     virtual void addParameterAssignment(const std::string& parameterName, const Expression& expression) {}
+    virtual void addAttribute(const std::string& attributeName, const ConstantExpression& expression) {}
     virtual void endModule() {}
     //LCOV_EXCL_STOP
   private:

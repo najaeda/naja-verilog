@@ -191,14 +191,41 @@ struct Expression {
   enum Type { IDENTIFIER=0, NUMBER=1, STRING=2, CONCATENATION=3 }; 
   using Value = std::variant<Identifier, Number, std::string, Concatenation>;
 
-  bool          valid_          {false};
+  bool          valid_          { false };
   //If valid_ is true and supported_ is false, then this expression construction
   //is not currently supported.
-  bool          supported_      {true};
+  bool          supported_      { true };
   Value         value_          {};
   Concatenation concatenation_  {};
 };
 
+struct ConstantExpression {
+  ConstantExpression() = default;
+  ConstantExpression(const ConstantExpression&) = default;
+
+  enum Type { NUMBER=0, STRING=1 }; 
+  using Value = std::variant<Number, std::string>;
+
+  std::string getString() const;
+  std::string getDescription() const;
+
+  bool        valid_  { false };
+  Value       value_  {};
+};
+
+struct Attribute {
+  Attribute() = default;
+  Attribute(const Attribute&) = default;
+  Attribute(const std::string& name, const ConstantExpression& expression):
+    name_(name),
+    expression_(expression)
+  {}
+  std::string getString() const;
+  std::string getDescription() const;
+
+  std::string         name_       {};
+  ConstantExpression  expression_ {};
+};
 
 }} // namespace verilog // namespace naja
 

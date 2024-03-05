@@ -42,7 +42,6 @@ using token = naja::verilog::VerilogParser::token;
 %option c++
 
 %x in_comment
-%x in_attribute
 %x based_const
 
 /* Predefined rules */
@@ -51,9 +50,6 @@ SPACE         " "|"\t"|"\f"
 COMMENT_BEGIN "/*"
 COMMENT_END   "*/" 
 COMMENT_LINE  "//".*\n
-
-ATTRIBUTE_BEGIN "(*"
-ATTRIBUTE_END   "*)"
 
 IDENTIFIER [_a-zA-Z][$_a-zA-Z0-9]*
 UNSIGNED_NUMBER [0-9][0-9_]*
@@ -92,20 +88,7 @@ ESCAPED_IDENTIFIER \\[\\^!"#$%&',()*+\-.a-zA-Z0-9/{|}~[\]_:;<=>?@]+[\t\f ]
 <in_comment>. { /* ignore characters in comment */ }
 <in_comment>{COMMENT_END} { BEGIN(INITIAL); }
 
-{ATTRIBUTE_BEGIN} { BEGIN(in_attribute); }
-<in_attribute><<EOF>> { 
-  BEGIN(INITIAL);
-  std::ostringstream reason;
-  reason << "Unclosed attribute at line " 
-    << loc->end.line << " col " << loc->end.column;
-  throw VerilogException(reason.str());
-}
-
-<in_attribute>{NEWLINE} { loc->lines(); }
-<in_attribute>. { /* ignore characters in comment */ }
-<in_attribute>{ATTRIBUTE_END} { BEGIN(INITIAL); }
-
-"."|","|";"|"("|")"|"#"|"["|"]"|":"|"{"|"}"|"=" {
+"."|","|";"|"("|")"|"*"|"#"|"["|"]"|":"|"{"|"}"|"=" {
   return yytext[0];
 }
 

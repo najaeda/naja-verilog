@@ -35,7 +35,9 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     void addAssign(
       const naja::verilog::Identifiers& identifiers,
       const naja::verilog::Expression& expression) override;
-
+    void addAttribute(
+      const std::string& attributeName,
+      const naja::verilog::ConstantExpression& expression) override;
 
     struct OrderedInstanceConnection {
       OrderedInstanceConnection() = default;
@@ -132,12 +134,14 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
 
     using Modules = std::vector<Module*>;
     using ModulesMap = std::map<std::string, Module*>;
+    using Attributes = std::list<naja::verilog::Attribute>;
     void addModule(Module* module);
     
     bool        firstPass_        {true};
     Modules     modules_          {};
     ModulesMap  modulesMap_       {};
     Module*     currentModule_    {nullptr};
+    Attributes  attributes_       {};
     std::string currentModelName_ {};
 };
 
