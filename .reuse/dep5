@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: naja-verilog 
 Upstream-Contact: Christophe Alexandre <christophe.alex@gmail.com>
-Source: https://github.com/xtofalex/naja-verilog
+Source: https://github.com/najaeda/naja-verilog
 
 Files: .github/workflows/* .gitmodules .gitignore
 Copyright: 2023 The Naja verilog Authors.

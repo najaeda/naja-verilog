@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+// SPDX-FileCopyrightText: 2024 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,20 +17,21 @@ using namespace naja::verilog;
 #define NAJA_VERILOG_BENCHMARKS "Undefined"
 #endif
 
-TEST(NajaVerilogTest7, test) {
+TEST(NajaVerilogTest8, test) {
   VerilogConstructorTest constructor;
-  std::filesystem::path test7Path(
+  std::filesystem::path test8Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
       / std::filesystem::path("benchmarks")
-      / std::filesystem::path("test7.v"));
-  constructor.parse(test7Path);
+      / std::filesystem::path("test8.v"));
+  constructor.parse(test8Path);
   ASSERT_EQ(1, constructor.modules_.size());
-  auto test = constructor.modules_[0];
-  EXPECT_EQ("test", test->name_);
+  auto adder = constructor.modules_[0];
+  EXPECT_EQ("adder", adder->name_);
 
   constructor.setFirstPass(false);
-  constructor.parse(test7Path);
+  constructor.parse(test8Path);
 
+#if 0
   ASSERT_EQ(1, constructor.modules_[0]->instances_.size());
   auto instance = constructor.modules_[0]->instances_[0];
   EXPECT_EQ("ins", instance.name_);
@@ -45,4 +46,5 @@ TEST(NajaVerilogTest7, test) {
   paramIt = instance.parameterAssignments_.find("PARAM2");
   ASSERT_TRUE(paramIt != instance.parameterAssignments_.end());
   EXPECT_EQ("VALUE", paramIt->second);
+#endif
 }

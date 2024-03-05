@@ -1,7 +1,7 @@
 # naja-verilog
 
-![build](https://github.com/xtofalex/naja-verilog/actions/workflows/build.yml/badge.svg)
-[![codecov](https://codecov.io/gh/xtofalex/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/xtofalex/naja-verilog)
+![build](https://github.com/najaeda/naja-verilog/actions/workflows/build.yml/badge.svg)
+[![codecov](https://codecov.io/gh/najaeda/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/najaeda/naja-verilog)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ***
 
@@ -9,7 +9,7 @@
 
 Naja-Verilog is a structural (gate-level) Verilog parser and can be used to read synthesis generated netlists.
 
-This library provides a verilog interface to [Naja SNL](https://github.com/xtofalex/naja), however both projects are not tied and naja-verilog can be integrated in any project needing structural verilog support.
+This library provides a verilog interface to [Naja SNL](https://github.com/najaeda/naja), however both projects are not tied and naja-verilog can be integrated in any project needing structural verilog support.
 
 :information_desk_person: If you have any questions, bug to report or request, please open an issue or send me a [mail](mailto:christophe.alex@gmail.com).
 
@@ -42,7 +42,7 @@ A comparable project can be found here: [Parser-Verilog](https://github.com/Open
 
 ```bash
 # First clone the repository and go inside it
-git clone https://github.com/xtofalex/naja-verilog.git
+git clone https://github.com/najaeda/naja-verilog.git
 cd naja-verilog
 git submodule init
 git submodule update
@@ -93,12 +93,12 @@ make install
 
 Best starting point is to copy existing examples/implementations:
 
-* [NajaVerilogSnippet](https://github.com/xtofalex/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
-* [VerilogConstructorTest](https://github.com/xtofalex/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
-* [Unit tests](https://github.com/xtofalex/naja-verilog/blob/main/test): covers trough unit testing most of the parser aspects.
-* [SNLVRLConstructor](https://github.com/xtofalex/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h): More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
+* [NajaVerilogSnippet](https://github.com/najaeda/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
+* [VerilogConstructorTest](https://github.com/najaeda/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
+* [Unit tests](https://github.com/najaeda/naja-verilog/blob/main/test): covers trough unit testing most of the parser aspects.
+* [SNLVRLConstructor](https://github.com/najaeda/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h): More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
 
-The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogConstructor.h) and override [callback](#callbacks) methods launched while visiting verilog source.
+The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/najaeda/naja-verilog/blob/main/src/VerilogConstructor.h) and override [callback](#callbacks) methods launched while visiting verilog source.
 
 ### Two passes Parsing
 
@@ -111,7 +111,7 @@ As ordering of verilog modules in single or across multiple files is not preknow
 
 ## Callbacks
 
-Stuctures (Net, Port, Expression) details constructed by following callbacks can be found in [VerilogType.h](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogTypes.h) header.
+Stuctures (Net, Port, Expression) details constructed by following callbacks can be found in [VerilogType.h](https://github.com/najaeda/naja-verilog/blob/main/src/VerilogTypes.h) header.
 
 ### Callbacks for Module
 
