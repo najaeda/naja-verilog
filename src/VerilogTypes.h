@@ -196,7 +196,6 @@ struct Expression {
   //is not currently supported.
   bool          supported_      {true};
   Value         value_          {};
-  Concatenation concatenation_  {};
 };
 
 
