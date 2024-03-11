@@ -15,25 +15,25 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     ~VerilogConstructorTest();
     bool inFirstPass() const { return firstPass_; }
     void setFirstPass(bool mode) { firstPass_ = mode; }
-    void startModule(const std::string& name) override;
-    void moduleInterfaceSimplePort(const std::string& name) override;
+    void startModule(const naja::verilog::Identifier& id) override;
+    void moduleInterfaceSimplePort(const naja::verilog::Identifier& id) override;
     void moduleImplementationPort(const naja::verilog::Port& port) override;
     void moduleInterfaceCompletePort(const naja::verilog::Port& port) override;
-    void startInstantiation(const std::string& modelName) override;
-    void addInstance(const std::string& name) override;
+    void startInstantiation(const naja::verilog::Identifier& model) override;
+    void addInstance(const naja::verilog::Identifier& name) override;
     void addInstanceConnection(
-      const std::string& portName,
+      const naja::verilog::Identifier& port,
       const naja::verilog::Expression& expression) override;
     void addOrderedInstanceConnection(
       size_t portIndex,
       const naja::verilog::Expression& expression) override;
     void addParameterAssignment(
-      const std::string& parameterName,
+      const naja::verilog::Identifier& parameter,
       const naja::verilog::Expression& expression) override;
     void endInstantiation() override;
     void addNet(const naja::verilog::Net& net) override;
     void addAssign(
-      const naja::verilog::Identifiers& identifiers,
+      const naja::verilog::RangeIdentifiers& identifiers,
       const naja::verilog::Expression& expression) override;
 
 
@@ -62,7 +62,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       InstanceConnection() = default;
       InstanceConnection(const InstanceConnection&) = default;
       InstanceConnection(
-        const std::string& port,
+        const naja::verilog::Identifier& port,
         const naja::verilog::Expression& expression):
         port_(port),
         expression_(expression)
@@ -71,11 +71,11 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       std::string getString() const {
         std::ostringstream stream;
         stream << "InstanceConnection - port: "
-          << port_ << " : " << expression_.getString();
+          << port_.getString() << " : " << expression_.getString();
         return stream.str();
       }
-      
-      std::string               port_       {};
+
+      naja::verilog::Identifier port_       {}; 
       naja::verilog::Expression expression_ {};
     };
 
@@ -104,12 +104,12 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
 
     struct Assign {
       Assign(
-        const naja::verilog::Identifiers& identifiers,
+        const naja::verilog::RangeIdentifiers& identifiers,
         const naja::verilog::Expression& expression):
         identifiers_(identifiers),
         expression_(expression)
       {}
-      naja::verilog::Identifiers  identifiers_  {};
+      naja::verilog::RangeIdentifiers  identifiers_  {};
       naja::verilog::Expression   expression_   {};
     };
 
@@ -118,15 +118,15 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       using Nets = std::vector<naja::verilog::Net>;
       using Instances = std::vector<Instance>;
       using Assigns = std::vector<Assign>;
-      std::string                     name_                                 {};
+      naja::verilog::Identifier       identifier_                           {};
       Ports                           ports_                                {};
       Nets                            nets_                                 {};
       Assigns                         assigns_                              {};
       Instances                       instances_                            {};
       Instance::ParameterAssignments  currentInstanceParameterAssignments_  {};
 
-      Module(const std::string& name):
-        name_(name)
+      Module(const naja::verilog::Identifier& identifier):
+        identifier_(identifier)
       {}
     };
 

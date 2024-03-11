@@ -29,9 +29,9 @@ TEST(NajaVerilogTestMultipleFiles, test) {
   paths.push_back(multipleFilesPath / std::filesystem::path("top.v"));
   constructor.parse(paths);
   ASSERT_EQ(3, constructor.modules_.size());
-  EXPECT_EQ("mod0", constructor.modules_[0]->name_);
-  EXPECT_EQ("mod1", constructor.modules_[1]->name_);
-  EXPECT_EQ("top", constructor.modules_[2]->name_);
+  EXPECT_EQ("mod0", constructor.modules_[0]->identifier_.name_);
+  EXPECT_EQ("mod1", constructor.modules_[1]->identifier_.name_);
+  EXPECT_EQ("top", constructor.modules_[2]->identifier_.name_);
   ASSERT_EQ(2, constructor.modules_[0]->ports_.size());
   ASSERT_EQ(2, constructor.modules_[1]->ports_.size());
   ASSERT_EQ(2, constructor.modules_[2]->ports_.size());

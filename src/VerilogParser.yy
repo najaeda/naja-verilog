@@ -78,13 +78,13 @@ size_t portIndex = 0;
 %token<std::string> CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK
 %token<std::string> SIGN_TK
 
-%type<std::string> identifier;
+%type<naja::verilog::Identifier> identifier;
 //no support for XMRs for the moment
-%type<std::string> hierarchical_identifier;
-%type<std::string> hierarchical_net_identifier;
-%type<std::string> module_identifier;
-%type<std::string> name_of_module_instance;
-%type<std::string> parameter_identifier;
+%type<naja::verilog::Identifier> hierarchical_identifier;
+%type<naja::verilog::Identifier> hierarchical_net_identifier;
+%type<naja::verilog::Identifier> module_identifier;
+%type<naja::verilog::Identifier> name_of_module_instance;
+%type<naja::verilog::Identifier> parameter_identifier;
 
 %type<naja::verilog::Port> port_declaration
 %type<naja::verilog::Port::Direction> port_type_io
@@ -94,10 +94,10 @@ size_t portIndex = 0;
 %type<naja::verilog::Range> constant_range_expression.opt;
 %type<naja::verilog::Identifier> net_identifier;
 %type<naja::verilog::Identifiers> list_of_net_identifiers;
-%type<naja::verilog::Identifiers> net_lvalue;
-%type<naja::verilog::Identifiers> list_of_net_lvalues;
-%type<std::string> module_instance;
-%type<std::string> port_identifier;
+%type<naja::verilog::RangeIdentifiers> net_lvalue;
+%type<naja::verilog::RangeIdentifiers> list_of_net_lvalues;
+%type<naja::verilog::Identifier> module_instance;
+%type<naja::verilog::Identifier> port_identifier;
 
 %type<naja::verilog::Number> number;
 %type<naja::verilog::Number> constant_primary;
@@ -122,9 +122,12 @@ list_of_descriptions: description | list_of_descriptions description;
 
 description: module_declaration;
 
-identifier: IDENTIFIER_TK | ESCAPED_IDENTIFIER_TK {
-  $$ = $1;
-}
+identifier
+  : IDENTIFIER_TK { $$ = naja::verilog::Identifier($1); }
+  | ESCAPED_IDENTIFIER_TK {
+    std::string escaped = $1.substr(1, $1.size()-2);
+    $$ = naja::verilog::Identifier(escaped, true);
+  }
 
 constant_primary: number
 
@@ -161,7 +164,7 @@ non_port_module_item : module_or_generate_item;
 hierarchical_net_identifier: identifier;
 
 net_lvalue: hierarchical_net_identifier constant_range_expression.opt {
-  $$ = { naja::verilog::Identifier($1, $2) };
+  $$ = { naja::verilog::RangeIdentifier($1, $2) };
 }
 | '{' list_of_net_lvalues '}' {
   $$ = $2;
@@ -169,10 +172,10 @@ net_lvalue: hierarchical_net_identifier constant_range_expression.opt {
 
 //Only one level of list is supported
 list_of_net_lvalues: hierarchical_net_identifier constant_range_expression.opt {
-  $$ = { naja::verilog::Identifier($1, $2) };
+  $$ = { naja::verilog::RangeIdentifier($1, $2) };
 }
 | list_of_net_lvalues ',' hierarchical_net_identifier constant_range_expression.opt {
-  $1.push_back(naja::verilog::Identifier($3, $4));
+  $1.push_back(naja::verilog::RangeIdentifier($3, $4));
   $$ = $1;
 }
 
@@ -196,7 +199,7 @@ module_or_generate_item_declaration: net_declaration;
 net_declaration: net_type range.opt list_of_net_identifiers ';' {
   for (auto netIdentifier: $3) {
     constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-    constructor->addNet(Net(netIdentifier.name_, $2, $1));
+    constructor->addNet(Net(netIdentifier, $2, $1));
   }
 }
 
@@ -285,7 +288,7 @@ primary
 : number {
   $$.valid_ = true; $$.value_ = $1; }
 | hierarchical_identifier constant_range_expression.opt { 
-  $$.valid_ = true; $$.value_ = naja::verilog::Identifier($1, $2); }
+  $$.valid_ = true; $$.value_ = naja::verilog::RangeIdentifier($1, $2); }
 | STRING_TK { $$.valid_ = true; $$.value_ = $1.substr(1, $1.size()-2); } 
 | concatenation { $$.valid_ = true; $$.value_ = naja::verilog::Concatenation($1); }
 ;

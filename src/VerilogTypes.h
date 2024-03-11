@@ -25,6 +25,19 @@ struct Range {
   int   lsb_          {0};
 };
 
+struct Identifier {
+  Identifier() = default;
+  Identifier(const Identifier&) = default;
+  Identifier(const std::string& name, bool escaped=false): name_(name), escaped_(escaped) {}
+  std::string getString() const;
+  std::string getDescription() const;
+
+  std::string name_;
+  bool        escaped_  {false};
+};
+
+using Identifiers = std::vector<Identifier>;
+
 struct Port {
   class Direction {
     public:
@@ -45,22 +58,22 @@ struct Port {
 
   Port() = default;
   Port(const Port&) = default;
-  Port(const std::string& name, Direction direction):
-    name_(name),
+  Port(const Identifier& identifier, Direction direction):
+    identifier_(identifier),
     direction_(direction)
   {}
 
-  Port(const std::string& name, Direction direction, const Range& range):
-    name_(name),
-    direction_(direction),
-    range_(range)
+  Port(const Identifier& identifier, Direction direction, const Range& range):
+    identifier_(identifier),
+    range_(range),
+    direction_(direction)
   {}
 
   bool isBus() const { return range_.valid_; }
 
-  std::string name_       {};
-  Direction   direction_  {};
+  Identifier  identifier_ {};
   Range       range_      {};
+  Direction   direction_  {};
 
   std::string getString() const;
 };
@@ -86,34 +99,36 @@ struct Net {
   Net() = default;
   Net(const Net&) = default;
   
-  Net(const std::string& name, const Range& range, Type type):
-    name_(name),
+  Net(const Identifier& identifier, const Range& range, Type type):
+    identifier_(identifier),
     range_(range),
     type_(type)
   {}
 
   bool isBus() const { return range_.valid_; }
 
-  std::string name_   {};
-  Range       range_  {};
-  Type        type_   {};
+  Identifier  identifier_ {};
+  Range       range_      {};
+  Type        type_       {};
 
   std::string getString() const;
 };
 
-struct Identifier {
-  Identifier() = default;
-  Identifier(const Identifier&) = default;
-  Identifier(const std::string& name): name_(name) {}
-  Identifier(const std::string& name, const Range& range): name_(name), range_(range) {}
+
+
+struct RangeIdentifier {
+  RangeIdentifier() = default;
+  RangeIdentifier(const RangeIdentifier&) = default;
+  RangeIdentifier(const Identifier& identifier): identifier_(identifier) {}
+  RangeIdentifier(const Identifier& identifier, const Range& range): identifier_(identifier), range_(range) {}
   std::string getString() const;
   std::string getDescription() const;
 
-  std::string name_;
+  Identifier  identifier_;
   Range       range_;
 };
 
-using Identifiers = std::vector<Identifier>;
+using RangeIdentifiers = std::vector<RangeIdentifier>;
 
 struct BasedNumber {
   BasedNumber() = default;
@@ -188,8 +203,8 @@ struct Expression {
   std::string getString() const;
   std::string getDescription() const;
 
-  enum Type { IDENTIFIER=0, NUMBER=1, STRING=2, CONCATENATION=3 }; 
-  using Value = std::variant<Identifier, Number, std::string, Concatenation>;
+  enum Type { RANGEIDENTIFIER=0, NUMBER=1, STRING=2, CONCATENATION=3 }; 
+  using Value = std::variant<RangeIdentifier, Number, std::string, Concatenation>;
 
   bool          valid_          {false};
   //If valid_ is true and supported_ is false, then this expression construction

@@ -67,23 +67,23 @@ void VerilogConstructor::internalParse(std::istream &stream) {
   bool result = parser_->parse();
 }
 
-void VerilogConstructor::internalStartModule(const std::string& name) {
+void VerilogConstructor::internalStartModule(const naja::verilog::Identifier& id) {
   type_ = ModuleInterfaceType::Unknown;
-  startModule(name);
+  startModule(id);
 }
 
 void VerilogConstructor::internalEndModule() {
   endModule();
 }
  
-void VerilogConstructor::internalModuleInterfaceSimplePort(const std::string& name) {
+void VerilogConstructor::internalModuleInterfaceSimplePort(const naja::verilog::Identifier& id) {
   if (type_ == ModuleInterfaceType::Unknown) {
     type_ = ModuleInterfaceType::Port; 
   }
   if (type_ == ModuleInterfaceType::PortDeclaration) {
-    moduleInterfaceCompletePort(Port(name, lastDirection_, lastRange_));
+    moduleInterfaceCompletePort(Port(id, lastDirection_, lastRange_));
   } else {
-    moduleInterfaceSimplePort(name);
+    moduleInterfaceSimplePort(id);
   }
 }
   

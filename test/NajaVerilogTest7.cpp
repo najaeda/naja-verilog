@@ -26,7 +26,7 @@ TEST(NajaVerilogTest7, test) {
   constructor.parse(test7Path);
   ASSERT_EQ(1, constructor.modules_.size());
   auto test = constructor.modules_[0];
-  EXPECT_EQ("test", test->name_);
+  EXPECT_EQ("test", test->identifier_.name_);
 
   constructor.setFirstPass(false);
   constructor.parse(test7Path);
