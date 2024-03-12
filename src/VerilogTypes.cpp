@@ -13,6 +13,7 @@ std::string Identifier::getString() const {
   return name_;
 }
 
+//LCOV_EXCL_START
 std::string Identifier::getDescription() const {
   if (escaped_) {
     return "Identifier: [\\" + name_ + " ] (escaped)";
@@ -20,6 +21,7 @@ std::string Identifier::getDescription() const {
     return "Identifier: [" + name_ + "]";
   }
 }
+//LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
 std::string Range::getString() const {
