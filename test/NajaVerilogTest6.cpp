@@ -26,7 +26,7 @@ TEST(NajaVerilogTest6, test) {
   constructor.parse(test6Path);
   ASSERT_EQ(1, constructor.modules_.size());
   auto test = constructor.modules_[0];
-  EXPECT_EQ("test", test->name_);
+  EXPECT_EQ("test", test->identifier_.name_);
   EXPECT_EQ(1, constructor.modules_.size());
   {
     auto mod = constructor.modules_[0];
@@ -44,13 +44,13 @@ TEST(NajaVerilogTest6, test) {
     auto assign = mod->assigns_[0];
     EXPECT_EQ(1, assign.identifiers_.size());
     auto identifier = assign.identifiers_[0];
-    EXPECT_EQ("n0", identifier.name_);
+    EXPECT_EQ("n0", identifier.identifier_.name_);
     EXPECT_FALSE(identifier.range_.valid_);
     auto expression = assign.expression_;
     EXPECT_TRUE(expression.valid_);
-    EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER, expression.value_.index());
-    auto leftId = std::get<naja::verilog::Expression::Type::IDENTIFIER>(expression.value_);
-    EXPECT_EQ("n1", leftId.name_);
+    EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER, expression.value_.index());
+    auto leftId = std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(expression.value_);
+    EXPECT_EQ("n1", leftId.identifier_.name_);
     EXPECT_FALSE(leftId.range_.valid_);
   }
 
@@ -58,7 +58,7 @@ TEST(NajaVerilogTest6, test) {
     auto assign = mod->assigns_[1];
     EXPECT_EQ(1, assign.identifiers_.size());
     auto identifier = assign.identifiers_[0];
-    EXPECT_EQ("n1", identifier.name_);
+    EXPECT_EQ("n1", identifier.identifier_.name_);
     EXPECT_FALSE(identifier.range_.valid_);
     auto expression = assign.expression_;
     EXPECT_TRUE(expression.valid_);
@@ -77,12 +77,12 @@ TEST(NajaVerilogTest6, test) {
     auto assign = mod->assigns_[2];
     EXPECT_EQ(2, assign.identifiers_.size());
     auto id0 = assign.identifiers_[0];
-    EXPECT_EQ("n2", id0.name_);
+    EXPECT_EQ("n2", id0.identifier_.name_);
     EXPECT_TRUE(id0.range_.valid_);
     EXPECT_EQ(3, id0.range_.msb_);
     EXPECT_EQ(2, id0.range_.lsb_);
     auto id1 = assign.identifiers_[1];
-    EXPECT_EQ("n2", id1.name_);
+    EXPECT_EQ("n2", id1.identifier_.name_);
     EXPECT_TRUE(id1.range_.valid_);
     EXPECT_EQ(1, id1.range_.msb_);
     EXPECT_EQ(0, id1.range_.lsb_);
@@ -108,7 +108,7 @@ TEST(NajaVerilogTest6, test) {
     auto assign = mod->assigns_[3];
     EXPECT_EQ(1, assign.identifiers_.size());
     auto identifier = assign.identifiers_[0];
-    EXPECT_EQ("n3", identifier.name_);
+    EXPECT_EQ("n3", identifier.identifier_.name_);
     EXPECT_FALSE(identifier.range_.valid_);
     auto expression = assign.expression_;
     EXPECT_TRUE(expression.valid_);

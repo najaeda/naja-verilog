@@ -14,28 +14,29 @@ VerilogConstructorTest::~VerilogConstructorTest() {
 }
 
 void VerilogConstructorTest::addModule(Module* module) {
-  assert(modulesMap_.find(module->name_) == modulesMap_.end());
-  modulesMap_[module->name_] = module;
+  assert(modulesMap_.find(module->identifier_.name_) == modulesMap_.end());
+  modulesMap_[module->identifier_.name_] = module;
   modules_.push_back(module);
 }
 
-void VerilogConstructorTest::startModule(const std::string& name) {
+void VerilogConstructorTest::startModule(const naja::verilog::Identifier& identifier) {
   if (inFirstPass()) {
-    currentModule_ = new Module(name);
+    currentModule_ = new Module(identifier);
     addModule(currentModule_);
-    std::cerr << "Construct Module: " << name << std::endl;
+    std::cerr << "Construct Module: " << identifier.getString() << std::endl;
   } else {
-    if (modulesMap_.find(name) == modulesMap_.end()) {
-      std::cerr << "Cannot find Module: " << name << std::endl;
+    if (auto it = modulesMap_.find(identifier.name_); it != modulesMap_.end()) {
+      currentModule_ = it->second;
+    } else {
+      std::cerr << "Cannot find Module: " << identifier.getString() << std::endl;
       exit(5);
     }
-    currentModule_ = modulesMap_.find(name)->second;
   } 
 }
 
-void VerilogConstructorTest::moduleInterfaceSimplePort(const std::string& name) {
+void VerilogConstructorTest::moduleInterfaceSimplePort(const naja::verilog::Identifier& port) {
   if (inFirstPass()) {
-    std::cerr << "Construct Simple: " << name << std::endl;
+    std::cerr << "Construct Simple: " << port.getString() << std::endl;
   }
 }
 
@@ -60,10 +61,10 @@ void VerilogConstructorTest::addNet(const naja::verilog::Net& net) {
   }
 }
 
-void VerilogConstructorTest::startInstantiation(const std::string& modelName) {
+void VerilogConstructorTest::startInstantiation(const naja::verilog::Identifier& model) {
   if (not inFirstPass()) {
-    std::cerr << "startInstantiation: " << modelName << std::endl;
-    currentModelName_ = modelName;
+    std::cerr << "startInstantiation: " << model.getString() << std::endl;
+    currentModelName_ = model.name_;
   }
 }
 
@@ -76,21 +77,21 @@ void VerilogConstructorTest::endInstantiation() {
   }
 }
 
-void VerilogConstructorTest::addInstance(const std::string& instanceName) {
+void VerilogConstructorTest::addInstance(const naja::verilog::Identifier& instance) {
   if (not inFirstPass()) {
-    std::cerr << "Add instance: " << instanceName << std::endl;
-    currentModule_->instances_.push_back(Instance(currentModelName_, instanceName));
+    std::cerr << "Add instance: " << instance.getString() << std::endl;
+    currentModule_->instances_.push_back(Instance(currentModelName_, instance.getString()));
   }
 }
 
 void VerilogConstructorTest::addInstanceConnection(
-  const std::string& portName,
+  const naja::verilog::Identifier& port,
   const naja::verilog::Expression& expression) {
   if (not inFirstPass()) {
     std::cerr << "Add instance connection: "
-      << portName << " " << expression.getString() <<  std::endl;
+      << port.getString() << " " << expression.getString() <<  std::endl;
     Instance& instance = currentModule_->instances_.back();
-    instance.connections_.push_back(InstanceConnection(portName, expression));
+    instance.connections_.push_back(InstanceConnection(port.name_, expression));
   }
 }
 
@@ -106,17 +107,17 @@ void VerilogConstructorTest::addOrderedInstanceConnection(
 }
 
 void VerilogConstructorTest::addParameterAssignment(
-  const std::string& parameterName,
+  const naja::verilog::Identifier& parameter,
   const naja::verilog::Expression& expression) {
   if (not inFirstPass()) {
     std::cerr << "Add parameter assignment: "
-      << parameterName << " " << expression.getString() <<  std::endl;
-    currentModule_->currentInstanceParameterAssignments_[parameterName] = expression.getString();
+      << parameter.getString() << " " << expression.getString() <<  std::endl;
+    currentModule_->currentInstanceParameterAssignments_[parameter.getString()] = expression.getString();
   }
 }
 
 void VerilogConstructorTest::addAssign(
-  const naja::verilog::Identifiers& identifiers,
+  const naja::verilog::RangeIdentifiers& identifiers,
   const naja::verilog::Expression& expression) {
   if (not inFirstPass()) {
     currentModule_->assigns_.push_back(Assign(identifiers, expression));
