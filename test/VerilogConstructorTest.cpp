@@ -91,7 +91,7 @@ void VerilogConstructorTest::addInstanceConnection(
     std::cerr << "Add instance connection: "
       << port.getString() << " " << expression.getString() <<  std::endl;
     Instance& instance = currentModule_->instances_.back();
-    instance.connections_.push_back(InstanceConnection(port, expression));
+    instance.connections_.push_back(InstanceConnection(port.name_, expression));
   }
 }
 

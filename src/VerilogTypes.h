@@ -15,6 +15,11 @@ namespace naja { namespace verilog {
 struct Range {
   Range() = default;
   Range(const Range&) = default;
+  Range(int msb, int lsb):
+    valid_(true), singleValue_(false), msb_(msb), lsb_(lsb) {}
+  Range(int value):
+    valid_(true), singleValue_(true), msb_(value) {}
+  bool operator==(const Range& other) const = default;
 
   std::string getString() const;
 
@@ -29,6 +34,7 @@ struct Identifier {
   Identifier() = default;
   Identifier(const Identifier&) = default;
   Identifier(const std::string& name, bool escaped=false): name_(name), escaped_(escaped) {}
+  bool operator==(const Identifier& other) const = default;
   std::string getString() const;
   std::string getDescription() const;
 
@@ -113,8 +119,6 @@ struct Net {
 
   std::string getString() const;
 };
-
-
 
 struct RangeIdentifier {
   RangeIdentifier() = default;
@@ -212,7 +216,6 @@ struct Expression {
   bool          supported_      {true};
   Value         value_          {};
 };
-
 
 }} // namespace verilog // namespace naja
 

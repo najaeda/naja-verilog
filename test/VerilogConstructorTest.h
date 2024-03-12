@@ -75,7 +75,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
         return stream.str();
       }
 
-      naja::verilog::Identifier port_       {}; 
+      naja::verilog::Identifier port_       {};
       naja::verilog::Expression expression_ {};
     };
 
@@ -85,21 +85,22 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       using ParameterAssignments = std::map<std::string, std::string>;
       Instance() = default;
       Instance(const Instance&) = default;
-      Instance(const std::string& model, const std::string& name):
-        model_(model), name_(name)
+      Instance(const naja::verilog::Identifier& model, const naja::verilog::Identifier& id):
+        model_(model), identifier_(id)
       {}
 
       std::string getString() const {
         std::ostringstream stream;
-        stream << "Instance: (" << model_ << ") " << name_;
+        stream << "Instance: (" << model_.getString() << ") "
+          << identifier_.getString();
         return stream.str();
       }
   
-      std::string           model_                {};
-      std::string           name_                 {};
-      ParameterAssignments  parameterAssignments_ {};
-      Connections           connections_          {};
-      OrderedConnections    orderedConnections_   {};
+      naja::verilog::Identifier   model_                {};
+      naja::verilog::Identifier   identifier_           {};
+      ParameterAssignments        parameterAssignments_ {};
+      Connections                 connections_          {};
+      OrderedConnections          orderedConnections_   {};
     };
 
     struct Assign {

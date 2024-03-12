@@ -142,9 +142,7 @@ constant_expression: constant_primary {
 }
 
 range: '[' constant_expression ':' constant_expression ']' {
-  $$.valid_ = true;
-  $$.msb_ = $2.getInt();
-  $$.lsb_ = $4.getInt();
+  $$ = Range($2.getInt(), $4.getInt());
 }
 
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
@@ -265,9 +263,7 @@ hierarchical_identifier: identifier;
 //only numeric values (one bit) [4] or [4:5] are supported
 constant_range_expression.opt: %empty { $$.valid_ = false; } 
 | '[' constant_expression ']' {
-  $$.valid_ = true;
-  $$.singleValue_ = true;
-  $$.msb_ = $2.getInt();
+  $$ = Range($2.getInt());
 }
 | range {
   $$ = $1;

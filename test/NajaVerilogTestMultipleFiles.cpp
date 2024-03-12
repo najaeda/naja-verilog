@@ -39,14 +39,13 @@ TEST(NajaVerilogTestMultipleFiles, test) {
   constructor.setFirstPass(false);
   constructor.parse(paths);
 
-
   EXPECT_TRUE(constructor.modules_[0]->instances_.empty());
   EXPECT_TRUE(constructor.modules_[1]->instances_.empty());
   ASSERT_EQ(2, constructor.modules_[2]->instances_.size());
   auto ins0 = constructor.modules_[2]->instances_[0];
-  EXPECT_EQ("ins0", ins0.name_);
-  EXPECT_EQ("mod0", ins0.model_);
+  EXPECT_EQ("ins0", ins0.identifier_.name_);
+  EXPECT_EQ("mod0", ins0.model_.name_);
   auto ins1 = constructor.modules_[2]->instances_[1];
-  EXPECT_EQ("ins1", ins1.name_);
-  EXPECT_EQ("mod1", ins1.model_);
+  EXPECT_EQ("ins1", ins1.identifier_.name_);
+  EXPECT_EQ("mod1", ins1.model_.name_);
 }

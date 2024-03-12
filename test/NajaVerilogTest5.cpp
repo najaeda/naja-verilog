@@ -52,8 +52,8 @@ TEST(NajaVerilogTest5, test) {
 
   EXPECT_EQ(1, test->instances_.size());
   const VerilogConstructorTest::Instance& instance = test->instances_[0];
-  EXPECT_EQ("_4370_", instance.name_);
-  EXPECT_EQ("LUT4", instance.model_);
+  EXPECT_EQ("_4370_", instance.identifier_.name_);
+  EXPECT_EQ("LUT4", instance.model_.name_);
   EXPECT_EQ(1, instance.parameterAssignments_.size());
   EXPECT_EQ("INIT", instance.parameterAssignments_.begin()->first);
   EXPECT_EQ("8'h2b", instance.parameterAssignments_.begin()->second);
