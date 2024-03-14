@@ -70,6 +70,19 @@ Using nix-shell:
 nix-shell -p cmake bison flex
 ```
 
+On macOS, using [Homebrew](https://brew.sh/):
+
+```bash
+brew install cmake bison flex
+```
+
+Ensure the versions of `bison` and `flex` installed via Homebrew take precedence over the macOS defaults by modifying your $PATH environment variable as follows:
+
+```bash
+export PATH="/opt/homebrew/opt/flex/bin:/opt/homebrew/opt/bison/bin:$PATH"
+```
+
+
 ### Building and Installing
 
 ```bash
