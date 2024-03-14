@@ -19,7 +19,12 @@ struct Range {
     valid_(true), singleValue_(false), msb_(msb), lsb_(lsb) {}
   Range(int value):
     valid_(true), singleValue_(true), msb_(value) {}
-  bool operator==(const Range& other) const = default;
+  bool operator==(const Range& other) const {
+    return valid_ == other.valid_
+    && singleValue_ == other.singleValue_
+    && msb_ == other.msb_
+    && lsb_ == other.lsb_;
+  }
 
   std::string getString() const;
 
@@ -34,7 +39,9 @@ struct Identifier {
   Identifier() = default;
   Identifier(const Identifier&) = default;
   Identifier(const std::string& name, bool escaped=false): name_(name), escaped_(escaped) {}
-  bool operator==(const Identifier& other) const = default;
+  bool operator==(const Identifier& other) const {
+    return name_ == other.name_ && escaped_ == other.escaped_;
+  }
   std::string getString() const;
   std::string getDescription() const;
 
