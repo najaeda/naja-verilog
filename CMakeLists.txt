@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 #For Finding flex include path on MacOS with homebrew installation
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /opt/homebrew/opt/flex/include)
+set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /usr/local/opt/flex/include)
 
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
