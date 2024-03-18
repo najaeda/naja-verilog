@@ -21,7 +21,7 @@ class VerilogConstructor {
   public:
     VerilogConstructor() = default;
     ~VerilogConstructor();
-    using Paths = std::list<std::filesystem::path>;
+    using Paths = std::vector<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
 
