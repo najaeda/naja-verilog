@@ -122,7 +122,15 @@ supply1     { return token::SUPPLY1_KW; }
 assign      { return token::ASSIGN_KW; }
 
 {IDENTIFIER}          { yylval->build<std::string>( yytext ); return token::IDENTIFIER_TK; }
-{ESCAPED_IDENTIFIER}  { yylval->build<std::string>( yytext ); return token::ESCAPED_IDENTIFIER_TK; }
+{ESCAPED_IDENTIFIER}  {
+  //if the character ending the escape identifier is '\n'
+  //we need to update the line number
+  if (yytext[strlen(yytext)-1] == '\n') {
+    loc->lines();
+  }
+  yylval->build<std::string>( yytext );
+  return token::ESCAPED_IDENTIFIER_TK; 
+}
 {STRING}              { yylval->build<std::string>( yytext ); return token::STRING_TK; }
 
 {UNSIGNED_NUMBER} {
