@@ -64,7 +64,16 @@ TEST(NajaVerilogTest9, test) {
   constructor.setFirstPass(false);
   constructor.parse(test9Path);
   ASSERT_EQ(1, constructor.modules_.size());
-  EXPECT_TRUE(constructor.modules_[0]->nets_.empty());
   EXPECT_TRUE(constructor.modules_[0]->assigns_.empty());
   EXPECT_TRUE(constructor.modules_[0]->instances_.empty());
+  EXPECT_EQ(8, constructor.modules_[0]->nets_.size());
+  const auto& nets = constructor.modules_[0]->nets_;
+  EXPECT_EQ(naja::verilog::Identifier("macu_n_280", false), nets[0].identifier_);
+  EXPECT_EQ(naja::verilog::Identifier("macu_n_281", false), nets[1].identifier_);
+  EXPECT_EQ(naja::verilog::Identifier("macu_n_282", false), nets[2].identifier_);
+  EXPECT_EQ(naja::verilog::Identifier("macu_result[0]_203", true), nets[3].identifier_);
+  EXPECT_EQ(naja::verilog::Identifier("macu_result[1]_204", true), nets[4].identifier_);
+  EXPECT_EQ(naja::verilog::Identifier("macu_result[2]_205", true), nets[5].identifier_);
+  EXPECT_EQ(naja::verilog::Identifier("macu_result[3]_206", true), nets[6].identifier_);
+  EXPECT_EQ(naja::verilog::Identifier("macu_result[4]_207", true), nets[7].identifier_);
 }

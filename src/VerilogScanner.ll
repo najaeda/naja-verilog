@@ -64,7 +64,7 @@ STRING \"[^\"]*\"
   Check the escape rule inside character class 
   https://www.regular-expressions.info/charclass.html
 */
-ESCAPED_IDENTIFIER \\[\\^!"#$%&',()*+\-.a-zA-Z0-9/{|}~[\]_:;<=>?@]+[\t\f ]
+ESCAPED_IDENTIFIER \\[\\^!"#$%&',()*+\-.a-zA-Z0-9/{|}~[\]_:;<=>?@]+[\n\t\f ]
 
 %%
 %{          /** Code executed at the beginning of yylex **/
