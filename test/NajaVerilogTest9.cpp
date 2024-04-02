@@ -55,7 +55,9 @@ TEST(NajaVerilogTest9, test) {
   EXPECT_TRUE(ports[3].range_.valid_);
   EXPECT_EQ(3, ports[3].range_.msb_);
   EXPECT_EQ(0, ports[3].range_.lsb_);
-  EXPECT_FALSE(ports[4].range_.valid_);
+  EXPECT_TRUE(ports[4].range_.valid_);
+  EXPECT_EQ(3, ports[4].range_.msb_);
+  EXPECT_EQ(0, ports[4].range_.lsb_);
   EXPECT_FALSE(ports[5].range_.valid_);
   EXPECT_FALSE(ports[6].range_.valid_);
   
