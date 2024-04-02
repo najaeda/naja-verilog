@@ -87,13 +87,14 @@ size_t portIndex = 0;
 %type<naja::verilog::Identifier> parameter_identifier;
 
 %type<naja::verilog::Port> port_declaration
+%type<naja::verilog::Ports> internal_ports_declaration
 %type<naja::verilog::Port::Direction> port_type_io
 %type<naja::verilog::Net::Type> net_type;
 %type<naja::verilog::Range> range;
 %type<naja::verilog::Range> range.opt
 %type<naja::verilog::Range> constant_range_expression.opt;
 %type<naja::verilog::Identifier> net_identifier;
-%type<naja::verilog::Identifiers> list_of_net_identifiers;
+%type<naja::verilog::Identifiers> list_of_identifiers;
 %type<naja::verilog::RangeIdentifiers> net_lvalue;
 %type<naja::verilog::RangeIdentifiers> list_of_net_lvalues;
 %type<naja::verilog::Identifier> module_instance;
@@ -151,6 +152,13 @@ port_declaration: port_type_io range.opt identifier {
   $$ = Port($3, $1, $2);
 }
 
+internal_ports_declaration: port_type_io range.opt list_of_identifiers {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  for (auto portIdentifier: $3) {
+    constructor->internalModuleImplementationPort(Port(portIdentifier, $1, $2));
+  }
+}
+
 port_type_io
   : INOUT_KW  { $$ = naja::verilog::Port::Direction::InOut; } 
   | INPUT_KW  { $$ = naja::verilog::Port::Direction::Input; }
@@ -194,18 +202,18 @@ module_or_generate_item:
 
 module_or_generate_item_declaration: net_declaration;
 
-net_declaration: net_type range.opt list_of_net_identifiers ';' {
+net_declaration: net_type range.opt list_of_identifiers ';' {
   for (auto netIdentifier: $3) {
     constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
     constructor->addNet(Net(netIdentifier, $2, $1));
   }
 }
 
-list_of_net_identifiers
+list_of_identifiers
 : net_identifier {
   $$ = { $1 };
 }
-| list_of_net_identifiers ',' net_identifier {
+| list_of_identifiers ',' net_identifier {
   $1.push_back($3);
   $$ = $1;
 }
@@ -362,11 +370,7 @@ port: identifier {
   constructor->internalModuleInterfaceSimplePort($1);
 }
 
-module_item: port_declaration {
-  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  constructor->internalModuleImplementationPort($1);
-} ';'
-| non_port_module_item;
+module_item: internal_ports_declaration ';' | non_port_module_item;
 
 list_of_module_items: module_item | list_of_module_items module_item;
 

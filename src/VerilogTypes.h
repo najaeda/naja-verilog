@@ -91,6 +91,8 @@ struct Port {
   std::string getString() const;
 };
 
+using Ports = std::vector<Port>;
+
 struct Net {
   class Type {
     public:
