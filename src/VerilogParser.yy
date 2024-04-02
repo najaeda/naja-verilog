@@ -155,7 +155,7 @@ port_declaration: port_type_io range.opt identifier {
 internal_ports_declaration: port_type_io range.opt list_of_identifiers {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   for (auto portIdentifier: $3) {
-    constructor->internalModuleInterfaceCompletePort(Port(portIdentifier, $1, $2));
+    constructor->internalModuleImplementationPort(Port(portIdentifier, $1, $2));
   }
 }
 
