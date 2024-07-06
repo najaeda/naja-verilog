@@ -1,6 +1,6 @@
 # naja-verilog
 
-![build](https://github.com/najaeda/naja-verilog/actions/workflows/build.yml/badge.svg)
+![build](https://github.com/najaeda/naja-verilog/actions/workflows/ubuntu-build.yml/badge.svg)
 [![codecov](https://codecov.io/gh/najaeda/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/najaeda/naja-verilog)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ***
