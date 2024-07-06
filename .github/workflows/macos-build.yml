@@ -24,7 +24,7 @@ jobs:
         submodules: true
     # install dependencies
     - name: Install dependencies
-      run: brew install cmake bison flex
+      run: brew install bison flex
     
     - name: set env variable
       run: echo "/usr/local/opt/flex/bin" >> $GITHUB_PATH; echo "/usr/local/opt/bison/bin" >> $GITHUB_PATH
