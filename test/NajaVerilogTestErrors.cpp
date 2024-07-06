@@ -53,3 +53,8 @@ TEST(NajaVerilogTestErrors, test2) {
   VerilogConstructorTest constructor;
   EXPECT_THROW(constructor.parse(error2Path), VerilogException);
 }
+
+TEST(NajaVerilogTestErrors, testVerilogTypeErrors) {
+  auto number = Number("2", false, 'b', "00");
+  EXPECT_THROW(number.getInt(), VerilogException);
+}
