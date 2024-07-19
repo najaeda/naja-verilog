@@ -131,7 +131,10 @@ std::string BasedNumber::getBaseString(Base base) {
 //LCOV_EXCL_START
 std::string BasedNumber::getString() const {
   std::ostringstream stream;
-  stream << size_ << "'";
+  if (hasSize_) {
+    stream << size_;
+  }
+  stream << "'";
   if (signed_) {
     stream << 's';
   }

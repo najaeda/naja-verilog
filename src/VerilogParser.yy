@@ -56,6 +56,62 @@
 
 size_t portIndex = 0;
 
+static naja::verilog::Number generateNumber(
+  bool hasSize,
+  const std::string& size,
+  const std::string& base,
+  const std::string& digits,
+  int beginLine,
+  int beginColumn,
+  int endLine,
+  int endColumn) {
+  if (base.size() == 2) {
+    //LCOV_EXCL_START
+    if (not (base[0] == 's' || base[0] == 'S')) {
+      //Following should not happen as long as lexer is correct
+      //should this be replaced by an assertion ?
+      std::ostringstream reason;
+      reason << "Parser error: ";
+      if (hasSize) {
+        reason << "\'" << size << base << digits;
+      } else {
+        reason << "\'" << base << digits; 
+      }
+      reason << " is not a valid number: wrong signed character.\n"
+        << "  begin at line " << beginLine <<  " col " << beginColumn  << '\n' 
+        << "  end   at line " << endLine <<  " col " << endColumn << "\n";
+      throw naja::verilog::VerilogException(reason.str());
+    }
+    //LCOV_EXCL_STOP
+    if (hasSize) {
+      return naja::verilog::Number(size, true, base[1], digits);
+    } else {
+      return naja::verilog::Number(true, base[1], digits);
+    }
+  } else if (base.size() == 1) {
+    if (hasSize) {
+      return naja::verilog::Number(size, false, base[0], digits);
+    } else {
+      return naja::verilog::Number(false, base[0], digits);
+    }
+  } else {
+    //LCOV_EXCL_START
+    //Same as previously: should not be accessible, as this is filtered by lexer.
+    std::ostringstream reason;
+    reason << "Parser error: ";
+    if (hasSize) {
+        reason << "\'" << size << base << digits;
+    } else {
+        reason << "\'" << base << digits; 
+    }
+    reason << " is not a valid number\n"
+      << "  begin at line " << beginLine <<  " col " << beginColumn  << '\n' 
+      << "  end   at line " << endLine <<  " col " << endColumn << "\n";
+    throw naja::verilog::VerilogException(reason.str());
+    //LCOV_EXCL_STOP
+  }
+}
+
 }
 
 %define api.value.type variant
@@ -232,34 +288,11 @@ list_of_module_instances
 ;
 
 number 
-: CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK {
-  if ($2.size() == 2) {
-    //LCOV_EXCL_START
-    if (not ($2[0] == 's' || $2[0] == 'S')) {
-      //Following should not happen as long as lexer is correct
-      //should this be replaced by an assertion ?
-      std::ostringstream reason;
-      reason << "Parser error: "
-        << $1 << $2 << $3 << " is not a valid number: wrong size character.\n"
-        << "  begin at line " << @$.begin.line <<  " col " << @$.begin.column  << '\n' 
-        << "  end   at line " << @$.end.line <<  " col " << @$.end.column << "\n";
-      throw VerilogException(reason.str());
-    }
-    //LCOV_EXCL_STOP
-    $$ = Number($1, true, $2[1], $3);
-  } else if ($2.size() == 1) {
-    $$ = Number($1, false, $2[0], $3);
-  } else {
-    //LCOV_EXCL_START
-    //Same as previously: should not be accessible, as this is filtered by lexer.
-    std::ostringstream reason;
-    reason << "Parser error: "
-      << $1 << $2 << $3 << " is not a valid number\n"
-      << "  begin at line " << @$.begin.line <<  " col " << @$.begin.column  << '\n' 
-      << "  end   at line " << @$.end.line <<  " col " << @$.end.column << "\n";
-    throw VerilogException(reason.str());
-    //LCOV_EXCL_STOP
-  }
+: BASE_TK BASED_CONSTVAL_TK {
+  $$ = generateNumber(false, "", $1, $2, @$.begin.line, @$.end.line, @$.begin.column, @$.end.column);
+} 
+| CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK {
+  $$ = generateNumber(true, $1, $2, $3, @$.begin.line, @$.end.line, @$.begin.column, @$.end.column);
 }
 | CONSTVAL_TK {
   $$ = Number($1);

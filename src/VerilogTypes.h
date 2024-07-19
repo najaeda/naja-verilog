@@ -145,8 +145,8 @@ using RangeIdentifiers = std::vector<RangeIdentifier>;
 
 struct BasedNumber {
   BasedNumber() = default;
-  BasedNumber(const std::string& size, bool isSigned, char base, const std::string& digits) {
-    size_ = static_cast<unsigned>(std::stoul(size));
+  BasedNumber(bool isSigned, char base, const std::string& digits) {
+    hasSize_ = false;
     signed_ = isSigned;
     switch (base) {
       case 'b': case 'B': 
@@ -164,16 +164,22 @@ struct BasedNumber {
     }
     digits_ = digits;
   }
+  BasedNumber(const std::string& size, bool isSigned, char base, const std::string& digits):
+    BasedNumber(isSigned, base, digits) {
+    hasSize_ = true;
+    size_ = static_cast<unsigned>(std::stoul(size));
+  }
   enum Base { BINARY, OCTAL, HEX, DECIMAL };
 
   static std::string getBaseString(Base base);
   std::string getString() const;
   std::string getDescription() const;
  
-  size_t      size_   {0};
-  bool        signed_ {false};
-  Base        base_   {};
-  std::string digits_ {};
+  bool        hasSize_  {false};
+  size_t      size_     {0};
+  bool        signed_   {false};
+  Base        base_     {};
+  std::string digits_   {};
 };
 
 struct Number {
@@ -184,6 +190,9 @@ struct Number {
   }
   Number(const std::string& size, bool isSigned, char base, const std::string& value) {
     value_ = BasedNumber(size, isSigned, base, value);
+  }
+  Number(bool isSigned, char base, const std::string& value) {
+    value_ = BasedNumber(isSigned, base, value);
   }
   std::string getString() const;
   std::string getDescription() const;
