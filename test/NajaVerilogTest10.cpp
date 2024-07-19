@@ -43,7 +43,16 @@ TEST(NajaVerilogTest10, test) {
   auto instance = test->instances_[0];
   EXPECT_EQ("ins", instance.identifier_.name_);
   EXPECT_EQ("MOD", instance.model_.name_);
-  EXPECT_EQ(1, instance.parameterAssignments_.size());
-  EXPECT_EQ("elem10", instance.parameterAssignments_.begin()->first);
-  EXPECT_EQ("\'d0", instance.parameterAssignments_.begin()->second);
+  EXPECT_EQ(3, instance.parameterAssignments_.size());
+  using Parameters = std::vector<std::pair<std::string, std::string>>;
+  Parameters parameters;
+  for (const auto& [parameter, value]: instance.parameterAssignments_) {
+    parameters.push_back({parameter, value});
+  }
+  EXPECT_EQ("elem10", parameters[0].first);
+  EXPECT_EQ("'d0", parameters[0].second);
+  EXPECT_EQ("elem11", parameters[1].first);
+  EXPECT_EQ("10'sd0", parameters[1].second);
+  EXPECT_EQ("elem12", parameters[2].first);
+  EXPECT_EQ("'sd0", parameters[2].second);
 }

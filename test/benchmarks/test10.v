@@ -7,7 +7,9 @@ MOD
   // param1('d0)
   // param2(1'b0)
   #(
-   .elem10('d0)
+   .elem10('d0),
+   .elem11(10'sd0),
+   .elem12('sd0)
   )
   ins (
    .INPUT1(1'b1)
