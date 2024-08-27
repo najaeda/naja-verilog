@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-install(FILES FindNajaVerilog.cmake DESTINATION cmake)
+install(FILES FindNajaVerilog.cmake DESTINATION ${CMAKE_INSTALL_DATADIR}/naja-verilog/cmake)

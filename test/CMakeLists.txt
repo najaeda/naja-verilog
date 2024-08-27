@@ -15,6 +15,7 @@ set(tests
   NajaVerilogTest8.cpp
   NajaVerilogTest9.cpp
   NajaVerilogTest10.cpp
+  NajaVerilogTest11.cpp
   NajaVerilogTestMultipleFiles.cpp
   NajaVerilogTestErrors.cpp
 )
