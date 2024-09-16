@@ -17,31 +17,30 @@ using namespace naja::verilog;
 #define NAJA_VERILOG_BENCHMARKS "Undefined"
 #endif
 
-TEST(NajaVerilogTest12, test) {
+TEST(NajaVerilogTest13, test) {
   VerilogConstructorTest constructor;
-  std::filesystem::path test12Path(
+  std::filesystem::path test13Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
       / std::filesystem::path("benchmarks")
-      / std::filesystem::path("test12.v"));
+      / std::filesystem::path("test13.v"));
 
   constructor.setFirstPass(true);
-  constructor.parse(test12Path);
+  constructor.parse(test13Path);
   ASSERT_EQ(1, constructor.modules_.size());
   auto test = constructor.modules_[0];
-  EXPECT_TRUE(test->ports_.empty());
+  ASSERT_EQ(27, test->ports_.size());
   EXPECT_TRUE(test->nets_.empty());
   EXPECT_TRUE(test->assigns_.empty());
   EXPECT_TRUE(test->instances_.empty());
 
   constructor.setFirstPass(false);
-  constructor.parse(test12Path);
+  constructor.parse(test13Path);
   ASSERT_EQ(1, constructor.modules_.size());
-  EXPECT_TRUE(test->ports_.empty());
+  ASSERT_EQ(27, test->ports_.size());
+  ASSERT_EQ(67, test->nets_.size());
   EXPECT_TRUE(test->assigns_.empty());
-  ASSERT_EQ(2, test->nets_.size());
-  ASSERT_EQ(2, test->instances_.size());
+  EXPECT_EQ(69, test->instances_.size());
 #if 0
-  auto instance = test->instances_[0];
   EXPECT_EQ("ins", instance.identifier_.name_);
   EXPECT_EQ("MOD", instance.model_.name_);
   EXPECT_EQ(2, instance.parameterAssignments_.size());

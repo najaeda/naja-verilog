@@ -126,6 +126,7 @@ static naja::verilog::Number generateNumber(
 %token SUPPLY1_KW
 %token WIRE_KW
 %token ASSIGN_KW
+%token DEFPARAM_KW
 %token END 0 "end of file"
 
 %token<std::string> IDENTIFIER_TK
@@ -136,7 +137,6 @@ static naja::verilog::Number generateNumber(
 
 %type<naja::verilog::Identifier> identifier;
 //no support for XMRs for the moment
-%type<naja::verilog::Identifier> hierarchical_identifier;
 %type<naja::verilog::Identifier> hierarchical_net_identifier;
 %type<naja::verilog::Identifier> module_identifier;
 %type<naja::verilog::Identifier> name_of_module_instance;
@@ -151,16 +151,19 @@ static naja::verilog::Number generateNumber(
 %type<naja::verilog::Range> constant_range_expression.opt;
 %type<naja::verilog::Identifier> net_identifier;
 %type<naja::verilog::Identifiers> list_of_identifiers;
+%type<naja::verilog::Identifiers> hierarchical_identifier;
+%type<naja::verilog::Identifiers> hierarchical_parameter_identifier;
 %type<naja::verilog::RangeIdentifiers> net_lvalue;
 %type<naja::verilog::RangeIdentifiers> list_of_net_lvalues;
 %type<naja::verilog::Identifier> module_instance;
 %type<naja::verilog::Identifier> port_identifier;
 
 %type<naja::verilog::Number> number;
-%type<naja::verilog::Number> constant_primary;
-%type<naja::verilog::Number> constant_expression;
+%type<naja::verilog::Expression> constant_mintypmax_expression;
 %type<std::string> unary_operator;
 %type<naja::verilog::Expression> primary;
+%type<naja::verilog::Expression> constant_primary;
+%type<naja::verilog::Expression> constant_expression;
 %type<naja::verilog::Expression> expression;
 %type<naja::verilog::Expression> expression.opt;
 %type<naja::verilog::Expression> mintypmax_expression;
@@ -186,7 +189,21 @@ identifier
     $$ = naja::verilog::Identifier(escaped, true);
   }
 
-constant_primary: number
+primary
+: number {
+  $$.valid_ = true; $$.value_ = $1; }
+//no support for XMRs for the moment: should be hierarchical_identifier below
+| identifier constant_range_expression.opt { 
+  $$.valid_ = true; $$.value_ = naja::verilog::RangeIdentifier($1, $2); }
+| STRING_TK { $$.valid_ = true; $$.value_ = $1.substr(1, $1.size()-2); } 
+| concatenation { $$.valid_ = true; $$.value_ = naja::verilog::Concatenation($1); }
+;
+
+constant_primary
+: number {
+  $$.valid_ = true; $$.value_ = $1; }
+| STRING_TK { $$.valid_ = true; $$.value_ = $1.substr(1, $1.size()-2); } 
+;
 
 unary_operator: SIGN_TK; 
 
@@ -194,12 +211,26 @@ constant_expression: constant_primary {
   $$ = $1;
 } 
 | unary_operator constant_primary {
-  $$ = $2;
-  if ($1 == "-") { $$.sign_ = false; }
+  auto expression = $2;
+  if (expression.value_.index() == naja::verilog::Expression::NUMBER) {
+    auto number = std::get<naja::verilog::Number>(expression.value_);
+    if ($1 == "-") { number.sign_ = false; }
+    $$.valid_ = true;
+    $$.value_ = number;
+  } else {
+    throw VerilogException("Only constant number expression are supported");
+  }
 }
 
 range: '[' constant_expression ':' constant_expression ']' {
-  $$ = Range($2.getInt(), $4.getInt());
+  if ($2.value_.index() == naja::verilog::Expression::NUMBER and
+      $4.value_.index() == naja::verilog::Expression::NUMBER) {
+    auto number1 = std::get<naja::verilog::Number>($2.value_);
+    auto number2 = std::get<naja::verilog::Number>($4.value_);
+    $$ = Range(number1.getInt(), number2.getInt());
+  } else {
+    throw VerilogException("Only constant number expression are supported");
+  }
 }
 
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
@@ -221,7 +252,20 @@ port_type_io
   | OUTPUT_KW { $$ = naja::verilog::Port::Direction::Output; }
   ;
 
-non_port_module_item : module_or_generate_item;
+non_port_module_item: module_or_generate_item;
+
+hierarchical_parameter_identifier: hierarchical_identifier;
+
+constant_mintypmax_expression: constant_expression;
+
+defparam_assignment: hierarchical_parameter_identifier '=' constant_mintypmax_expression {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addDefParameterAssignment($1, $3);
+}
+
+list_of_defparam_assignments: defparam_assignment| list_of_defparam_assignments defparam_assignment;
+
+parameter_override: DEFPARAM_KW list_of_defparam_assignments ';'
 
 hierarchical_net_identifier: identifier;
 
@@ -253,6 +297,7 @@ continuous_assign: ASSIGN_KW list_of_net_assignments ';'
 module_or_generate_item: 
   module_or_generate_item_declaration
 | module_instantiation
+| parameter_override
 | continuous_assign
 ; 
 
@@ -298,13 +343,26 @@ number
   $$ = Number($1);
 }
 
-//no support for XMRs for the moment
-hierarchical_identifier: identifier;
+//hierarchical_identifier ::=
+//{ identifier [ [ constant_expression ] ] . } identifier
+hierarchical_identifier
+: identifier {
+  $$ = { $1 };
+}
+| hierarchical_identifier '.' identifier {
+  $1.push_back($3);
+  $$ = $1;
+}
 
 //only numeric values (one bit) [4] or [4:5] are supported
 constant_range_expression.opt: %empty { $$.valid_ = false; } 
 | '[' constant_expression ']' {
-  $$ = Range($2.getInt());
+  if ($2.value_.index() == naja::verilog::Expression::NUMBER) {
+    auto number = std::get<naja::verilog::Number>($2.value_);
+    $$ = Range(number.getInt());
+  } else {
+    throw VerilogException("Only constant number expression are supported");
+  }
 }
 | range {
   $$ = $1;
@@ -320,15 +378,6 @@ expression {
 }
 
 concatenation: '{' list_of_expressions '}' { $$ = $2; }
-
-primary
-: number {
-  $$.valid_ = true; $$.value_ = $1; }
-| hierarchical_identifier constant_range_expression.opt { 
-  $$.valid_ = true; $$.value_ = naja::verilog::RangeIdentifier($1, $2); }
-| STRING_TK { $$.valid_ = true; $$.value_ = $1.substr(1, $1.size()-2); } 
-| concatenation { $$.valid_ = true; $$.value_ = naja::verilog::Concatenation($1); }
-;
 
 expression: primary { $$ = $1; }
 

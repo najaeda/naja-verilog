@@ -64,6 +64,9 @@ class VerilogConstructor {
     virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
     virtual void endInstantiation() {}
     virtual void addParameterAssignment(const naja::verilog::Identifier& parameter, const Expression& expression) {}
+    virtual void addDefParameterAssignment(
+      const naja::verilog::Identifiers& hierarchicalParameter,
+      const naja::verilog::Expression& expression) {}
     virtual void endModule() {}
     //LCOV_EXCL_STOP
   private:
