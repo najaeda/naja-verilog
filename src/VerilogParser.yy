@@ -229,7 +229,7 @@ range: '[' constant_expression ':' constant_expression ']' {
     auto number2 = std::get<naja::verilog::Number>($4.value_);
     $$ = Range(number1.getInt(), number2.getInt());
   } else {
-    throw VerilogException("Only constant number expression are supported");
+    throw VerilogException("Only constant number expression are supported"); //LCOV_EXCL_LINE
   }
 }
 
@@ -361,7 +361,7 @@ constant_range_expression.opt: %empty { $$.valid_ = false; }
     auto number = std::get<naja::verilog::Number>($2.value_);
     $$ = Range(number.getInt());
   } else {
-    throw VerilogException("Only constant number expression are supported");
+    throw VerilogException("Only constant number expression are supported"); //LCOV_EXCL_LINE
   }
 }
 | range {
