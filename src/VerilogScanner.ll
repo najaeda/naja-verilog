@@ -120,6 +120,7 @@ wire        { return token::WIRE_KW; }
 supply0     { return token::SUPPLY0_KW; }
 supply1     { return token::SUPPLY1_KW; }
 assign      { return token::ASSIGN_KW; }
+defparam    { return token::DEFPARAM_KW; }
 
 {IDENTIFIER}          { yylval->build<std::string>( yytext ); return token::IDENTIFIER_TK; }
 {ESCAPED_IDENTIFIER}  {

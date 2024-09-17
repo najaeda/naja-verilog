@@ -123,3 +123,12 @@ void VerilogConstructorTest::addAssign(
     currentModule_->assigns_.push_back(Assign(identifiers, expression));
   }
 }
+
+void VerilogConstructorTest::addDefParameterAssignment(
+  const naja::verilog::Identifiers& hierarchicalParameter,
+  const naja::verilog::Expression& expression) {
+  if (not inFirstPass()) {
+    currentModule_->defParameterAssignments_.push_back(
+      VerilogConstructorTest::Module::DefParameterAssignment(hierarchicalParameter, expression));
+  }
+}

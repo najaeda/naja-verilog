@@ -5,6 +5,7 @@
 #include "VerilogConstructor.h"
 
 #include <iostream>
+#include <sstream>
 
 namespace {
 
@@ -43,6 +44,20 @@ class VerilogConstructorExample: public naja::verilog::VerilogConstructor {
     }
     void addParameterAssignment(const naja::verilog::Identifier& parameter, const naja::verilog::Expression& expression) override {
       std::cout << "addParameterAssignment: " << parameter.getString() << ": " <<  expression.getString() << std::endl;
+    }
+    virtual void addDefParameterAssignment(
+      const naja::verilog::Identifiers& hierarchicalParameter,
+      const naja::verilog::Expression& expression) override {
+      std::ostringstream oss;
+      for (size_t i = 0; i < hierarchicalParameter.size(); i++) {
+        oss << hierarchicalParameter[i].getString();
+        if (i < hierarchicalParameter.size() - 1) {
+          oss << ".";
+        }
+      }
+      std::cout << "addDefParameterAssignment: "
+        << oss.str()
+        << ": " << expression.getString() << std::endl;
     }
     void endModule() override {
       std::cout << "endModule" << std::endl; 
