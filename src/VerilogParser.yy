@@ -218,7 +218,7 @@ constant_expression: constant_primary {
     $$.valid_ = true;
     $$.value_ = number;
   } else {
-    throw VerilogException("Only constant number expression are supported");
+    throw VerilogException("Only constant number expression are supported"); //LCOV_EXCL_LINE
   }
 }
 
