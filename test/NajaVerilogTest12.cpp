@@ -39,20 +39,54 @@ TEST(NajaVerilogTest12, test) {
   EXPECT_TRUE(test->ports_.empty());
   EXPECT_TRUE(test->assigns_.empty());
   ASSERT_EQ(2, test->nets_.size());
-  ASSERT_EQ(2, test->instances_.size());
-#if 0
-  auto instance = test->instances_[0];
-  EXPECT_EQ("ins", instance.identifier_.name_);
-  EXPECT_EQ("MOD", instance.model_.name_);
-  EXPECT_EQ(2, instance.parameterAssignments_.size());
-  using Parameters = std::vector<std::pair<std::string, std::string>>;
-  Parameters parameters;
-  for (const auto& [parameter, value]: instance.parameterAssignments_) {
-    parameters.push_back({parameter, value});
-  }
-  EXPECT_EQ("elem10", parameters[0].first);
-  EXPECT_EQ("'o0", parameters[0].second);
-  EXPECT_EQ("elem11", parameters[1].first);
-  EXPECT_EQ("8'o84", parameters[1].second);
-#endif
+  ASSERT_EQ(3, test->instances_.size());
+
+  auto ins1 = test->instances_[0];
+  EXPECT_EQ("ins1", ins1.identifier_.name_);
+  EXPECT_FALSE(ins1.identifier_.escaped_);
+  EXPECT_EQ("CFG1", ins1.model_.name_);
+  EXPECT_TRUE(ins1.parameterAssignments_.empty());
+
+  auto mem = test->instances_[1];
+  EXPECT_EQ("mem_regfile_mem_regfile_0_0", mem.identifier_.name_);
+  EXPECT_FALSE(mem.identifier_.escaped_);
+  EXPECT_EQ("RAM64x18", mem.model_.name_);
+  EXPECT_TRUE(mem.parameterAssignments_.empty());
+
+  auto ins2 = test->instances_[2];
+  EXPECT_EQ("$$ins2@@", ins2.identifier_.name_);
+  EXPECT_FALSE(ins2.identifier_.escaped_);
+  EXPECT_EQ("CFG1", ins2.model_.name_);
+  EXPECT_TRUE(ins2.parameterAssignments_.empty());
+
+  EXPECT_EQ(3, test->defParameterAssignments_.size());
+  auto def0Path = test->defParameterAssignments_[0].first;
+  auto def0Value = test->defParameterAssignments_[0].second;
+  EXPECT_EQ(2, def0Path.size());
+  EXPECT_EQ("ins1", def0Path[0].name_);
+  EXPECT_FALSE(def0Path[0].escaped_);
+  EXPECT_EQ("INIT", def0Path[1].name_);
+  EXPECT_FALSE(def0Path[1].escaped_);
+  EXPECT_EQ("2'h1", def0Value.getString());
+  EXPECT_EQ(Expression::Type::NUMBER ,def0Value.value_.index());
+
+  auto def1Path = test->defParameterAssignments_[1].first;
+  auto def1Value = test->defParameterAssignments_[1].second;
+  EXPECT_EQ(2, def1Path.size());
+  EXPECT_EQ("mem_regfile_mem_regfile_0_0", def1Path[0].name_);
+  EXPECT_FALSE(def1Path[0].escaped_);
+  EXPECT_EQ("RAMINDEX", def1Path[1].name_);
+  EXPECT_FALSE(def1Path[1].escaped_);
+  EXPECT_EQ(Expression::Type::STRING ,def1Value.value_.index());
+  EXPECT_EQ("mem_regfile[7:0]%32%8%SPEED%0%0%MICRO_RAM", def1Value.getString());
+
+  auto def2Path = test->defParameterAssignments_[2].first;
+  auto def2Value = test->defParameterAssignments_[2].second;
+  EXPECT_EQ(2, def2Path.size());
+  EXPECT_EQ("$$ins2@@", def2Path[0].name_);
+  EXPECT_TRUE(def2Path[0].escaped_);
+  EXPECT_EQ("INIT", def2Path[1].name_);
+  EXPECT_FALSE(def2Path[1].escaped_);
+  EXPECT_EQ(Expression::Type::NUMBER ,def2Value.value_.index());
+  EXPECT_EQ("2'h2", def2Value.getString());
 }
