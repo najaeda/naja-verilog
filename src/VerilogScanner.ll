@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+ * SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
  * 
  * SPDX-License-Identifier: Apache-2.0
 */
@@ -60,7 +60,7 @@ STRING \"[^\"]*\"
   Check the escape rule inside character class 
   https://www.regular-expressions.info/charclass.html
 */
-ESCAPED_IDENTIFIER \\[\\^!"#$%&',()*+\-.a-zA-Z0-9/{|}~[\]_:;<=>?@]+[\t\f ]
+ESCAPED_IDENTIFIER \\[\\^!"#$%&',()*+\-.a-zA-Z0-9/{|}~[\]_:;<=>?@]+[\n\t\f ]
 
 %%
 %{          /** Code executed at the beginning of yylex **/
@@ -103,9 +103,18 @@ wire        { return token::WIRE_KW; }
 supply0     { return token::SUPPLY0_KW; }
 supply1     { return token::SUPPLY1_KW; }
 assign      { return token::ASSIGN_KW; }
+defparam    { return token::DEFPARAM_KW; }
 
 {IDENTIFIER}          { yylval->build<std::string>( yytext ); return token::IDENTIFIER_TK; }
-{ESCAPED_IDENTIFIER}  { yylval->build<std::string>( yytext ); return token::ESCAPED_IDENTIFIER_TK; }
+{ESCAPED_IDENTIFIER}  {
+  //if the character ending the escape identifier is '\n'
+  //we need to update the line number
+  if (yytext[strlen(yytext)-1] == '\n') {
+    loc->lines();
+  }
+  yylval->build<std::string>( yytext );
+  return token::ESCAPED_IDENTIFIER_TK; 
+}
 {STRING}              { yylval->build<std::string>( yytext ); return token::STRING_TK; }
 
 {UNSIGNED_NUMBER} {

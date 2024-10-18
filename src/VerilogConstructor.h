@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -21,7 +21,7 @@ class VerilogConstructor {
   public:
     VerilogConstructor() = default;
     ~VerilogConstructor();
-    using Paths = std::list<std::filesystem::path>;
+    using Paths = std::vector<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
 
@@ -50,20 +50,23 @@ class VerilogConstructor {
     }
     
     //LCOV_EXCL_START
-    virtual void startModule(const std::string& name) {}
+    virtual void startModule(const naja::verilog::Identifier& id) {}
     //Simple Port declaration (only name), no range, no direction in module interface
-    virtual void moduleInterfaceSimplePort(const std::string& name) {}
+    virtual void moduleInterfaceSimplePort(const naja::verilog::Identifier& port) {}
     //Complete Port declaration in module interface
     virtual void moduleInterfaceCompletePort(const Port& port) {}
     virtual void moduleImplementationPort(const Port& port) {}
     virtual void addNet(const Net& net) {}
-    virtual void addAssign(const Identifiers& identifiers, const Expression& expression) {}
-    virtual void startInstantiation(const std::string& modelName) {}
-    virtual void addInstance(const std::string& instanceName) {}
-    virtual void addInstanceConnection(const std::string& portName, const Expression& expression) {}
+    virtual void addAssign(const RangeIdentifiers& identifiers, const Expression& expression) {}
+    virtual void startInstantiation(const naja::verilog::Identifier& model) {}
+    virtual void addInstance(const naja::verilog::Identifier& instance) {}
+    virtual void addInstanceConnection(const naja::verilog::Identifier& port, const Expression& expression) {}
     virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
     virtual void endInstantiation() {}
-    virtual void addParameterAssignment(const std::string& parameterName, const Expression& expression) {}
+    virtual void addParameterAssignment(const naja::verilog::Identifier& parameter, const Expression& expression) {}
+    virtual void addDefParameterAssignment(
+      const naja::verilog::Identifiers& hierarchicalParameter,
+      const naja::verilog::Expression& expression) {}
     virtual void addAttribute(const std::string& attributeName, const ConstantExpression& expression) {}
     virtual void endModule() {}
     //LCOV_EXCL_STOP
@@ -81,9 +84,9 @@ class VerilogConstructor {
           ModuleInterfaceTypeEnum typeEnum_;
     }; 
     void internalParse(std::istream& stream);
-    void internalStartModule(const std::string& name);
+    void internalStartModule(const naja::verilog::Identifier& id);
     void internalEndModule();
-    void internalModuleInterfaceSimplePort(const std::string& name);
+    void internalModuleInterfaceSimplePort(const naja::verilog::Identifier& id);
     void internalModuleInterfaceCompletePort(const Port& port);
     void internalModuleImplementationPort(const Port& port);
 

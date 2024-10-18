@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,6 +8,20 @@
 #include <sstream>
 
 namespace naja { namespace verilog {
+
+std::string Identifier::getString() const {
+  return name_;
+}
+
+//LCOV_EXCL_START
+std::string Identifier::getDescription() const {
+  if (escaped_) {
+    return "Identifier: [\\" + name_ + " ] (escaped)";
+  } else {
+    return "Identifier: [" + name_ + "]";
+  }
+}
+//LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
 std::string Range::getString() const {
@@ -44,7 +58,7 @@ std::string Port::Direction::getString() const {
 //LCOV_EXCL_START
 std::string Port::getString() const {
   std::ostringstream stream;
-  stream << "Port: " << name_;
+  stream << "Port: " << identifier_.getString();
   if (range_.valid_) {
     stream << range_.getString();
   }
@@ -72,7 +86,7 @@ std::string Net::Type::getString() const {
 //LCOV_EXCL_START
 std::string Net::getString() const {
   std::ostringstream stream;
-  stream << "Net: " << name_;
+  stream << "Net: " << identifier_.getString();
   if (range_.valid_) {
     stream << range_.getString();
   }
@@ -82,9 +96,9 @@ std::string Net::getString() const {
 //LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
-std::string Identifier::getString() const {
+std::string RangeIdentifier::getString() const {
   std::ostringstream stream;
-  stream << name_;
+  stream << identifier_.getString();
   if (range_.valid_) {
     stream << range_.getString();
   }
@@ -93,8 +107,8 @@ std::string Identifier::getString() const {
 //LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
-std::string Identifier::getDescription() const {
-  return "Identifier: " + getString();
+std::string RangeIdentifier::getDescription() const {
+  return "RangeIdentifier: " + getString();
 }
 //LCOV_EXCL_STOP
 
@@ -117,7 +131,10 @@ std::string BasedNumber::getBaseString(Base base) {
 //LCOV_EXCL_START
 std::string BasedNumber::getString() const {
   std::ostringstream stream;
-  stream << size_ << "'";
+  if (hasSize_) {
+    stream << size_;
+  }
+  stream << "'";
   if (signed_) {
     stream << 's';
   }
@@ -217,8 +234,8 @@ std::string Concatenation::getDescription() const {
 std::string Expression::getString() const {
   std::ostringstream stream;
   switch (value_.index()) {
-    case Type::IDENTIFIER:
-      return std::get<Type::IDENTIFIER>(value_).getString();
+    case Type::RANGEIDENTIFIER:
+      return std::get<Type::RANGEIDENTIFIER>(value_).getString();
     case Type::NUMBER:
       return std::get<Type::NUMBER>(value_).getString();
     case Type::STRING:
@@ -235,8 +252,8 @@ std::string Expression::getDescription() const {
   std::ostringstream stream;
   stream << "Expression: (valid: " << valid_ << " supported: " << supported_ << ") ";
   switch (value_.index()) {
-    case Type::IDENTIFIER:
-      stream << std::get<Type::IDENTIFIER>(value_).getDescription();
+    case Type::RANGEIDENTIFIER:
+      stream << std::get<Type::RANGEIDENTIFIER>(value_).getDescription();
       break; 
     case Type::NUMBER:
       stream << std::get<Type::NUMBER>(value_).getDescription();

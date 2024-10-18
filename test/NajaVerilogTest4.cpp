@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -27,11 +27,11 @@ TEST(NajaVerilogTest4, test) {
   ASSERT_EQ(2, constructor.modules_.size());
 
   auto test = constructor.modules_[1];
-  EXPECT_EQ("test", test->name_);
+  EXPECT_EQ("test", test->identifier_.name_);
   ASSERT_EQ(3, test->ports_.size());
-  EXPECT_EQ("i", test->ports_[0].name_);
-  EXPECT_EQ("o", test->ports_[1].name_);
-  EXPECT_EQ("io", test->ports_[2].name_);
+  EXPECT_EQ("i", test->ports_[0].identifier_.name_);
+  EXPECT_EQ("o", test->ports_[1].identifier_.name_);
+  EXPECT_EQ("io", test->ports_[2].identifier_.name_);
 
   EXPECT_EQ(naja::verilog::Port::Direction::Input, test->ports_[0].direction_);
   EXPECT_EQ(naja::verilog::Port::Direction::Output, test->ports_[1].direction_);
@@ -42,11 +42,11 @@ TEST(NajaVerilogTest4, test) {
   constructor.setFirstPass(false);
   constructor.parse(test4Path);
   ASSERT_EQ(5, test->nets_.size());
-  EXPECT_EQ("_i0_", test->nets_[0].name_);
-  EXPECT_EQ("_i1_", test->nets_[1].name_);
-  EXPECT_EQ("i", test->nets_[2].name_);
-  EXPECT_EQ("o", test->nets_[3].name_);
-  EXPECT_EQ("io", test->nets_[4].name_);
+  EXPECT_EQ("_i0_", test->nets_[0].identifier_.name_);
+  EXPECT_EQ("_i1_", test->nets_[1].identifier_.name_);
+  EXPECT_EQ("i", test->nets_[2].identifier_.name_);
+  EXPECT_EQ("o", test->nets_[3].identifier_.name_);
+  EXPECT_EQ("io", test->nets_[4].identifier_.name_);
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[0].type_);
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[1].type_);
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[2].type_);

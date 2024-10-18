@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -26,15 +26,15 @@ TEST(NajaVerilogTest7, test) {
   constructor.parse(test7Path);
   ASSERT_EQ(1, constructor.modules_.size());
   auto test = constructor.modules_[0];
-  EXPECT_EQ("test", test->name_);
+  EXPECT_EQ("test", test->identifier_.name_);
 
   constructor.setFirstPass(false);
   constructor.parse(test7Path);
 
   ASSERT_EQ(1, constructor.modules_[0]->instances_.size());
   auto instance = constructor.modules_[0]->instances_[0];
-  EXPECT_EQ("ins", instance.name_);
-  EXPECT_EQ("mod", instance.model_);
+  EXPECT_EQ("ins", instance.identifier_.name_);
+  EXPECT_EQ("mod", instance.model_.name_);
   ASSERT_EQ(3, instance.parameterAssignments_.size());
   auto paramIt = instance.parameterAssignments_.find("PARAM0");
   ASSERT_TRUE(paramIt != instance.parameterAssignments_.end());

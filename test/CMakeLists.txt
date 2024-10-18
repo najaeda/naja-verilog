@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+# SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -13,6 +13,12 @@ set(tests
   NajaVerilogTest6.cpp
   NajaVerilogTest7.cpp
   NajaVerilogTest8.cpp
+  NajaVerilogTest9.cpp
+  NajaVerilogTest10.cpp
+  NajaVerilogTest11.cpp
+  NajaVerilogTest12.cpp
+  NajaVerilogTest13.cpp
+  NajaVerilogTest14.cpp
   NajaVerilogTestMultipleFiles.cpp
   NajaVerilogTestErrors.cpp
 )

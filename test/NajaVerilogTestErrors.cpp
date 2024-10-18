@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -52,4 +52,9 @@ TEST(NajaVerilogTestErrors, test2) {
       / std::filesystem::path("error2.v"));
   VerilogConstructorTest constructor;
   EXPECT_THROW(constructor.parse(error2Path), VerilogException);
+}
+
+TEST(NajaVerilogTestErrors, testVerilogTypeErrors) {
+  auto number = Number("2", false, 'b', "00");
+  EXPECT_THROW(number.getInt(), VerilogException);
 }

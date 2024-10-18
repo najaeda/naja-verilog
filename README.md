@@ -1,7 +1,7 @@
 # naja-verilog
 
-![build](https://github.com/xtofalex/naja-verilog/actions/workflows/build.yml/badge.svg)
-[![codecov](https://codecov.io/gh/xtofalex/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/xtofalex/naja-verilog)
+![build](https://github.com/najaeda/naja-verilog/actions/workflows/ubuntu-build.yml/badge.svg)
+[![codecov](https://codecov.io/gh/najaeda/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/najaeda/naja-verilog)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ***
 
@@ -9,7 +9,7 @@
 
 Naja-Verilog is a structural (gate-level) Verilog parser and can be used to read synthesis generated netlists.
 
-This library provides a verilog interface to [Naja SNL](https://github.com/xtofalex/naja), however both projects are not tied and naja-verilog can be integrated in any project needing structural verilog support.
+This library provides a verilog interface to [Naja SNL](https://github.com/najaeda/naja), however both projects are not tied and naja-verilog can be integrated in any project needing structural verilog support.
 
 :information_desk_person: If you have any questions, bug to report or request, please open an issue or send me a [mail](mailto:christophe.alex@gmail.com).
 
@@ -42,7 +42,7 @@ A comparable project can be found here: [Parser-Verilog](https://github.com/Open
 
 ```bash
 # First clone the repository and go inside it
-git clone https://github.com/xtofalex/naja-verilog.git
+git clone https://github.com/najaeda/naja-verilog.git
 cd naja-verilog
 git submodule init
 git submodule update
@@ -70,6 +70,19 @@ Using nix-shell:
 nix-shell -p cmake bison flex
 ```
 
+On macOS, using [Homebrew](https://brew.sh/):
+
+```bash
+brew install cmake bison flex
+```
+
+Ensure the versions of `bison` and `flex` installed via Homebrew take precedence over the macOS defaults by modifying your $PATH environment variable as follows:
+
+```bash
+export PATH="/opt/homebrew/opt/flex/bin:/opt/homebrew/opt/bison/bin:$PATH"
+```
+
+
 ### Building and Installing
 
 ```bash
@@ -93,12 +106,12 @@ make install
 
 Best starting point is to copy existing examples/implementations:
 
-* [NajaVerilogSnippet](https://github.com/xtofalex/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
-* [VerilogConstructorTest](https://github.com/xtofalex/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
-* [Unit tests](https://github.com/xtofalex/naja-verilog/blob/main/test): covers trough unit testing most of the parser aspects.
-* [SNLVRLConstructor](https://github.com/xtofalex/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h): More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
+* [NajaVerilogSnippet](https://github.com/najaeda/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
+* [VerilogConstructorTest](https://github.com/najaeda/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
+* [Unit tests](https://github.com/najaeda/naja-verilog/blob/main/test): covers trough unit testing most of the parser aspects.
+* [SNLVRLConstructor](https://github.com/najaeda/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h): More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
 
-The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogConstructor.h) and override [callback](#callbacks) methods launched while visiting verilog source.
+The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/najaeda/naja-verilog/blob/main/src/VerilogConstructor.h) and override [callback](#callbacks) methods launched while visiting verilog source.
 
 ### Two passes Parsing
 
@@ -111,19 +124,21 @@ As ordering of verilog modules in single or across multiple files is not preknow
 
 ## Callbacks
 
-Stuctures (Net, Port, Expression) details constructed by following callbacks can be found in [VerilogType.h](https://github.com/xtofalex/naja-verilog/blob/main/src/VerilogTypes.h) header.
+Stuctures (Identifier, Net, Port, Expression) details constructed by following callbacks can be found in [VerilogType.h](https://github.com/najaeda/naja-verilog/blob/main/src/VerilogTypes.h) header.
+
+An Identifier is a struct that holds the unescaped string. It also includes a boolean flag indicating whether the collected identifier was escaped or not.
 
 ### Callbacks for Module
 
 #### Starting a Module
 
 ```c++
-void startModule(const std::string& name);
+void startModule(const naja::verilog::Identifier& module);
 ```
 
-This callback is invoked when a module declaration begins. It receives the name of the module as an argument.
+This callback is invoked when a module declaration begins. It receives the identifier of the module as an argument.
 
-For instance, the callback is called with **name="foo"** for the Verilog module declaration below:
+For instance, the callback is called with **identifier:{name_="foo",escaped_=false}** for the Verilog module declaration below:
 
 ```verilog
 module foo;
@@ -148,15 +163,15 @@ endmodule //foo
 #### Simple Port Declaration in Module Interface
 
 ```c++
-void moduleInterfaceSimplePort(const std::string& name)
+void moduleInterfaceSimplePort(const naja::verilog::Identifier& port)
 ```
 
-Triggered when a module uses a simple declaration (only the port name) for ports. It will be called multiple times depending on the number of ports declared.
+Triggered when a module uses a simple declaration (only the port identifier) for ports. It will be called multiple times depending on the number of ports declared.
 
-For example, it is called with **name="a", name="b", and name="c"** for:
+For example, it is called with **identifier.name_="a", identifier.{name_="b@", escaped_=true}, and identifier.name_="c"** for:
 
 ```verilog
-module foo(a, b, c);
+module foo(a, \b@ , c);
 ```
 
 #### Port details in module implementation
@@ -170,14 +185,14 @@ void moduleImplementationPort(const Port& port)
 is called for each port listed in the implementation section of a module.
 
 ```verilog
-module foo(a, b, c);
+module foo(\a# , b, c);
 input a;
 output [3:0] b;
 inout c;
 //will invoke 3 times moduleImplementationPort with:
-//Port name_=a, direction=Input, isBus()=true, range_.msb_=3, range_.lsb_=0
-//Port name_=b, direction=Output, isBus()=true, range_.msb_=0, range_.lsb_=3
-//Port name_=c, direction=InOut, isBus()=false
+//Port identifier_={a#,true}, direction=Input, isBus()=true, range_.msb_=3, range_.lsb_=0
+//Port identifier_={b,false}, direction=Output, isBus()=true, range_.msb_=0, range_.lsb_=3
+//Port identifier_={c,false}, direction=InOut, isBus()=false
 ```
 
 #### Port complete declaration in Module interface
@@ -191,9 +206,9 @@ Invoked for a complete interface port declaration, detailing port direction (inp
 ```verilog
 module foo(input[3:0] a, output[0:3] b, inout c);
 //will invoke 3 times moduleInterfaceCompletePort with:
-//Port name_=a, direction=Input, isBus()=true, range_.msb_=3, range_.lsb_=0
-//Port name_=b, direction=Output, isBus()=true, range_.msb_=0, range_.lsb_=3
-//Port name_=c, direction=InOut, isBus()=false
+//Port identifier_={a,false}, direction=Input, isBus()=true, range_.msb_=3, range_.lsb_=0
+//Port identifier_={b,false}, direction=Output, isBus()=true, range_.msb_=0, range_.lsb_=3
+//Port identifier_={c,false}, direction=InOut, isBus()=false
 ```
 
 ### Callbacks for Nets
@@ -224,20 +239,20 @@ Below are Verilog examples followed by pseudo C++ representations of the data st
 
 ```verilog
 assign n0 = n1;
-//identifiers = { {name_=n0, range_.valid_=false} }
+//identifiers = { {identifier_={n0,false}, range_.valid_=false} }
 //expressions = 
 // {
 //   { 
 //     value_.index()=naja::verilog::Expression::Type::IDENTIFIER
 //     with auto id=std::get<naja::verilog::Expression::Type::IDENTIFIER>(value_)
-//     id.name_="n1", id.range_.valid_=false
+//     id.identifier_={"n1",false}, id.range_.valid_=false
 //   } 
 // }
 ```
 
 ```verilog
 assign n1 = 1'b0;
-//identifiers = { {name_=n1, range_.valid_=false} }
+//identifiers = { {identifier_={n1,false}, range_.valid_=false} }
 //expressions = 
 // {
 //   { 
@@ -253,16 +268,16 @@ assign n1 = 1'b0;
 assign { n2[3:2], n2[1:0] } = { n0, n1, 2'h2 };
 //identifiers =
 // {
-//    { name_=n2, range_.valid_=true, range_.msb_=3, range_.lsb=3 },
-//    { name_=n2, range_.valid_=true, range_.msb_=1, range_.lsb=0 },
+//    { identifier_={n2,false}, range_.valid_=true, range_.msb_=3, range_.lsb=3 },
+//    { identifier_={n2,false}, range_.valid_=true, range_.msb_=1, range_.lsb=0 },
 // }
 //expressions = 
 // {
 //   { 
 //     value_.index()=naja::verilog::Expression::Type::CONCATENATION
 //     with auto concat=std::get<naja::verilog::Expression::Type::CONCATENATION>(value_)
-//     concat[0] is an Identifier name_=n0, range_.valid_=false
-//     concat[1] is an Identifier name_=n1, range_.valid_=false
+//     concat[0] is an Identifier identifier_={n0,false}, range_.valid_=false
+//     concat[1] is an Identifier identifier_={n1,false}, range_.valid_=false
 //     concat[2] is an NUMBER with:
 //     nb.base_=naja::verilog::BasedNumber::HEX
 //     nb.size_=2, nb.digits_="2"
@@ -275,10 +290,10 @@ assign { n2[3:2], n2[1:0] } = { n0, n1, 2'h2 };
 #### Starting Instantiation
 
 ```c++
-void startInstantiation(const std::string& modelName)
+void startInstantiation(const naja::verilog::Identifier& model)
 ```
 
-allows to collect module (used as a model) name for one or multiple instanciations. This method will collect `modelName=Model` for the two following declarations:
+allows to collect module (used as a model) name for one or multiple instanciations. This method will collect `model={Model,false}` for the two following declarations:
 
 ```verilog
 Model ins();
@@ -288,10 +303,10 @@ Model ins0(), ins1(), ins2();
 #### Adding an Instance
 
 ```c++
-void addInstance(const std::string& instanceName)
+void addInstance(const naja::verilog::Identifier& instance)
 ```
 
-will be called 3 times with `instanceName=ins1, ins2, ins3` for following declaration:
+will be called 3 times with `instance={ins1,false}, {ins2,false}, {ins3,false}` for following declaration:
 
 ```verilog
 Model ins(), ins2(), ins3();
@@ -310,7 +325,7 @@ is called at the conclusion of an instance declaration, it signals that all inst
 #### Named Port Connection
 
 ```c++
-void addInstanceConnection(const std::string& portName, const Expression& expression);
+void addInstanceConnection(const naja::verilog::Identifier& port, const Expression& expression);
 ```
 
 This function is called for each named port connection in an instance, capturing the relationship between the port and its connected net or expression.
@@ -318,15 +333,15 @@ This function is called for each named port connection in an instance, capturing
 ```verilog
 mod1 inst2(.i0(net4[3:6]), .o0(net5));
 //addInstanceConnection is called 2 times with:
-//portName=i0
+//port=Identifier{"i0",false}
 //expression_.value_.index() = naja::verilog::Expression::Type::IDENTIFIER,
 //with auto id = std::get<naja::verilog::Expression::Type::IDENTIFIER>(expression.value_)
-//id.name_="net4", id.isBus=true, id.range_.msb_=3, is.range_.lsb_=6
+//id.identifier_={"net4",false}, id.isBus=true, id.range_.msb_=3, is.range_.lsb_=6
 //and:
-//portName=o0
+//port=Identifier{"o0",false}
 //expression_.value_.index() = naja::verilog::Expression::Type::IDENTIFIER,
 //with auto id = std::get<naja::verilog::Expression::Type::IDENTIFIER>(expression.value_)
-//id.name_="net5", id.isBus=false
+//id.identifier_={"net5",false}, id.isBus=false
 ```
 
 #### Ordered Port Connection
@@ -343,7 +358,7 @@ mod1 inst4(net4[7:10], {net0, net1, net2, net3});
 //portIndex=0
 //expression_.value_.index() = naja::verilog::Expression::Type::IDENTIFIER,
 //with auto id = std::get<naja::verilog::Expression::Type::IDENTIFIER>(expression.value_)
-//id.name_="net4", id.isBus=true, id.range_.msb_=7, is.range_.lsb_=10
+//id.identifier_={"net4",false}, id.isBus=true, id.range_.msb_=7, is.range_.lsb_=10
 //and:
 //portIndex=1
 //expression_.value_.index() = naja::verilog::Expression::Type::CONCATENATION,
@@ -354,7 +369,7 @@ mod1 inst4(net4[7:10], {net0, net1, net2, net3});
 ### Callback for Parameter Assignment
 
 ```c++
-void addParameterAssignment(const std::string& parameterName, const Expression& expression);
+void addParameterAssignment(const naja::verilog::Identifier& parameter, const Expression& expression);
 ```
 
 This callback function is designed to handle parameter assignments within module instantiations.
@@ -366,7 +381,7 @@ module test();
   ) ins();
 endmodule
 //addParameterAssignment is called one time with:
-//parameterName=PARAM0 and expression is an Identifier with name="VAL"
+//parameter={"PARAM0",false} and expression is a RangeIdentifier with name="VAL"
 ```
 
 <div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>

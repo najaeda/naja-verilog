@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/xtofalex/naja-verilog/blob/main/AUTHORS>
+// SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -26,10 +26,11 @@ TEST(NajaVerilogTest5, test) {
   constructor.parse(test5Path);
   ASSERT_EQ(1, constructor.modules_.size());
   auto test = constructor.modules_[0];
-  EXPECT_EQ("test", test->name_);
+  EXPECT_EQ("test", test->identifier_.name_);
 
   ASSERT_EQ(1, test->ports_.size());
-  EXPECT_EQ("\\asqrt[33] ", test->ports_[0].name_);
+  EXPECT_EQ("asqrt[33]", test->ports_[0].identifier_.name_);
+  EXPECT_TRUE(test->ports_[0].identifier_.escaped_);
   EXPECT_EQ(naja::verilog::Port::Direction::Output, test->ports_[0].direction_);
 
   EXPECT_TRUE(test->nets_.empty());
@@ -38,9 +39,10 @@ TEST(NajaVerilogTest5, test) {
   constructor.setFirstPass(false);
   constructor.parse(test5Path);
   ASSERT_EQ(3, test->nets_.size());
-  EXPECT_EQ("\\asqrt[33] ", test->nets_[0].name_);
-  EXPECT_EQ("_0746_", test->nets_[1].name_);
-  EXPECT_EQ("_0747_", test->nets_[2].name_);
+  EXPECT_EQ("asqrt[33]", test->nets_[0].identifier_.name_);
+  EXPECT_TRUE(test->nets_[0].identifier_.escaped_);
+  EXPECT_EQ("_0746_", test->nets_[1].identifier_.name_);
+  EXPECT_EQ("_0747_", test->nets_[2].identifier_.name_);
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[0].type_);
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[1].type_);
   EXPECT_EQ(naja::verilog::Net::Type::Wire, test->nets_[2].type_);
@@ -50,17 +52,17 @@ TEST(NajaVerilogTest5, test) {
 
   EXPECT_EQ(1, test->instances_.size());
   const VerilogConstructorTest::Instance& instance = test->instances_[0];
-  EXPECT_EQ("_4370_", instance.name_);
-  EXPECT_EQ("LUT4", instance.model_);
+  EXPECT_EQ("_4370_", instance.identifier_.name_);
+  EXPECT_EQ("LUT4", instance.model_.name_);
   EXPECT_EQ(1, instance.parameterAssignments_.size());
   EXPECT_EQ("INIT", instance.parameterAssignments_.begin()->first);
   EXPECT_EQ("8'h2b", instance.parameterAssignments_.begin()->second);
   EXPECT_EQ(5, instance.connections_.size());
-  EXPECT_EQ("I0", instance.connections_[0].port_);
-  EXPECT_EQ("I1", instance.connections_[1].port_);
-  EXPECT_EQ("I2", instance.connections_[2].port_);
-  EXPECT_EQ("I3", instance.connections_[3].port_);
-  EXPECT_EQ("Q", instance.connections_[4].port_);
+  EXPECT_EQ("I0", instance.connections_[0].port_.name_);
+  EXPECT_EQ("I1", instance.connections_[1].port_.name_);
+  EXPECT_EQ("I2", instance.connections_[2].port_.name_);
+  EXPECT_EQ("I3", instance.connections_[3].port_.name_);
+  EXPECT_EQ("Q", instance.connections_[4].port_.name_);
   EXPECT_TRUE(instance.connections_[0].expression_.supported_);
   EXPECT_TRUE(instance.connections_[1].expression_.supported_);
   EXPECT_TRUE(instance.connections_[2].expression_.supported_);
@@ -71,24 +73,25 @@ TEST(NajaVerilogTest5, test) {
   EXPECT_TRUE(instance.connections_[2].expression_.valid_);
   EXPECT_TRUE(instance.connections_[3].expression_.valid_);
   EXPECT_FALSE(instance.connections_[4].expression_.valid_);
-  EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+  EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER,
     instance.connections_[0].expression_.value_.index());
   auto identifier =
-    std::get<naja::verilog::Expression::Type::IDENTIFIER>(instance.connections_[0].expression_.value_);
+    std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(instance.connections_[0].expression_.value_);
   EXPECT_FALSE(identifier.range_.valid_);
-  EXPECT_EQ("_0746_", identifier.name_);
-  EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+  EXPECT_EQ("_0746_", identifier.identifier_.name_);
+  EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER,
     instance.connections_[1].expression_.value_.index());
   identifier =
-    std::get<naja::verilog::Expression::Type::IDENTIFIER>(instance.connections_[1].expression_.value_);
+    std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(instance.connections_[1].expression_.value_);
   EXPECT_FALSE(identifier.range_.valid_);
-  EXPECT_EQ("_0747_", identifier.name_);
-  EXPECT_EQ(naja::verilog::Expression::Type::IDENTIFIER,
+  EXPECT_EQ("_0747_", identifier.identifier_.name_);
+  EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER,
     instance.connections_[2].expression_.value_.index());
   identifier =
-    std::get<naja::verilog::Expression::Type::IDENTIFIER>(instance.connections_[2].expression_.value_);
+    std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(instance.connections_[2].expression_.value_);
   EXPECT_FALSE(identifier.range_.valid_);
-  EXPECT_EQ("\\asqrt[33] ", identifier.name_);
+  EXPECT_EQ("asqrt[33]", identifier.identifier_.name_);
+  EXPECT_TRUE(identifier.identifier_.escaped_);
   EXPECT_EQ(naja::verilog::Expression::Type::NUMBER,
     instance.connections_[3].expression_.value_.index());
   auto number =
