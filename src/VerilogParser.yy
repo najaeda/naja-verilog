@@ -161,11 +161,9 @@ static naja::verilog::Number generateNumber(
 %type<naja::verilog::Number> number;
 %type<naja::verilog::ConstantExpression> constant_primary;
 %type<naja::verilog::ConstantExpression> constant_expression;
-%type<naja::verilog::Expression> constant_mintypmax_expression;
+%type<naja::verilog::ConstantExpression> constant_mintypmax_expression;
 %type<std::string> unary_operator;
 %type<naja::verilog::Expression> primary;
-%type<naja::verilog::Expression> constant_primary;
-%type<naja::verilog::Expression> constant_expression;
 %type<naja::verilog::Expression> expression;
 %type<naja::verilog::Expression> expression.opt;
 %type<naja::verilog::Expression> mintypmax_expression;
@@ -488,8 +486,7 @@ attr_spec_value: %empty {
   $$.valid_ = false;
 }
 | '=' constant_expression {
-  $$.valid_ = true;
-  $$.value_ = $2;
+  $$ = $2;
 }
 
 attr_spec: identifier attr_spec_value {

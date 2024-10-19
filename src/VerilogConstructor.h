@@ -66,8 +66,10 @@ class VerilogConstructor {
     virtual void addParameterAssignment(const naja::verilog::Identifier& parameter, const Expression& expression) {}
     virtual void addDefParameterAssignment(
       const naja::verilog::Identifiers& hierarchicalParameter,
-      const naja::verilog::Expression& expression) {}
-    virtual void addAttribute(const std::string& attributeName, const ConstantExpression& expression) {}
+      const naja::verilog::ConstantExpression& expression) {}
+    virtual void addAttribute(
+      const naja::verilog::Identifier& attributeName,
+      const ConstantExpression& expression) {}
     virtual void endModule() {}
     //LCOV_EXCL_STOP
   private:

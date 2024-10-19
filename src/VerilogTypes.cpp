@@ -266,4 +266,33 @@ std::string Expression::getDescription() const {
 } 
 //LCOV_EXCL_STOP
 
+//LCOV_EXCL_START
+std::string ConstantExpression::getString() const {
+  std::ostringstream stream;
+  switch (value_.index()) {
+    case Type::NUMBER:
+      return std::get<Type::NUMBER>(value_).getString();
+    case Type::STRING:
+      return std::get<Type::STRING>(value_);
+  }
+  return std::string();
+} 
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
+std::string ConstantExpression::getDescription() const {
+  std::ostringstream stream;
+  stream << "Expression: (valid: " << valid_ << ") ";
+  switch (value_.index()) {
+    case Type::NUMBER:
+      stream << std::get<Type::NUMBER>(value_).getDescription();
+      break; 
+    case Type::STRING:
+      stream << std::get<Type::STRING>(value_);
+      break;
+  }
+  return stream.str();
+} 
+//LCOV_EXCL_STOP
+
 }} // namespace verilog // namespace naja
