@@ -37,11 +37,10 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       const naja::verilog::Expression& expression) override;
     virtual void addDefParameterAssignment(
       const naja::verilog::Identifiers& hierarchicalParameter,
-      const naja::verilog::Expression& expression) override;
-    void addAttribute(
-      const std::string& attributeName,
       const naja::verilog::ConstantExpression& expression) override;
-
+    void addAttribute(
+      const naja::verilog::Identifier& attributeName,
+      const naja::verilog::ConstantExpression& expression) override;
     struct OrderedInstanceConnection {
       OrderedInstanceConnection() = default;
       OrderedInstanceConnection(const OrderedInstanceConnection&) = default;
@@ -124,7 +123,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       using Nets = std::vector<naja::verilog::Net>;
       using Instances = std::vector<Instance>;
       using Assigns = std::vector<Assign>;
-      using DefParameterAssignment = std::pair<naja::verilog::Identifiers, naja::verilog::Expression>;
+      using DefParameterAssignment = std::pair<naja::verilog::Identifiers, naja::verilog::ConstantExpression>;
       using DefParameterAssignments = std::vector<DefParameterAssignment>; 
       naja::verilog::Identifier       identifier_                           {};
       Ports                           ports_                                {};

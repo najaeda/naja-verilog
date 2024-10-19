@@ -252,15 +252,15 @@ struct ConstantExpression {
 struct Attribute {
   Attribute() = default;
   Attribute(const Attribute&) = default;
-  Attribute(const std::string& name, const ConstantExpression& expression):
+  Attribute(const naja::verilog::Identifier& name, const ConstantExpression& expression):
     name_(name),
     expression_(expression)
   {}
   std::string getString() const;
   std::string getDescription() const;
 
-  std::string         name_       {};
-  ConstantExpression  expression_ {};
+  naja::verilog::Identifier name_       {};
+  ConstantExpression        expression_ {};
 };
 
 }} // namespace verilog // namespace naja
