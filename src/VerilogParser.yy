@@ -241,10 +241,10 @@ port_declaration: port_type_io range.opt identifier {
   $$ = Port($3, $1, $2);
 }
 
-internal_ports_declaration: port_type_io range.opt list_of_identifiers {
+internal_ports_declaration: list_of_attribute_instance.opt port_type_io range.opt list_of_identifiers {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  for (auto portIdentifier: $3) {
-    constructor->internalModuleImplementationPort(Port(portIdentifier, $1, $2));
+  for (auto portIdentifier: $4) {
+    constructor->internalModuleImplementationPort(Port(portIdentifier, $2, $3));
   }
 }
 
@@ -297,10 +297,10 @@ list_of_net_assignments: net_assignment | list_of_net_assignments ',' net_assign
 continuous_assign: ASSIGN_KW list_of_net_assignments ';' 
 
 module_or_generate_item: 
-  module_or_generate_item_declaration
-| module_instantiation
-| parameter_override
-| continuous_assign
+  list_of_attribute_instance.opt module_or_generate_item_declaration
+| list_of_attribute_instance.opt module_instantiation
+| list_of_attribute_instance.opt parameter_override
+| list_of_attribute_instance.opt continuous_assign
 ; 
 
 module_or_generate_item_declaration: net_declaration;
