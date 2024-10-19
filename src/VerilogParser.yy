@@ -214,7 +214,7 @@ constant_expression: constant_primary {
 } 
 | unary_operator constant_primary {
   auto expression = $2;
-  if (expression.value_.index() == naja::verilog::Expression::NUMBER) {
+  if (expression.value_.index() == naja::verilog::ConstantExpression::NUMBER) {
     auto number = std::get<naja::verilog::Number>(expression.value_);
     if ($1 == "-") { number.sign_ = false; }
     $$.valid_ = true;
@@ -225,8 +225,8 @@ constant_expression: constant_primary {
 }
 
 range: '[' constant_expression ':' constant_expression ']' {
-  if ($2.value_.index() == naja::verilog::Expression::NUMBER and
-      $4.value_.index() == naja::verilog::Expression::NUMBER) {
+  if ($2.value_.index() == naja::verilog::ConstantExpression::NUMBER and
+      $4.value_.index() == naja::verilog::ConstantExpression::NUMBER) {
     auto number1 = std::get<naja::verilog::Number>($2.value_);
     auto number2 = std::get<naja::verilog::Number>($4.value_);
     $$ = Range(number1.getInt(), number2.getInt());
@@ -359,7 +359,7 @@ hierarchical_identifier
 //only numeric values (one bit) [4] or [4:5] are supported
 constant_range_expression.opt: %empty { $$.valid_ = false; } 
 | '[' constant_expression ']' {
-  if ($2.value_.index() == naja::verilog::Expression::NUMBER) {
+  if ($2.value_.index() == naja::verilog::ConstantExpression::NUMBER) {
     auto number = std::get<naja::verilog::Number>($2.value_);
     $$ = Range(number.getInt());
   } else {
