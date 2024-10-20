@@ -24,5 +24,4 @@ module adder(a, b, s);
     .I1(_04_[1]),
     .O(_05_[4])
   );
-
 endmodule
