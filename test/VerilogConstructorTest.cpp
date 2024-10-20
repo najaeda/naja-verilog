@@ -23,6 +23,7 @@ void VerilogConstructorTest::startModule(const naja::verilog::Identifier& identi
   if (inFirstPass()) {
     currentModule_ = new Module(identifier);
     addModule(currentModule_);
+    currentModuleAttributes_.clear();
     std::cerr << "Construct Module: " << identifier.getString() << std::endl;
   } else {
     if (auto it = modulesMap_.find(identifier.name_); it != modulesMap_.end()) {
@@ -136,5 +137,5 @@ void VerilogConstructorTest::addDefParameterAssignment(
 void VerilogConstructorTest::addAttribute(
   const naja::verilog::Identifier& attributeName,
   const naja::verilog::ConstantExpression& expression) {
-  attributes_.push_back(naja::verilog::Attribute(attributeName, expression));
+  currentModuleAttributes_.push_back(naja::verilog::Attribute(attributeName, expression));
 }

@@ -143,12 +143,12 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     using Attributes = std::list<naja::verilog::Attribute>;
     void addModule(Module* module);
     
-    bool        firstPass_        {true};
-    Modules     modules_          {};
-    ModulesMap  modulesMap_       {};
-    Module*     currentModule_    {nullptr};
-    Attributes  attributes_       {};
-    std::string currentModelName_ {};
+    bool        firstPass_                {true};
+    Modules     modules_                  {};
+    ModulesMap  modulesMap_               {};
+    Module*     currentModule_            {nullptr};
+    Attributes  currentModuleAttributes_  {};
+    std::string currentModelName_         {};
 };
 
 #endif /* __VERILOG_CONSTRUCTOR_TEST_H_ */
