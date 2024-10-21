@@ -45,8 +45,7 @@ jobs:
       
     - name: lcov
       working-directory: ${{github.workspace}}/build
-      run: |
-           lcov --directory . --capture --output-file coverage.info
+      run: lcov --directory . --capture --output-file coverage.info
            lcov --remove coverage.info --output-file coverage.info '/usr/*' '*/naja-verilog/test/*' '*/naja-verilog/thirdparty/*'
            lcov --list coverage.info
     - name: Upload coverage to Codecov
@@ -54,11 +53,11 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
-        directory: ${{github.workspace}}/build
+        #directory: ${{github.workspace}}/build
         codecov_yml_path: ${{github.workspace}}/.codecov.yml
         #env_vars: OS,PYTHON
         fail_ci_if_error: true
-        file: coverage.info
+        file: ${{github.workspace}}/coverage.info
         disable_search: true
         flags: unittests
         name: codecov-umbrella
