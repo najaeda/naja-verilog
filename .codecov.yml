@@ -1,4 +1,0 @@
-codecov:
-  ignore:
-    - "test/**/*"
-    - "thirdparty/**/*"
