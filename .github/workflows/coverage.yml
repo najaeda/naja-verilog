@@ -54,6 +54,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
         directory: ${{github.workspace}}/build
+        codecov_yml_path: ${{github.workspace}}/.codecov.yml
         #env_vars: OS,PYTHON
         fail_ci_if_error: true
         files: coverage.info
