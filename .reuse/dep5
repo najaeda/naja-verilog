@@ -3,7 +3,7 @@ Upstream-Name: naja-verilog
 Upstream-Contact: Christophe Alexandre <christophe.alex@gmail.com>
 Source: https://github.com/najaeda/naja-verilog
 
-Files: .github/workflows/* .gitmodules .gitignore
+Files: .github/workflows/* .gitmodules .gitignore .codecov.yml
 Copyright: 2023 The Naja verilog Authors.
 License: Apache-2.0
 

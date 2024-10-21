@@ -47,7 +47,7 @@ class VerilogConstructorExample: public naja::verilog::VerilogConstructor {
     }
     virtual void addDefParameterAssignment(
       const naja::verilog::Identifiers& hierarchicalParameter,
-      const naja::verilog::Expression& expression) override {
+      const naja::verilog::ConstantExpression& expression) override {
       std::ostringstream oss;
       for (size_t i = 0; i < hierarchicalParameter.size(); i++) {
         oss << hierarchicalParameter[i].getString();
