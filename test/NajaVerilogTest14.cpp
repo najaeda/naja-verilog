@@ -27,6 +27,7 @@ TEST(NajaVerilogTest14, test) {
   ASSERT_EQ(1, constructor.modules_.size());
   auto adder = constructor.modules_[0];
   EXPECT_EQ("adder", adder->identifier_.getString());
+  //EXPECT_EQ(2, adder->currentMo connections_.size());
 
   constructor.setFirstPass(false);
   constructor.parse(test14Path);

@@ -23,7 +23,7 @@ void VerilogConstructorTest::startModule(const naja::verilog::Identifier& identi
   if (inFirstPass()) {
     currentModule_ = new Module(identifier);
     addModule(currentModule_);
-    currentModuleAttributes_.clear();
+    //currentModuleAttributes_.clear();
     std::cerr << "Construct Module: " << identifier.getString() << std::endl;
   } else {
     if (auto it = modulesMap_.find(identifier.name_); it != modulesMap_.end()) {
@@ -58,8 +58,10 @@ void VerilogConstructorTest::moduleImplementationPort(const naja::verilog::Port&
 void VerilogConstructorTest::addNet(const naja::verilog::Net& net) {
   if (not inFirstPass()) {
     std::cerr << "Add net: " << net.getString() << std::endl;
+    //net.addAttributes(nextObjectAttributes_);
     currentModule_->nets_.push_back(std::move(net));
   }
+  nextObjectAttributes_.clear();
 }
 
 void VerilogConstructorTest::startInstantiation(const naja::verilog::Identifier& model) {
@@ -70,6 +72,9 @@ void VerilogConstructorTest::startInstantiation(const naja::verilog::Identifier&
 }
 
 void VerilogConstructorTest::endInstantiation() {
+  if (not nextObjectAttributes_.empty()) {
+    //error
+  }
   if (not inFirstPass()) {
     std::cerr << "Finish Instantiation of: " << currentModelName_ << std::endl;
     Instance& instance = currentModule_->instances_.back();
@@ -78,11 +83,14 @@ void VerilogConstructorTest::endInstantiation() {
   }
 }
 
-void VerilogConstructorTest::addInstance(const naja::verilog::Identifier& instance) {
+void VerilogConstructorTest::addInstance(const naja::verilog::Identifier& instanceID) {
   if (not inFirstPass()) {
-    std::cerr << "Add instance: " << instance.getString() << std::endl;
-    currentModule_->instances_.push_back(Instance(currentModelName_, instance.getString()));
+    std::cerr << "Add instance: " << instanceID.getString() << std::endl;
+    auto instance = Instance(currentModelName_, instanceID.getString());
+    instance.addAttributes(nextObjectAttributes_);
+    currentModule_->instances_.push_back(instance);
   }
+  nextObjectAttributes_.clear();
 }
 
 void VerilogConstructorTest::addInstanceConnection(
@@ -137,5 +145,5 @@ void VerilogConstructorTest::addDefParameterAssignment(
 void VerilogConstructorTest::addAttribute(
   const naja::verilog::Identifier& attributeName,
   const naja::verilog::ConstantExpression& expression) {
-  currentModuleAttributes_.push_back(naja::verilog::Attribute(attributeName, expression));
+  nextObjectAttributes_.push_back(naja::verilog::Attribute(attributeName, expression));
 }

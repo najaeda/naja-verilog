@@ -237,8 +237,8 @@ range: '[' constant_expression ':' constant_expression ']' {
 
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
 
-port_declaration: port_type_io range.opt identifier {
-  $$ = Port($3, $1, $2);
+port_declaration: list_of_attribute_instance.opt port_type_io range.opt identifier {
+  $$ = Port($4, $2, $3);
 }
 
 internal_ports_declaration: list_of_attribute_instance.opt port_type_io range.opt list_of_identifiers {

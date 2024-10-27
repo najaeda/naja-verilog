@@ -62,6 +62,17 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       naja::verilog::Expression expression_ {};
     };
 
+    using Attributes = std::list<naja::verilog::Attribute>;
+
+    struct ObjectWithAttributes {
+      ObjectWithAttributes() = default;
+      void addAttributes(const Attributes& attributes) {
+        attributes_.insert(attributes_.end(), attributes.begin(), attributes.end());
+      }
+
+      Attributes  attributes_ {};
+    };
+
     struct InstanceConnection {
       InstanceConnection() = default;
       InstanceConnection(const InstanceConnection&) = default;
@@ -83,7 +94,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       naja::verilog::Expression expression_ {};
     };
 
-    struct Instance {
+    struct Instance: public ObjectWithAttributes {
       using Connections = std::vector<InstanceConnection>;
       using OrderedConnections = std::vector<OrderedInstanceConnection>;
       using ParameterAssignments = std::map<std::string, std::string>;
@@ -140,14 +151,13 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
 
     using Modules = std::vector<Module*>;
     using ModulesMap = std::map<std::string, Module*>;
-    using Attributes = std::list<naja::verilog::Attribute>;
     void addModule(Module* module);
     
     bool        firstPass_                {true};
     Modules     modules_                  {};
     ModulesMap  modulesMap_               {};
     Module*     currentModule_            {nullptr};
-    Attributes  currentModuleAttributes_  {};
+    Attributes  nextObjectAttributes_     {};
     std::string currentModelName_         {};
 };
 
