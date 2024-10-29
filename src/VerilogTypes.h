@@ -242,6 +242,7 @@ struct ConstantExpression {
   enum Type { NUMBER=0, STRING=1 }; 
   using Value = std::variant<Number, std::string>;
 
+  Type getType() const { return Type(value_.index()); }
   std::string getString() const;
   std::string getDescription() const;
 
