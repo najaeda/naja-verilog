@@ -50,23 +50,26 @@ class VerilogConstructor {
     }
     
     //LCOV_EXCL_START
-    virtual void startModule(const naja::verilog::Identifier& id) {}
+    virtual void startModule(const Identifier& id) {}
     //Simple Port declaration (only name), no range, no direction in module interface
-    virtual void moduleInterfaceSimplePort(const naja::verilog::Identifier& port) {}
+    virtual void moduleInterfaceSimplePort(const Identifier& port) {}
     //Complete Port declaration in module interface
     virtual void moduleInterfaceCompletePort(const Port& port) {}
     virtual void moduleImplementationPort(const Port& port) {}
     virtual void addNet(const Net& net) {}
     virtual void addAssign(const RangeIdentifiers& identifiers, const Expression& expression) {}
-    virtual void startInstantiation(const naja::verilog::Identifier& model) {}
-    virtual void addInstance(const naja::verilog::Identifier& instance) {}
-    virtual void addInstanceConnection(const naja::verilog::Identifier& port, const Expression& expression) {}
+    virtual void startInstantiation(const Identifier& model) {}
+    virtual void addInstance(const Identifier& instance) {}
+    virtual void addInstanceConnection(const Identifier& port, const Expression& expression) {}
     virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
     virtual void endInstantiation() {}
-    virtual void addParameterAssignment(const naja::verilog::Identifier& parameter, const Expression& expression) {}
+    virtual void addParameterAssignment(const Identifier& parameter, const Expression& expression) {}
     virtual void addDefParameterAssignment(
-      const naja::verilog::Identifiers& hierarchicalParameter,
-      const naja::verilog::Expression& expression) {}
+      const Identifiers& hierarchicalParameter,
+      const ConstantExpression& expression) {}
+    virtual void addAttribute(
+      const Identifier& attributeName,
+      const ConstantExpression& expression) {}
     virtual void endModule() {}
     //LCOV_EXCL_STOP
   private:
@@ -83,9 +86,9 @@ class VerilogConstructor {
           ModuleInterfaceTypeEnum typeEnum_;
     }; 
     void internalParse(std::istream& stream);
-    void internalStartModule(const naja::verilog::Identifier& id);
+    void internalStartModule(const Identifier& id);
     void internalEndModule();
-    void internalModuleInterfaceSimplePort(const naja::verilog::Identifier& id);
+    void internalModuleInterfaceSimplePort(const Identifier& id);
     void internalModuleInterfaceCompletePort(const Port& port);
     void internalModuleImplementationPort(const Port& port);
 

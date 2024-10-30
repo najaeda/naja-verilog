@@ -68,7 +68,7 @@ TEST(NajaVerilogTest12, test) {
   EXPECT_EQ("INIT", def0Path[1].name_);
   EXPECT_FALSE(def0Path[1].escaped_);
   EXPECT_EQ("2'h1", def0Value.getString());
-  EXPECT_EQ(Expression::Type::NUMBER ,def0Value.value_.index());
+  EXPECT_EQ(ConstantExpression::Type::NUMBER ,def0Value.value_.index());
 
   auto def1Path = test->defParameterAssignments_[1].first;
   auto def1Value = test->defParameterAssignments_[1].second;
@@ -77,7 +77,7 @@ TEST(NajaVerilogTest12, test) {
   EXPECT_FALSE(def1Path[0].escaped_);
   EXPECT_EQ("RAMINDEX", def1Path[1].name_);
   EXPECT_FALSE(def1Path[1].escaped_);
-  EXPECT_EQ(Expression::Type::STRING ,def1Value.value_.index());
+  EXPECT_EQ(ConstantExpression::Type::STRING ,def1Value.value_.index());
   EXPECT_EQ("mem_regfile[7:0]%32%8%SPEED%0%0%MICRO_RAM", def1Value.getString());
 
   auto def2Path = test->defParameterAssignments_[2].first;
@@ -87,6 +87,6 @@ TEST(NajaVerilogTest12, test) {
   EXPECT_TRUE(def2Path[0].escaped_);
   EXPECT_EQ("INIT", def2Path[1].name_);
   EXPECT_FALSE(def2Path[1].escaped_);
-  EXPECT_EQ(Expression::Type::NUMBER ,def2Value.value_.index());
+  EXPECT_EQ(ConstantExpression::Type::NUMBER ,def2Value.value_.index());
   EXPECT_EQ("2'h2", def2Value.getString());
 }

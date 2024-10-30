@@ -159,17 +159,19 @@ static naja::verilog::Number generateNumber(
 %type<naja::verilog::Identifier> port_identifier;
 
 %type<naja::verilog::Number> number;
-%type<naja::verilog::Expression> constant_mintypmax_expression;
+%type<naja::verilog::ConstantExpression> constant_primary;
+%type<naja::verilog::ConstantExpression> constant_expression;
+%type<naja::verilog::ConstantExpression> constant_mintypmax_expression;
 %type<std::string> unary_operator;
 %type<naja::verilog::Expression> primary;
-%type<naja::verilog::Expression> constant_primary;
-%type<naja::verilog::Expression> constant_expression;
 %type<naja::verilog::Expression> expression;
 %type<naja::verilog::Expression> expression.opt;
 %type<naja::verilog::Expression> mintypmax_expression;
 %type<naja::verilog::Expression> mintypmax_expression.opt;
 %type<naja::verilog::Expression::Expressions> concatenation;
 %type<naja::verilog::Expression::Expressions> list_of_expressions; 
+%type<naja::verilog::ConstantExpression> attr_spec_value;
+%type<naja::verilog::Attribute> attr_spec;
 
 %locations 
 %start source_text
@@ -212,7 +214,7 @@ constant_expression: constant_primary {
 } 
 | unary_operator constant_primary {
   auto expression = $2;
-  if (expression.value_.index() == naja::verilog::Expression::NUMBER) {
+  if (expression.value_.index() == naja::verilog::ConstantExpression::NUMBER) {
     auto number = std::get<naja::verilog::Number>(expression.value_);
     if ($1 == "-") { number.sign_ = false; }
     $$.valid_ = true;
@@ -223,8 +225,8 @@ constant_expression: constant_primary {
 }
 
 range: '[' constant_expression ':' constant_expression ']' {
-  if ($2.value_.index() == naja::verilog::Expression::NUMBER and
-      $4.value_.index() == naja::verilog::Expression::NUMBER) {
+  if ($2.value_.index() == naja::verilog::ConstantExpression::NUMBER and
+      $4.value_.index() == naja::verilog::ConstantExpression::NUMBER) {
     auto number1 = std::get<naja::verilog::Number>($2.value_);
     auto number2 = std::get<naja::verilog::Number>($4.value_);
     $$ = Range(number1.getInt(), number2.getInt());
@@ -235,14 +237,14 @@ range: '[' constant_expression ':' constant_expression ']' {
 
 range.opt: %empty { $$.valid_ = false; } | range { $$ = $1; }
 
-port_declaration: port_type_io range.opt identifier {
-  $$ = Port($3, $1, $2);
+port_declaration: list_of_attribute_instance.opt port_type_io range.opt identifier {
+  $$ = Port($4, $2, $3);
 }
 
-internal_ports_declaration: port_type_io range.opt list_of_identifiers {
+internal_ports_declaration: list_of_attribute_instance.opt port_type_io range.opt list_of_identifiers {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  for (auto portIdentifier: $3) {
-    constructor->internalModuleImplementationPort(Port(portIdentifier, $1, $2));
+  for (auto portIdentifier: $4) {
+    constructor->internalModuleImplementationPort(Port(portIdentifier, $2, $3));
   }
 }
 
@@ -295,10 +297,10 @@ list_of_net_assignments: net_assignment | list_of_net_assignments ',' net_assign
 continuous_assign: ASSIGN_KW list_of_net_assignments ';' 
 
 module_or_generate_item: 
-  module_or_generate_item_declaration
-| module_instantiation
-| parameter_override
-| continuous_assign
+  list_of_attribute_instance.opt module_or_generate_item_declaration
+| list_of_attribute_instance.opt module_instantiation
+| list_of_attribute_instance.opt parameter_override
+| list_of_attribute_instance.opt continuous_assign
 ; 
 
 module_or_generate_item_declaration: net_declaration;
@@ -357,7 +359,7 @@ hierarchical_identifier
 //only numeric values (one bit) [4] or [4:5] are supported
 constant_range_expression.opt: %empty { $$.valid_ = false; } 
 | '[' constant_expression ']' {
-  if ($2.value_.index() == naja::verilog::Expression::NUMBER) {
+  if ($2.value_.index() == naja::verilog::ConstantExpression::NUMBER) {
     auto number = std::get<naja::verilog::Number>($2.value_);
     $$ = Range(number.getInt());
   } else {
@@ -470,13 +472,36 @@ list_of_module_args: module_arg | list_of_module_args ',' module_arg;
 
 list_of_module_args.opt: %empty | '(' ')' | '(' list_of_module_args ')';
 
-module_declaration: MODULE_KW module_identifier {
+module_declaration: list_of_attribute_instance.opt {
+} MODULE_KW module_identifier {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  constructor->internalStartModule(std::move($2));
+  constructor->internalStartModule(std::move($4));
 } list_of_module_args.opt ';' list_of_module_items.opt ENDMODULE_KW {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->internalEndModule();
 }
+
+/* 3.8 */
+attr_spec_value: %empty {
+  $$.valid_ = false;
+}
+| '=' constant_expression {
+  $$ = $2;
+}
+
+attr_spec: identifier attr_spec_value {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addAttribute($1, $2);
+}
+
+list_of_attr_spec: attr_spec | list_of_attr_spec ',' attr_spec; 
+
+//A.9.1
+attribute_instance: '(' '*' list_of_attr_spec '*' ')';
+
+list_of_attribute_instance: attribute_instance | list_of_attribute_instance attribute_instance;
+
+list_of_attribute_instance.opt: %empty | list_of_attribute_instance;
 
 %%
 

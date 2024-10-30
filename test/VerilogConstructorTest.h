@@ -37,8 +37,10 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       const naja::verilog::Expression& expression) override;
     virtual void addDefParameterAssignment(
       const naja::verilog::Identifiers& hierarchicalParameter,
-      const naja::verilog::Expression& expression) override;
-
+      const naja::verilog::ConstantExpression& expression) override;
+    void addAttribute(
+      const naja::verilog::Identifier& attributeName,
+      const naja::verilog::ConstantExpression& expression) override;
     struct OrderedInstanceConnection {
       OrderedInstanceConnection() = default;
       OrderedInstanceConnection(const OrderedInstanceConnection&) = default;
@@ -58,6 +60,17 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       
       size_t                    portIndex_  {0};
       naja::verilog::Expression expression_ {};
+    };
+
+    using Attributes = std::list<naja::verilog::Attribute>;
+
+    struct ObjectWithAttributes {
+      ObjectWithAttributes() = default;
+      void addAttributes(const Attributes& attributes) {
+        attributes_.insert(attributes_.end(), attributes.begin(), attributes.end());
+      }
+
+      Attributes  attributes_ {};
     };
 
     struct InstanceConnection {
@@ -81,7 +94,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       naja::verilog::Expression expression_ {};
     };
 
-    struct Instance {
+    struct Instance: public ObjectWithAttributes {
       using Connections = std::vector<InstanceConnection>;
       using OrderedConnections = std::vector<OrderedInstanceConnection>;
       using ParameterAssignments = std::map<std::string, std::string>;
@@ -121,7 +134,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       using Nets = std::vector<naja::verilog::Net>;
       using Instances = std::vector<Instance>;
       using Assigns = std::vector<Assign>;
-      using DefParameterAssignment = std::pair<naja::verilog::Identifiers, naja::verilog::Expression>;
+      using DefParameterAssignment = std::pair<naja::verilog::Identifiers, naja::verilog::ConstantExpression>;
       using DefParameterAssignments = std::vector<DefParameterAssignment>; 
       naja::verilog::Identifier       identifier_                           {};
       Ports                           ports_                                {};
@@ -140,11 +153,12 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     using ModulesMap = std::map<std::string, Module*>;
     void addModule(Module* module);
     
-    bool        firstPass_        {true};
-    Modules     modules_          {};
-    ModulesMap  modulesMap_       {};
-    Module*     currentModule_    {nullptr};
-    std::string currentModelName_ {};
+    bool        firstPass_                {true};
+    Modules     modules_                  {};
+    ModulesMap  modulesMap_               {};
+    Module*     currentModule_            {nullptr};
+    Attributes  nextObjectAttributes_     {};
+    std::string currentModelName_         {};
 };
 
 #endif /* __VERILOG_CONSTRUCTOR_TEST_H_ */
