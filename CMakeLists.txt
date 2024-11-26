@@ -44,14 +44,15 @@ if(ENABLE_SANITIZERS)
 endif(ENABLE_SANITIZERS)
 
 add_subdirectory(src)
-add_subdirectory(cmake)
 
-#Build tests only if module is top level
-#and if googletest submodule has been added.
-if(PROJECT_IS_TOP_LEVEL
-  AND EXISTS "${PROJECT_SOURCE_DIR}/thirdparty/googletest/CMakeLists.txt")
-  add_subdirectory(thirdparty)
-  include(CTest)
-  enable_testing()
-  add_subdirectory(test)
-endif()
+if(PROJECT_IS_TOP_LEVEL)
+  add_subdirectory(cmake)
+  if(EXISTS "${PROJECT_SOURCE_DIR}/thirdparty/googletest/CMakeLists.txt")
+    #Build tests only if module is top level
+    #and if googletest submodule has been added.
+    add_subdirectory(thirdparty)
+    include(CTest)
+    enable_testing()
+    add_subdirectory(test)
+  endif()
+endif(PROJECT_IS_TOP_LEVEL)

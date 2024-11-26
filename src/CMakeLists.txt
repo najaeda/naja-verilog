@@ -29,10 +29,11 @@ target_include_directories(naja_verilog
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${FLEX_INCLUDE_DIRS}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-set_target_properties(naja_verilog PROPERTIES PUBLIC_HEADER "${HEADERS}")
-install(TARGETS naja_verilog
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-add_executable(naja_verilog_test NajaVerilogSnippet.cpp)
-target_link_libraries(naja_verilog_test naja_verilog)
+if(PROJECT_IS_TOP_LEVEL)
+  set_target_properties(naja_verilog PROPERTIES PUBLIC_HEADER "${HEADERS}")
+  install(TARGETS naja_verilog
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+  add_executable(naja_verilog_test NajaVerilogSnippet.cpp)
+  target_link_libraries(naja_verilog_test naja_verilog)
+endif()
