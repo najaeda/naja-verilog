@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-13, macos-14]
+        os: [macos-13, macos-14, macos-15]
 
     steps:
     - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
     - name: set env variable for macos-13
       run: echo "/usr/local/opt/flex/bin" >> $GITHUB_PATH; echo "/usr/local/opt/bison/bin" >> $GITHUB_PATH
 
-    - name: set env variable for macos-14
+    - name: set env variable for macos-14 and further
       run: echo "/opt/homebrew/opt/flex/bin" >> $GITHUB_PATH; echo "/opt/homebrew/opt/bison/bin" >> $GITHUB_PATH
 
     - name: Configure CMake
