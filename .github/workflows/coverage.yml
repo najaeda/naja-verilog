@@ -44,7 +44,7 @@ jobs:
       run: ctest -VV -C ${{env.BUILD_TYPE}}
       
     - name: lcov
-      working-directory: ${{github.workspace}}/build
+      working-directory: ${{github.workspace}}/build/src
       run: |
            lcov --directory . --capture --output-file coverage.info
            lcov --remove coverage.info --output-file coverage.info '/usr/*' '*/naja-verilog/test/*' '*/naja-verilog/thirdparty/*'
