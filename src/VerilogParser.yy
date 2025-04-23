@@ -7,6 +7,7 @@
 %define parse.trace
 %defines 
 %define api.namespace {naja::verilog}
+%language "c++"
 %define api.parser.class {VerilogParser}
 
 %define parse.error verbose
