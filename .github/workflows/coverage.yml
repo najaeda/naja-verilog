@@ -27,6 +27,9 @@ jobs:
     - name: Install dependencies 
       # install dependencies
       run: sudo apt-get update && sudo apt-get install -yq libfl-dev lcov
+
+    - name: Clean build directory
+      run: rm -rf ${{github.workspace}}/build
       
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
