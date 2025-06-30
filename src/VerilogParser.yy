@@ -129,6 +129,15 @@ static naja::verilog::Number generateNumber(
 %token ASSIGN_KW
 %token DEFPARAM_KW
 %token END 0 "end of file"
+%token AND_KW
+%token NAND_KW
+%token OR_KW
+%token NOR_KW
+%token XOR_KW
+%token XNOR_KW
+%token BUF_KW
+%token NOT_KW
+//%token END 0 "end of file"
 
 %token<std::string> IDENTIFIER_TK
 %token<std::string> ESCAPED_IDENTIFIER_TK
@@ -173,6 +182,8 @@ static naja::verilog::Number generateNumber(
 %type<naja::verilog::Expression::Expressions> list_of_expressions; 
 %type<naja::verilog::ConstantExpression> attr_spec_value;
 %type<naja::verilog::Attribute> attr_spec;
+
+%type<naja::verilog::GateType> n_gatetype;
 
 %locations 
 %start source_text
@@ -302,6 +313,7 @@ module_or_generate_item:
 | list_of_attribute_instance.opt module_instantiation
 | list_of_attribute_instance.opt parameter_override
 | list_of_attribute_instance.opt continuous_assign
+| list_of_attribute_instance.opt gate_instantiation
 ; 
 
 module_or_generate_item_declaration: net_declaration;
@@ -503,6 +515,27 @@ attribute_instance: '(' '*' list_of_attr_spec '*' ')';
 list_of_attribute_instance: attribute_instance | list_of_attribute_instance attribute_instance;
 
 list_of_attribute_instance.opt: %empty | list_of_attribute_instance;
+
+//need to differentiate input and output
+//as the accepted terminals are different
+list_of_terminals: %empty;
+
+n_gate_instance: '(' list_of_terminals ')' ;
+
+list_of_n_gate_instances: n_gate_instance | list_of_n_gate_instances ',' n_gate_instance ;
+
+n_gatetype: 
+  AND_KW  { $$ = naja::verilog::GateType::And; }
+| NAND_KW { $$ = naja::verilog::GateType::Nand; }
+| OR_KW   { $$ = naja::verilog::GateType::Or; }
+| NOR_KW  { $$ = naja::verilog::GateType::Nor; }
+| XOR_KW  { $$ = naja::verilog::GateType::Xor; }
+| XNOR_KW { $$ = naja::verilog::GateType::Xnor; }
+| BUF_KW  { $$ = naja::verilog::GateType::Buf; }
+| NOT_KW  { $$ = naja::verilog::GateType::Not; }
+
+//A.3.1
+gate_instantiation: n_gatetype list_of_n_gate_instances;
 
 %%
 

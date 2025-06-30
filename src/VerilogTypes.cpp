@@ -295,4 +295,25 @@ std::string ConstantExpression::getDescription() const {
 } 
 //LCOV_EXCL_STOP
 
+GateType::GateType(const GateTypeEnum& gateTypeEnum):
+  gateTypeEnum_(gateTypeEnum)
+{}
+
+//LCOV_EXCL_START
+std::string GateType::getString() const {
+  switch (gateTypeEnum_) {
+    case GateType::And: return "And";
+    case GateType::Nand: return "Nand";
+    case GateType::Or: return "Or";
+    case GateType::Nor: return "Nor";
+    case GateType::Xor: return "Xor";
+    case GateType::Xnor: return "Xnor";
+    case GateType::Buf: return "Buf";
+    case GateType::Not: return "Not";
+    case GateType::Unknown: return "Unknown";
+  }
+  return "Error";
+}
+//LCOV_EXCL_STOP
+
 }} // namespace verilog // namespace naja

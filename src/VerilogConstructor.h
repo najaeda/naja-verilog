@@ -48,7 +48,7 @@ class VerilogConstructor {
     void setCurrentLocation(unsigned line, unsigned column) {
       line_= line; column_ = column;
     }
-    
+
     //LCOV_EXCL_START
     virtual void startModule(const Identifier& id) {}
     //Simple Port declaration (only name), no range, no direction in module interface
@@ -59,6 +59,7 @@ class VerilogConstructor {
     virtual void addNet(const Net& net) {}
     virtual void addAssign(const RangeIdentifiers& identifiers, const Expression& expression) {}
     virtual void startInstantiation(const Identifier& model) {}
+    virtual void startGateInstantiation() {}
     virtual void addInstance(const Identifier& instance) {}
     virtual void addInstanceConnection(const Identifier& port, const Expression& expression) {}
     virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}

@@ -264,6 +264,22 @@ struct Attribute {
   ConstantExpression        expression_ {};
 };
 
+struct GateType {
+  public:
+    enum GateTypeEnum {
+      And, Nand, Or, Nor, Xor, Xnor,Buf, Not, Unknown
+    };
+    GateType() = default;
+    GateType(const GateTypeEnum& gateTypeEnum);
+    GateType(const GateType&) = default;
+    GateType(GateType&&) = default;
+    GateType& operator=(const GateType&) = default;
+    operator const GateTypeEnum&() const {return gateTypeEnum_;}
+    std::string getString() const;
+    private:
+      GateTypeEnum  gateTypeEnum_ { Unknown };
+};
+
 }} // namespace verilog // namespace naja
 
 #endif /* __VERILOG_TYPES_H_ */
