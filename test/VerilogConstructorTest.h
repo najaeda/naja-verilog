@@ -31,6 +31,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       const naja::verilog::Identifier& parameter,
       const naja::verilog::Expression& expression) override;
     void endInstantiation() override;
+    void endGateInstantiation() override;
     void addNet(const naja::verilog::Net& net) override;
     void addAssign(
       const naja::verilog::RangeIdentifiers& identifiers,
@@ -153,12 +154,13 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     using ModulesMap = std::map<std::string, Module*>;
     void addModule(Module* module);
     
-    bool        firstPass_                {true};
-    Modules     modules_                  {};
-    ModulesMap  modulesMap_               {};
-    Module*     currentModule_            {nullptr};
-    Attributes  nextObjectAttributes_     {};
-    std::string currentModelName_         {};
+    bool                    firstPass_            {true};
+    Modules                 modules_              {};
+    ModulesMap              modulesMap_           {};
+    Module*                 currentModule_        {nullptr};
+    naja::verilog::GateType currentGateType_      {naja::verilog::GateType::Unknown};
+    Attributes              nextObjectAttributes_ {};
+    std::string             currentModelName_     {};
 };
 
 #endif /* __VERILOG_CONSTRUCTOR_TEST_H_ */

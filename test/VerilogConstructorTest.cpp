@@ -115,6 +115,16 @@ void VerilogConstructorTest::addOrderedInstanceConnection(
   }
 }
 
+void VerilogConstructorTest::endGateInstantiation() {
+  //if (not nextObjectAttributes_.empty()) {
+  //  //error
+  //}
+  if (not inFirstPass()) {
+    std::cerr << "Finish Instantiation of: " << currentGateType_.getString() << std::endl;
+    currentGateType_ = naja::verilog::GateType::Unknown;
+  }
+}
+
 void VerilogConstructorTest::addParameterAssignment(
   const naja::verilog::Identifier& parameter,
   const naja::verilog::Expression& expression) {
