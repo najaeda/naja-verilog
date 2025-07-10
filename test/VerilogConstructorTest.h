@@ -31,6 +31,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       const naja::verilog::Identifier& parameter,
       const naja::verilog::Expression& expression) override;
     void endInstantiation() override;
+    void startGateInstantiation(const naja::verilog::GateType& type) override;
     void endGateInstantiation() override;
     void addNet(const naja::verilog::Net& net) override;
     void addAssign(
@@ -96,18 +97,25 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     };
 
     struct Instance: public ObjectWithAttributes {
-      using Connections = std::vector<InstanceConnection>;
       using OrderedConnections = std::vector<OrderedInstanceConnection>;
+
+      virtual std::string getString() const = 0;
+
+      OrderedConnections          orderedConnections_   {};
+    };
+
+    struct ModuleInstance: public Instance {
+      using Connections = std::vector<InstanceConnection>;
       using ParameterAssignments = std::map<std::string, std::string>;
-      Instance() = default;
-      Instance(const Instance&) = default;
-      Instance(const naja::verilog::Identifier& model, const naja::verilog::Identifier& id):
+      ModuleInstance() = default;
+      ModuleInstance(const ModuleInstance&) = default;
+      ModuleInstance(const naja::verilog::Identifier& model, const naja::verilog::Identifier& id):
         model_(model), identifier_(id)
       {}
 
-      std::string getString() const {
+      std::string getString() const override {
         std::ostringstream stream;
-        stream << "Instance: (" << model_.getString() << ") "
+        stream << "ModuleInstance: (" << model_.getString() << ") "
           << identifier_.getString();
         return stream.str();
       }
@@ -116,7 +124,26 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       naja::verilog::Identifier   identifier_           {};
       ParameterAssignments        parameterAssignments_ {};
       Connections                 connections_          {};
-      OrderedConnections          orderedConnections_   {};
+    };
+
+    struct GateInstance: public Instance {
+      GateInstance() = default;
+      GateInstance(const GateInstance&) = default;
+      GateInstance(const naja::verilog::GateType& type,
+        const naja::verilog::Identifier& id):
+        type_(type),
+        identifier_(id)
+      {}
+
+      bool isAnonymous() const { return identifier_.empty(); }
+
+      std::string getString() const {
+        std::ostringstream stream;
+        stream << "GateInstance: " << identifier_.getString();
+        return stream.str();
+      }
+      naja::verilog::GateType   type_       {};
+      naja::verilog::Identifier identifier_ {};
     };
 
     struct Assign {
@@ -133,17 +160,17 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
     struct Module {
       using Ports = std::vector<naja::verilog::Port>;
       using Nets = std::vector<naja::verilog::Net>;
-      using Instances = std::vector<Instance>;
+      using Instances = std::vector<Instance*>;
       using Assigns = std::vector<Assign>;
       using DefParameterAssignment = std::pair<naja::verilog::Identifiers, naja::verilog::ConstantExpression>;
       using DefParameterAssignments = std::vector<DefParameterAssignment>; 
-      naja::verilog::Identifier       identifier_                           {};
-      Ports                           ports_                                {};
-      Nets                            nets_                                 {};
-      Assigns                         assigns_                              {};
-      Instances                       instances_                            {};
-      Instance::ParameterAssignments  currentInstanceParameterAssignments_  {};
-      DefParameterAssignments         defParameterAssignments_              {};
+      naja::verilog::Identifier             identifier_                           {};
+      Ports                                 ports_                                {};
+      Nets                                  nets_                                 {};
+      Assigns                               assigns_                              {};
+      Instances                             instances_                            {};
+      ModuleInstance::ParameterAssignments  currentInstanceParameterAssignments_  {};
+      DefParameterAssignments               defParameterAssignments_              {};
 
       Module(const naja::verilog::Identifier& identifier):
         identifier_(identifier)

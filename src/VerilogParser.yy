@@ -145,6 +145,9 @@ static naja::verilog::Number generateNumber(
 %token<std::string> CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK
 %token<std::string> SIGN_TK
 
+//%left '[' ']'
+//%nonassoc LOWER_THAN_RANGE
+
 %type<naja::verilog::Identifier> identifier;
 //no support for XMRs for the moment
 %type<naja::verilog::Identifier> hierarchical_net_identifier;
@@ -520,23 +523,30 @@ list_of_attribute_instance.opt: %empty | list_of_attribute_instance;
 
 name_of_gate_instance.opt: %empty { $$ = naja::verilog::Identifier(); } | identifier { $$ = $1; }
 
-input_terminal: hierarchical_net_identifier constant_range_expression.opt {
-  //constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+input_terminal: expression {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   //constructor->addInputTerminal(naja::verilog::RangeIdentifier($1, $2));
 }
 
-output_terminal: hierarchical_net_identifier constant_range_expression.opt {
-  //constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+output_terminal: net_lvalue {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   //constructor->addOutputTerminal(naja::verilog::RangeIdentifier($1, $2));
 }
 
-list_of_output_terminals: output_terminal | list_of_output_terminals ',' output_terminal;
+//list_of_output_terminals: output_terminal | list_of_output_terminals ',' output_terminal;
 
 list_of_input_terminals: input_terminal | list_of_input_terminals ',' input_terminal;
 
-n_input_gate_instance: name_of_gate_instance.opt '(' output_terminal ',' list_of_input_terminals ')' ;
+n_input_gate_instance: name_of_gate_instance.opt {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addInstance(std::move($1));
+} '(' output_terminal ',' list_of_input_terminals ')' ;
 
-n_output_gate_instance: name_of_gate_instance.opt '(' list_of_output_terminals ',' input_terminal ')' ;
+n_output_gate_instance: name_of_gate_instance.opt {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addInstance(std::move($1));
+} '(' output_terminal ',' input_terminal ')' ;
+//} '(' list_of_output_terminals ',' input_terminal ')' ;
 
 list_of_n_output_gate_instances:
 n_output_gate_instance | list_of_n_output_gate_instances ',' n_output_gate_instance ;
@@ -567,13 +577,13 @@ gate_instantiation:
   }
   ';'
 | n_output_gatetype {
-    constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-    constructor->startGateInstantiation($1);
-  } list_of_n_output_gate_instances {
-    constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-    constructor->endGateInstantiation();
-  }
-  ';'
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->startGateInstantiation($1);
+} list_of_n_output_gate_instances {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->endGateInstantiation();
+}
+';'
 
 %%
 

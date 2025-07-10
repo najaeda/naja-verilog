@@ -77,17 +77,27 @@ void VerilogConstructorTest::endInstantiation() {
   }
   if (not inFirstPass()) {
     std::cerr << "Finish Instantiation of: " << currentModelName_ << std::endl;
-    Instance& instance = currentModule_->instances_.back();
-    instance.parameterAssignments_.swap(currentModule_->currentInstanceParameterAssignments_);
+    ModuleInstance* instance =
+      dynamic_cast<VerilogConstructorTest::ModuleInstance*>(currentModule_->instances_.back());
+    assert(instance);
+    instance->parameterAssignments_.swap(currentModule_->currentInstanceParameterAssignments_);
     currentModelName_ = std::string();
   }
 }
 
 void VerilogConstructorTest::addInstance(const naja::verilog::Identifier& instanceID) {
   if (not inFirstPass()) {
-    std::cerr << "Add instance: " << instanceID.getString() << std::endl;
-    auto instance = Instance(currentModelName_, instanceID.getString());
-    instance.addAttributes(nextObjectAttributes_);
+    Instance* instance = nullptr;
+    if (currentGateType_ == naja::verilog::GateType::Unknown) {
+      assert(!currentModelName_.empty());
+      std::cerr << "Add instance: " << instanceID.getString() << std::endl;
+      instance = new ModuleInstance(currentModelName_, instanceID.getString());
+    } else {
+      assert(currentModelName_.empty());
+      std::cerr << "Add gate instance model: " << currentGateType_.getString() << std::endl;
+      instance = new GateInstance(currentGateType_, instanceID.getString());
+    }
+    instance->addAttributes(nextObjectAttributes_);
     currentModule_->instances_.push_back(instance);
   }
   nextObjectAttributes_.clear();
@@ -99,8 +109,10 @@ void VerilogConstructorTest::addInstanceConnection(
   if (not inFirstPass()) {
     std::cerr << "Add instance connection: "
       << port.getString() << " " << expression.getString() <<  std::endl;
-    Instance& instance = currentModule_->instances_.back();
-    instance.connections_.push_back(InstanceConnection(port.name_, expression));
+    Instance* instance = currentModule_->instances_.back();
+    ModuleInstance* moduleInstance = dynamic_cast<ModuleInstance*>(instance);
+    assert(moduleInstance);
+    moduleInstance->connections_.push_back(InstanceConnection(port, expression));
   }
 }
 
@@ -110,8 +122,16 @@ void VerilogConstructorTest::addOrderedInstanceConnection(
   if (not inFirstPass()) {
     std::cerr << "Add ordered instance connection: "
       << portIndex << " " << expression.getString() <<  std::endl;
-    Instance& instance = currentModule_->instances_.back();
-    instance.orderedConnections_.push_back(OrderedInstanceConnection(portIndex, expression));
+    Instance* instance = currentModule_->instances_.back();
+    instance->orderedConnections_.push_back(OrderedInstanceConnection(portIndex, expression));
+  }
+}
+
+void VerilogConstructorTest::startGateInstantiation(
+  const naja::verilog::GateType& type) {
+  if (not inFirstPass()) {
+    std::cerr << "Start Gate Instantiation: " << type.getString() << std::endl;
+    currentGateType_ = type;
   }
 }
 

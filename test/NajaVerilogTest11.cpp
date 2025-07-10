@@ -40,13 +40,14 @@ TEST(NajaVerilogTest11, test) {
   EXPECT_TRUE(test->nets_.empty());
   EXPECT_TRUE(test->assigns_.empty());
   EXPECT_EQ(1, test->instances_.size());
-  auto instance = test->instances_[0];
-  EXPECT_EQ("ins", instance.identifier_.name_);
-  EXPECT_EQ("MOD", instance.model_.name_);
-  EXPECT_EQ(2, instance.parameterAssignments_.size());
+  auto instance = dynamic_cast<VerilogConstructorTest::ModuleInstance*>(test->instances_[0]);
+  EXPECT_NE(nullptr, instance);
+  EXPECT_EQ("ins", instance->identifier_.name_);
+  EXPECT_EQ("MOD", instance->model_.name_);
+  EXPECT_EQ(2, instance->parameterAssignments_.size());
   using Parameters = std::vector<std::pair<std::string, std::string>>;
   Parameters parameters;
-  for (const auto& [parameter, value]: instance.parameterAssignments_) {
+  for (const auto& [parameter, value]: instance->parameterAssignments_) {
     parameters.push_back({parameter, value});
   }
   EXPECT_EQ("elem10", parameters[0].first);

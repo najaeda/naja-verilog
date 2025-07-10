@@ -27,7 +27,16 @@ TEST(NajaVerilogTest16, test) {
   ASSERT_EQ(1, constructor.modules_.size());
   auto fa = constructor.modules_[0];
   EXPECT_EQ("FA", fa->identifier_.getString());
+  EXPECT_TRUE(fa->instances_.empty());
 
   constructor.setFirstPass(false);
   constructor.parse(test16Path);
+
+  EXPECT_EQ(8, fa->instances_.size());
+  auto and0 = dynamic_cast<VerilogConstructorTest::GateInstance*>(fa->instances_[0]);
+  ASSERT_NE(nullptr, and0);
+  EXPECT_FALSE(and0->identifier_.empty());
+  EXPECT_FALSE(and0->isAnonymous());
+  EXPECT_EQ("and0", and0->identifier_.getString());
+  EXPECT_EQ(naja::verilog::GateType::And, and0->type_);
 }

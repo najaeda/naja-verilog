@@ -32,17 +32,18 @@ TEST(NajaVerilogTest7, test) {
   constructor.parse(test7Path);
 
   ASSERT_EQ(1, constructor.modules_[0]->instances_.size());
-  auto instance = constructor.modules_[0]->instances_[0];
-  EXPECT_EQ("ins", instance.identifier_.name_);
-  EXPECT_EQ("mod", instance.model_.name_);
-  ASSERT_EQ(3, instance.parameterAssignments_.size());
-  auto paramIt = instance.parameterAssignments_.find("PARAM0");
-  ASSERT_TRUE(paramIt != instance.parameterAssignments_.end());
+  auto instance = dynamic_cast<VerilogConstructorTest::ModuleInstance*>(constructor.modules_[0]->instances_[0]);
+  ASSERT_NE(nullptr, instance);
+  EXPECT_EQ("ins", instance->identifier_.name_);
+  EXPECT_EQ("mod", instance->model_.name_);
+  ASSERT_EQ(3, instance->parameterAssignments_.size());
+  auto paramIt = instance->parameterAssignments_.find("PARAM0");
+  ASSERT_TRUE(paramIt != instance->parameterAssignments_.end());
   EXPECT_TRUE(paramIt->second.empty());
-  paramIt = instance.parameterAssignments_.find("PARAM1");
-  ASSERT_TRUE(paramIt != instance.parameterAssignments_.end());
+  paramIt = instance->parameterAssignments_.find("PARAM1");
+  ASSERT_TRUE(paramIt != instance->parameterAssignments_.end());
   EXPECT_EQ("A", paramIt->second);
-  paramIt = instance.parameterAssignments_.find("PARAM2");
-  ASSERT_TRUE(paramIt != instance.parameterAssignments_.end());
+  paramIt = instance->parameterAssignments_.find("PARAM2");
+  ASSERT_TRUE(paramIt != instance->parameterAssignments_.end());
   EXPECT_EQ("VALUE", paramIt->second);
 }

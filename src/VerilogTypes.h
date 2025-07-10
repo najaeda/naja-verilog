@@ -44,6 +44,7 @@ struct Identifier {
   }
   std::string getString() const;
   std::string getDescription() const;
+  bool empty() const { return name_.empty(); }
 
   std::string name_;
   bool        escaped_  {false};
@@ -250,6 +251,8 @@ struct ConstantExpression {
   Value       value_  {};
 };
 
+// Represents a Verilog attribute, which is a name and an expression
+// Example: `(* synthesis, keep *)` or `(* syn_keep = 1 *)
 struct Attribute {
   Attribute() = default;
   Attribute(const Attribute&) = default;
