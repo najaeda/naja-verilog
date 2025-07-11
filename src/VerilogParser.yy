@@ -546,6 +546,7 @@ n_input_gate_instance: name_of_gate_instance.opt {
 n_output_gate_instance: name_of_gate_instance.opt {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
   constructor->addGateInstance(std::move($1));
+  portIndex = 0;
 } '(' output_terminal ',' input_terminal ')' ;
 //} '(' list_of_output_terminals ',' input_terminal ')' ;
 

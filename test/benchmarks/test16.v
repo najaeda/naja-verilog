@@ -23,7 +23,9 @@ module FA(A, B, C, OUT, COUT);
 
    //OUT = ~(line[2] ^ B)
    xor xor6 (line[5], line[2], B);
-   not not7 (OUT, line[5]);
+   not not7 (line[6], line[5]);
+
+   buf buf8 (OUT, line[6]);
    
    //assign {COUT, OUT} = A+B+C;
 endmodule

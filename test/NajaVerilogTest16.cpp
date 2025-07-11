@@ -32,7 +32,7 @@ TEST(NajaVerilogTest16, test) {
   constructor.setFirstPass(false);
   constructor.parse(test16Path);
 
-  EXPECT_EQ(8, fa->instances_.size());
+  EXPECT_EQ(9, fa->instances_.size());
   auto and0 = dynamic_cast<VerilogConstructorTest::GateInstance*>(fa->instances_[0]);
   ASSERT_NE(nullptr, and0);
   EXPECT_FALSE(and0->identifier_.empty());
@@ -44,6 +44,26 @@ TEST(NajaVerilogTest16, test) {
   EXPECT_EQ(
     VerilogConstructorTest::OrderedInstanceConnection::Type::RANGEIDENTIFIERS,
     and0->orderedConnections_[0].value_.index()
+  );
+  auto rangeIdentifiers = std::get<naja::verilog::RangeIdentifiers>(and0->orderedConnections_[0].value_);
+  EXPECT_EQ(1, rangeIdentifiers.size());
+  EXPECT_FALSE(rangeIdentifiers[0].identifier_.empty());
+  EXPECT_TRUE(rangeIdentifiers[0].range_.valid_);
+  EXPECT_TRUE(rangeIdentifiers[0].range_.singleValue_);
+  EXPECT_EQ(0, rangeIdentifiers[0].range_.msb_);
+  EXPECT_EQ("line[0]", rangeIdentifiers[0].getString());
+
+  auto xor1 = dynamic_cast<VerilogConstructorTest::GateInstance*>(fa->instances_[1]);
+  ASSERT_NE(nullptr, xor1);
+  EXPECT_FALSE(xor1->identifier_.empty());
+  EXPECT_FALSE(xor1->isAnonymous());
+  EXPECT_EQ("xor1", xor1->identifier_.getString());
+  EXPECT_EQ(naja::verilog::GateType::Xor, xor1->type_);
+  EXPECT_EQ(3, xor1->orderedConnections_.size());
+  EXPECT_EQ(0, xor1->orderedConnections_[0].portIndex_);
+  EXPECT_EQ(
+    VerilogConstructorTest::OrderedInstanceConnection::Type::RANGEIDENTIFIERS,
+    xor1->orderedConnections_[0].value_.index()
   );
   //EXPECT_EQ("a", and0->orderedConnections_[0].expression_.getString());
   //EXPECT_EQ(1, and0->orderedConnections_[1].portIndex_);
