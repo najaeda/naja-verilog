@@ -123,6 +123,7 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
 
     struct Instance: public ObjectWithAttributes {
       using OrderedConnections = std::vector<OrderedInstanceConnection>;
+      virtual ~Instance() = default;
 
       virtual std::string getString() const = 0;
 
@@ -200,6 +201,11 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       Module(const naja::verilog::Identifier& identifier):
         identifier_(identifier)
       {}
+      ~Module() {
+        for (auto instance : instances_) {
+          delete instance;
+        }
+      }
     };
 
     using Modules = std::vector<Module*>;
