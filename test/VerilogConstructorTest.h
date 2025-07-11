@@ -32,6 +32,13 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       const naja::verilog::Expression& expression) override;
     void endInstantiation() override;
     void startGateInstantiation(const naja::verilog::GateType& type) override;
+    void addGateInstance(const naja::verilog::Identifier& name) override;
+    void addGateOutputInstanceConnection(
+      size_t portIndex,
+      const naja::verilog::RangeIdentifiers identifiers) override;
+    void addGateInputInstanceConnection(
+      size_t portIndex,
+      const naja::verilog::Expression& expression) override;
     void endGateInstantiation() override;
     void addNet(const naja::verilog::Net& net) override;
     void addAssign(
@@ -44,24 +51,42 @@ class VerilogConstructorTest: public naja::verilog::VerilogConstructor {
       const naja::verilog::Identifier& attributeName,
       const naja::verilog::ConstantExpression& expression) override;
     struct OrderedInstanceConnection {
+      enum Type { RANGEIDENTIFIERS=0, EXPRESSION=1 };
+      using Value = std::variant<
+        naja::verilog::RangeIdentifiers,
+        naja::verilog::Expression>;
       OrderedInstanceConnection() = default;
       OrderedInstanceConnection(const OrderedInstanceConnection&) = default;
       OrderedInstanceConnection(
         const size_t portIndex,
         const naja::verilog::Expression& expression):
         portIndex_(portIndex),
-        expression_(expression)
+        value_(expression)
+      {}
+
+      OrderedInstanceConnection(
+        const size_t portIndex,
+        const naja::verilog::RangeIdentifiers& identifiers):
+        portIndex_(portIndex),
+        value_(identifiers)
       {}
 
       std::string getString() const {
         std::ostringstream stream;
         stream << "OrderedInstanceConnection - port: "
-          << portIndex_ << " : " << expression_.getString();
+          << portIndex_ << " : ";
+        switch (value_.index()) {
+          case EXPRESSION:
+            stream << std::get<naja::verilog::Expression>(value_).getString();
+            break;
+          case RANGEIDENTIFIERS:
+            break;
+        }
         return stream.str();
       }
       
-      size_t                    portIndex_  {0};
-      naja::verilog::Expression expression_ {};
+      size_t  portIndex_  {0};
+      Value   value_ {};
     };
 
     using Attributes = std::list<naja::verilog::Attribute>;

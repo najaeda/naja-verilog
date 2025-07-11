@@ -39,4 +39,13 @@ TEST(NajaVerilogTest16, test) {
   EXPECT_FALSE(and0->isAnonymous());
   EXPECT_EQ("and0", and0->identifier_.getString());
   EXPECT_EQ(naja::verilog::GateType::And, and0->type_);
+  EXPECT_EQ(3, and0->orderedConnections_.size());
+  EXPECT_EQ(0, and0->orderedConnections_[0].portIndex_);
+  EXPECT_EQ(
+    VerilogConstructorTest::OrderedInstanceConnection::Type::RANGEIDENTIFIERS,
+    and0->orderedConnections_[0].value_.index()
+  );
+  //EXPECT_EQ("a", and0->orderedConnections_[0].expression_.getString());
+  //EXPECT_EQ(1, and0->orderedConnections_[1].portIndex_);
+  //EXPECT_EQ("b", and0->orderedConnections_[1].expression_.getString());
 }

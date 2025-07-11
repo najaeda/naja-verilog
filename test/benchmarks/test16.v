@@ -16,7 +16,7 @@ module FA(A, B, C, OUT, COUT);
 
    //line[4] = B & ~(line[2])
    not not3 (line[3], line[2]);
-   and and4 (line[4], line[3]);
+   and and4 (line[4], line[3], B);
 
    //COUT = line[4] | line[0]
    or or5 (COUT, line[4], line[0]);

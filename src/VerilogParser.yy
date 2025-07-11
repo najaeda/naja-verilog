@@ -525,12 +525,12 @@ name_of_gate_instance.opt: %empty { $$ = naja::verilog::Identifier(); } | identi
 
 input_terminal: expression {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  //constructor->addInputTerminal(naja::verilog::RangeIdentifier($1, $2));
+  constructor->addGateInputInstanceConnection(portIndex++, $1);
 }
 
 output_terminal: net_lvalue {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  //constructor->addOutputTerminal(naja::verilog::RangeIdentifier($1, $2));
+  constructor->addGateOutputInstanceConnection(portIndex++, $1);
 }
 
 //list_of_output_terminals: output_terminal | list_of_output_terminals ',' output_terminal;
@@ -539,12 +539,13 @@ list_of_input_terminals: input_terminal | list_of_input_terminals ',' input_term
 
 n_input_gate_instance: name_of_gate_instance.opt {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  constructor->addInstance(std::move($1));
+  constructor->addGateInstance(std::move($1));
+  portIndex = 0;
 } '(' output_terminal ',' list_of_input_terminals ')' ;
 
 n_output_gate_instance: name_of_gate_instance.opt {
   constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-  constructor->addInstance(std::move($1));
+  constructor->addGateInstance(std::move($1));
 } '(' output_terminal ',' input_terminal ')' ;
 //} '(' list_of_output_terminals ',' input_terminal ')' ;
 

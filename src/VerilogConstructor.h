@@ -61,10 +61,13 @@ class VerilogConstructor {
     virtual void startInstantiation(const Identifier& model) {}
     virtual void addInstanceConnection(const Identifier& port, const Expression& expression) {}
     virtual void addOrderedInstanceConnection(size_t portIndex, const Expression& expression) {}
+    virtual void addInstance(const Identifier& instance) {}
     virtual void endInstantiation() {}
     virtual void startGateInstantiation(const GateType& type) {}
+    virtual void addGateInstance(const Identifier& id) {}
+    virtual void addGateOutputInstanceConnection(size_t portIndex, const RangeIdentifiers identifiers) {}
+    virtual void addGateInputInstanceConnection(size_t portIndex, const Expression& expression) {}
     virtual void endGateInstantiation() {}
-    virtual void addInstance(const Identifier& instance) {}
     virtual void addParameterAssignment(const Identifier& parameter, const Expression& expression) {}
     virtual void addDefParameterAssignment(
       const Identifiers& hierarchicalParameter,
