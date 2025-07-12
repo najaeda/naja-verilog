@@ -144,6 +144,8 @@ struct RangeIdentifier {
 
 using RangeIdentifiers = std::vector<RangeIdentifier>;
 
+std::string getRangeIdentifiersString(const RangeIdentifiers& rangeIdentifiers);
+
 struct BasedNumber {
   BasedNumber() = default;
   BasedNumber(bool isSigned, char base, const std::string& digits) {
