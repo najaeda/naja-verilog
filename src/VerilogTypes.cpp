@@ -112,6 +112,7 @@ std::string RangeIdentifier::getDescription() const {
 }
 //LCOV_EXCL_STOP
 
+//LCOV_EXCL_START
 std::string getRangeIdentifiersString(const naja::verilog::RangeIdentifiers& rangeIdentifiers) {
   std::string result;
   for (size_t i = 0; i < rangeIdentifiers.size(); ++i) {
@@ -123,6 +124,7 @@ std::string getRangeIdentifiersString(const naja::verilog::RangeIdentifiers& ran
   }
   return result;
 }
+//LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
 std::string BasedNumber::getBaseString(Base base) {
