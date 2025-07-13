@@ -129,12 +129,24 @@ static naja::verilog::Number generateNumber(
 %token ASSIGN_KW
 %token DEFPARAM_KW
 %token END 0 "end of file"
+%token AND_KW
+%token NAND_KW
+%token OR_KW
+%token NOR_KW
+%token XOR_KW
+%token XNOR_KW
+%token BUF_KW
+%token NOT_KW
+//%token END 0 "end of file"
 
 %token<std::string> IDENTIFIER_TK
 %token<std::string> ESCAPED_IDENTIFIER_TK
 %token<std::string> STRING_TK
 %token<std::string> CONSTVAL_TK BASE_TK BASED_CONSTVAL_TK
 %token<std::string> SIGN_TK
+
+//%left '[' ']'
+//%nonassoc LOWER_THAN_RANGE
 
 %type<naja::verilog::Identifier> identifier;
 //no support for XMRs for the moment
@@ -158,6 +170,7 @@ static naja::verilog::Number generateNumber(
 %type<naja::verilog::RangeIdentifiers> list_of_net_lvalues;
 %type<naja::verilog::Identifier> module_instance;
 %type<naja::verilog::Identifier> port_identifier;
+%type<naja::verilog::Identifier> name_of_gate_instance.opt;
 
 %type<naja::verilog::Number> number;
 %type<naja::verilog::ConstantExpression> constant_primary;
@@ -173,6 +186,9 @@ static naja::verilog::Number generateNumber(
 %type<naja::verilog::Expression::Expressions> list_of_expressions; 
 %type<naja::verilog::ConstantExpression> attr_spec_value;
 %type<naja::verilog::Attribute> attr_spec;
+
+%type<naja::verilog::GateType> n_input_gatetype;
+%type<naja::verilog::GateType> n_output_gatetype;
 
 %locations 
 %start source_text
@@ -302,6 +318,7 @@ module_or_generate_item:
 | list_of_attribute_instance.opt module_instantiation
 | list_of_attribute_instance.opt parameter_override
 | list_of_attribute_instance.opt continuous_assign
+| list_of_attribute_instance.opt gate_instantiation
 ; 
 
 module_or_generate_item_declaration: net_declaration;
@@ -503,6 +520,72 @@ attribute_instance: '(' '*' list_of_attr_spec '*' ')';
 list_of_attribute_instance: attribute_instance | list_of_attribute_instance attribute_instance;
 
 list_of_attribute_instance.opt: %empty | list_of_attribute_instance;
+
+name_of_gate_instance.opt: %empty { $$ = naja::verilog::Identifier(); } | identifier { $$ = $1; }
+
+input_terminal: expression {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addGateInputInstanceConnection(portIndex++, $1);
+}
+
+output_terminal: net_lvalue {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addGateOutputInstanceConnection(portIndex++, $1);
+}
+
+//list_of_output_terminals: output_terminal | list_of_output_terminals ',' output_terminal;
+
+list_of_input_terminals: input_terminal | list_of_input_terminals ',' input_terminal;
+
+n_input_gate_instance: name_of_gate_instance.opt {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addGateInstance(std::move($1));
+  portIndex = 0;
+} '(' output_terminal ',' list_of_input_terminals ')' ;
+
+n_output_gate_instance: name_of_gate_instance.opt {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->addGateInstance(std::move($1));
+  portIndex = 0;
+} '(' output_terminal ',' input_terminal ')' ;
+//} '(' list_of_output_terminals ',' input_terminal ')' ;
+
+list_of_n_output_gate_instances:
+n_output_gate_instance | list_of_n_output_gate_instances ',' n_output_gate_instance ;
+
+list_of_n_input_gate_instances:
+n_input_gate_instance | list_of_n_input_gate_instances ',' n_input_gate_instance ;
+
+n_input_gatetype:
+  AND_KW  { $$ = naja::verilog::GateType::And; }
+| NAND_KW { $$ = naja::verilog::GateType::Nand; }
+| OR_KW   { $$ = naja::verilog::GateType::Or; }
+| NOR_KW  { $$ = naja::verilog::GateType::Nor; }
+| XOR_KW  { $$ = naja::verilog::GateType::Xor; }
+| XNOR_KW { $$ = naja::verilog::GateType::Xnor; }
+
+n_output_gatetype: 
+  BUF_KW  { $$ = naja::verilog::GateType::Buf; }
+| NOT_KW  { $$ = naja::verilog::GateType::Not; }
+
+//A.3.1
+gate_instantiation:
+  n_input_gatetype {
+    constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+    constructor->startGateInstantiation($1);
+  } list_of_n_input_gate_instances {
+    constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+    constructor->endGateInstantiation();
+  }
+  ';'
+| n_output_gatetype {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->startGateInstantiation($1);
+} list_of_n_output_gate_instances {
+  constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
+  constructor->endGateInstantiation();
+}
+';'
 
 %%
 

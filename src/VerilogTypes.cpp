@@ -113,6 +113,20 @@ std::string RangeIdentifier::getDescription() const {
 //LCOV_EXCL_STOP
 
 //LCOV_EXCL_START
+std::string getRangeIdentifiersString(const naja::verilog::RangeIdentifiers& rangeIdentifiers) {
+  std::string result;
+  for (size_t i = 0; i < rangeIdentifiers.size(); ++i) {
+    const auto& identifier = rangeIdentifiers[i];
+    result += identifier.getString();
+    if (i < rangeIdentifiers.size() - 1) {
+      result += ", ";
+    }
+  }
+  return result;
+}
+//LCOV_EXCL_STOP
+
+//LCOV_EXCL_START
 std::string BasedNumber::getBaseString(Base base) {
   switch (base) {
     case BINARY:
@@ -293,6 +307,27 @@ std::string ConstantExpression::getDescription() const {
   }
   return stream.str();
 } 
+//LCOV_EXCL_STOP
+
+GateType::GateType(const GateTypeEnum& gateTypeEnum):
+  gateTypeEnum_(gateTypeEnum)
+{}
+
+//LCOV_EXCL_START
+std::string GateType::getString() const {
+  switch (gateTypeEnum_) {
+    case GateType::And: return "And";
+    case GateType::Nand: return "Nand";
+    case GateType::Or: return "Or";
+    case GateType::Nor: return "Nor";
+    case GateType::Xor: return "Xor";
+    case GateType::Xnor: return "Xnor";
+    case GateType::Buf: return "Buf";
+    case GateType::Not: return "Not";
+    case GateType::Unknown: return "Unknown";
+  }
+  return "Error";
+}
 //LCOV_EXCL_STOP
 
 }} // namespace verilog // namespace naja

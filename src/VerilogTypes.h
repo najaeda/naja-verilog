@@ -44,6 +44,7 @@ struct Identifier {
   }
   std::string getString() const;
   std::string getDescription() const;
+  bool empty() const { return name_.empty(); }
 
   std::string name_;
   bool        escaped_  {false};
@@ -142,6 +143,8 @@ struct RangeIdentifier {
 };
 
 using RangeIdentifiers = std::vector<RangeIdentifier>;
+
+std::string getRangeIdentifiersString(const RangeIdentifiers& rangeIdentifiers);
 
 struct BasedNumber {
   BasedNumber() = default;
@@ -250,6 +253,8 @@ struct ConstantExpression {
   Value       value_  {};
 };
 
+// Represents a Verilog attribute, which is a name and an expression
+// Example: `(* synthesis, keep *)` or `(* syn_keep = 1 *)
 struct Attribute {
   Attribute() = default;
   Attribute(const Attribute&) = default;
@@ -262,6 +267,22 @@ struct Attribute {
 
   naja::verilog::Identifier name_       {};
   ConstantExpression        expression_ {};
+};
+
+struct GateType {
+  public:
+    enum GateTypeEnum {
+      And, Nand, Or, Nor, Xor, Xnor,Buf, Not, Unknown
+    };
+    GateType() = default;
+    GateType(const GateTypeEnum& gateTypeEnum);
+    GateType(const GateType&) = default;
+    GateType(GateType&&) = default;
+    GateType& operator=(const GateType&) = default;
+    operator const GateTypeEnum&() const {return gateTypeEnum_;}
+    std::string getString() const;
+    private:
+      GateTypeEnum  gateTypeEnum_ { Unknown };
 };
 
 }} // namespace verilog // namespace naja

@@ -104,6 +104,14 @@ supply0     { return token::SUPPLY0_KW; }
 supply1     { return token::SUPPLY1_KW; }
 assign      { return token::ASSIGN_KW; }
 defparam    { return token::DEFPARAM_KW; }
+and         { return token::AND_KW; }
+nand        { return token::NAND_KW; }
+or          { return token::OR_KW; }
+nor         { return token::NOR_KW; }
+xor         { return token::XOR_KW; }
+xnor        { return token::XNOR_KW; }
+buf         { return token::BUF_KW; }
+not         { return token::NOT_KW; }
 
 {IDENTIFIER}          { yylval->build<std::string>( yytext ); return token::IDENTIFIER_TK; }
 {ESCAPED_IDENTIFIER}  {

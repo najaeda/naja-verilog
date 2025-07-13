@@ -41,23 +41,26 @@ TEST(NajaVerilogTest12, test) {
   ASSERT_EQ(2, test->nets_.size());
   ASSERT_EQ(3, test->instances_.size());
 
-  auto ins1 = test->instances_[0];
-  EXPECT_EQ("ins1", ins1.identifier_.name_);
-  EXPECT_FALSE(ins1.identifier_.escaped_);
-  EXPECT_EQ("CFG1", ins1.model_.name_);
-  EXPECT_TRUE(ins1.parameterAssignments_.empty());
+  auto ins1 = dynamic_cast<VerilogConstructorTest::ModuleInstance*>(test->instances_[0]);
+  EXPECT_NE(nullptr, ins1);
+  EXPECT_EQ("ins1", ins1->identifier_.name_);
+  EXPECT_FALSE(ins1->identifier_.escaped_);
+  EXPECT_EQ("CFG1", ins1->model_.name_);
+  EXPECT_TRUE(ins1->parameterAssignments_.empty());
 
-  auto mem = test->instances_[1];
-  EXPECT_EQ("mem_regfile_mem_regfile_0_0", mem.identifier_.name_);
-  EXPECT_FALSE(mem.identifier_.escaped_);
-  EXPECT_EQ("RAM64x18", mem.model_.name_);
-  EXPECT_TRUE(mem.parameterAssignments_.empty());
+  auto mem = dynamic_cast<VerilogConstructorTest::ModuleInstance*>(test->instances_[1]);
+  EXPECT_NE(nullptr, mem);
+  EXPECT_EQ("mem_regfile_mem_regfile_0_0", mem->identifier_.name_);
+  EXPECT_FALSE(mem->identifier_.escaped_);
+  EXPECT_EQ("RAM64x18", mem->model_.name_);
+  EXPECT_TRUE(mem->parameterAssignments_.empty());
 
-  auto ins2 = test->instances_[2];
-  EXPECT_EQ("$$ins2@@", ins2.identifier_.name_);
-  EXPECT_FALSE(ins2.identifier_.escaped_);
-  EXPECT_EQ("CFG1", ins2.model_.name_);
-  EXPECT_TRUE(ins2.parameterAssignments_.empty());
+  auto ins2 = dynamic_cast<VerilogConstructorTest::ModuleInstance*>(test->instances_[2]);
+  EXPECT_NE(nullptr, ins2);
+  EXPECT_EQ("$$ins2@@", ins2->identifier_.name_);
+  EXPECT_FALSE(ins2->identifier_.escaped_);
+  EXPECT_EQ("CFG1", ins2->model_.name_);
+  EXPECT_TRUE(ins2->parameterAssignments_.empty());
 
   EXPECT_EQ(3, test->defParameterAssignments_.size());
   auto def0Path = test->defParameterAssignments_[0].first;
