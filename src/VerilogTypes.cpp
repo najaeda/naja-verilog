@@ -6,6 +6,7 @@
 #include "VerilogException.h"
 
 #include <sstream>
+#include <cmath>
 
 namespace naja { namespace verilog {
 
