@@ -150,6 +150,7 @@ size_t BasedNumber::getSize() const {
         }
     }
   }
+  return 0; //LCOV_EXCL_LINE
 }
 
 //LCOV_EXCL_START
