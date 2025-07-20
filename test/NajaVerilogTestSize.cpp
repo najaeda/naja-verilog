@@ -11,11 +11,15 @@ TEST(NajaVerilogTestSize, test) {
   EXPECT_EQ("8'sb10101010", basedNumber.getString());
   EXPECT_EQ(8, basedNumber.getSize());
 
+  naja::verilog::Number number("8", true, 'b', "10101010");
+  EXPECT_EQ("8'sb10101010", number.getString());
+  EXPECT_EQ(8, number.getSize());
+
   naja::verilog::BasedNumber basedNumberNoSize(true, 'h', "FF");
   EXPECT_EQ("'shFF", basedNumberNoSize.getString());
   EXPECT_EQ(8, basedNumberNoSize.getSize());
 
-  naja::verilog::Number number("42");
-  EXPECT_EQ(42, number.getInt());
-  EXPECT_EQ(32, number.getSize()); // Assuming int is 32 bits
+  naja::verilog::Number number42("42");
+  EXPECT_EQ(42, number42.getInt());
+  EXPECT_EQ(32, number42.getSize()); // Assuming int is 32 bits
 }

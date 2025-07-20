@@ -203,6 +203,16 @@ std::string BasedNumber::getDescription() const {
 }
 //LCOV_EXCL_STOP
 
+size_t Number::getSize() const {
+  switch (value_.index()) {
+    case Type::BASED:
+      return std::get<Type::BASED>(value_).getSize();
+    case Type::UNSIGNED:
+      return sizeof(std::get<Type::UNSIGNED>(value_)) * 8; // size in bits
+  }
+  return 0; //LCOV_EXCL_LINE
+}
+
 int Number::getInt() const {
   switch (value_.index()) {
     case Type::UNSIGNED: {

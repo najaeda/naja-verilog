@@ -200,16 +200,7 @@ struct Number {
   }
   std::string getString() const;
   std::string getDescription() const;
-  size_t getSize() const {
-    switch (value_.index()) {
-      case Type::BASED:
-        return std::get<Type::BASED>(value_).hasSize_ ? std::get<Type::BASED>(value_).size_ : 0;
-      case Type::UNSIGNED:
-        return sizeof(std::get<Type::UNSIGNED>(value_)) * 8; // size in bits
-    }
-    return 0;
-  }
-
+  size_t getSize() const;
   int getInt() const;
   enum Type { BASED, UNSIGNED };
   using Value = std::variant<BasedNumber, unsigned>;
