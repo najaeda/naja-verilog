@@ -126,6 +126,31 @@ std::string getRangeIdentifiersString(const naja::verilog::RangeIdentifiers& ran
 }
 //LCOV_EXCL_STOP
 
+size_t BasedNumber::getSize() const {
+  if (hasSize_) {
+    return size_;
+  } else {
+    //return size depending on the base and the number of digits
+    switch (base_) {
+      case BINARY:
+        return digits_.size();
+      case OCTAL:
+        return digits_.size() * 3; // 1 octal digit = 3 binary digits
+      case HEX:
+        return digits_.size() * 4; // 1 hex digit = 4 binary digits
+      case DECIMAL:
+        // For decimal, size in bits depends on whether the number is signed or not.
+        // If signed, need 1 bit for sign + bits for value.
+        // Use log2(10^n) ≈ n*3.32 bits for n decimal digits.
+        if (signed_) {
+          return static_cast<size_t>(std::ceil(digits_.size() * 3.32)) + 1;
+        } else {
+          return static_cast<size_t>(std::ceil(digits_.size() * 3.32));
+        }
+    }
+  }
+}
+
 //LCOV_EXCL_START
 std::string BasedNumber::getBaseString(Base base) {
   switch (base) {
@@ -186,6 +211,34 @@ int Number::getInt() const {
     default: {
       throw VerilogException("Unsupported number");
     }
+  }
+  return 0;
+}
+
+size_t Expression::getSize() const {
+  switch (value_.index()) {
+    case Type::RANGEIDENTIFIER: {
+      auto range = std::get<Type::RANGEIDENTIFIER>(value_).range_;
+      if (not range.valid_) {
+        throw VerilogException("RangeIdentifier is not valid");
+      }
+      if (range.singleValue_) {
+        return 1;
+      }
+      if (range.msb_ < range.lsb_) {
+        return range.lsb_ - range.msb_ + 1;
+      } else {
+        return range.msb_ - range.lsb_ + 1;
+      }
+    }
+    case Type::NUMBER: {
+      auto number = std::get<Type::NUMBER>(value_);
+      return number.getSize();
+    }
+    case Type::STRING:
+      return 1;
+    case Type::CONCATENATION:
+      return std::get<Type::CONCATENATION>(value_).expressions_.size();
   }
   return 0;
 }

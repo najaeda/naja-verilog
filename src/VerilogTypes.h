@@ -177,6 +177,7 @@ struct BasedNumber {
   static std::string getBaseString(Base base);
   std::string getString() const;
   std::string getDescription() const;
+  size_t getSize() const;
  
   bool        hasSize_  {false};
   size_t      size_     {0};
@@ -199,6 +200,15 @@ struct Number {
   }
   std::string getString() const;
   std::string getDescription() const;
+  size_t getSize() const {
+    switch (value_.index()) {
+      case Type::BASED:
+        return std::get<Type::BASED>(value_).hasSize_ ? std::get<Type::BASED>(value_).size_ : 0;
+      case Type::UNSIGNED:
+        return sizeof(std::get<Type::UNSIGNED>(value_)) * 8; // size in bits
+    }
+    return 0;
+  }
 
   int getInt() const;
   enum Type { BASED, UNSIGNED };
@@ -225,6 +235,11 @@ struct Expression {
   using Expressions = std::vector<Expression>;
   Expression() = default;
   Expression(const Expression&) = default;
+  /**
+   * @brief Get number of bits in the expression
+   * @return The number of bits
+   */
+  size_t getSize() const;
   std::string getString() const;
   std::string getDescription() const;
 
