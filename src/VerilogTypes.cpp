@@ -140,14 +140,7 @@ size_t BasedNumber::getSize() const {
       case HEX:
         return digits_.size() * 4; // 1 hex digit = 4 binary digits
       case DECIMAL:
-        // For decimal, size in bits depends on whether the number is signed or not.
-        // If signed, need 1 bit for sign + bits for value.
-        // Use log2(10^n) ≈ n*3.32 bits for n decimal digits.
-        if (signed_) {
-          return static_cast<size_t>(std::ceil(digits_.size() * 3.32)) + 1;
-        } else {
-          return static_cast<size_t>(std::ceil(digits_.size() * 3.32));
-        }
+        return signed_ ? 31 : 32; // Assuming 32 bits for signed, 31 bits for unsigned
     }
   }
   return 0; //LCOV_EXCL_LINE
