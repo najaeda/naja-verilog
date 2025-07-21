@@ -177,6 +177,7 @@ struct BasedNumber {
   static std::string getBaseString(Base base);
   std::string getString() const;
   std::string getDescription() const;
+  size_t getSize() const;
  
   bool        hasSize_  {false};
   size_t      size_     {0};
@@ -199,7 +200,7 @@ struct Number {
   }
   std::string getString() const;
   std::string getDescription() const;
-
+  size_t getSize() const;
   int getInt() const;
   enum Type { BASED, UNSIGNED };
   using Value = std::variant<BasedNumber, unsigned>;
@@ -222,9 +223,13 @@ struct Concatenation {
 };
 
 struct Expression {
-  using Expressions = std::vector<Expression>;
   Expression() = default;
   Expression(const Expression&) = default;
+  /**
+   * @brief Get number of bits in the expression
+   * @return The number of bits
+   */
+  size_t getSize() const;
   std::string getString() const;
   std::string getDescription() const;
 

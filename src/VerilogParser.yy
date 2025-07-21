@@ -182,8 +182,8 @@ static naja::verilog::Number generateNumber(
 %type<naja::verilog::Expression> expression.opt;
 %type<naja::verilog::Expression> mintypmax_expression;
 %type<naja::verilog::Expression> mintypmax_expression.opt;
-%type<naja::verilog::Expression::Expressions> concatenation;
-%type<naja::verilog::Expression::Expressions> list_of_expressions; 
+%type<naja::verilog::Concatenation::Expressions> concatenation;
+%type<naja::verilog::Concatenation::Expressions> list_of_expressions; 
 %type<naja::verilog::ConstantExpression> attr_spec_value;
 %type<naja::verilog::Attribute> attr_spec;
 

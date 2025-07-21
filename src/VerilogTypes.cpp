@@ -6,6 +6,7 @@
 #include "VerilogException.h"
 
 #include <sstream>
+#include <cmath>
 
 namespace naja { namespace verilog {
 
@@ -126,6 +127,25 @@ std::string getRangeIdentifiersString(const naja::verilog::RangeIdentifiers& ran
 }
 //LCOV_EXCL_STOP
 
+size_t BasedNumber::getSize() const {
+  if (hasSize_) {
+    return size_;
+  } else {
+    //return size depending on the base and the number of digits
+    switch (base_) {
+      case BINARY:
+        return digits_.size();
+      case OCTAL:
+        return digits_.size() * 3; // 1 octal digit = 3 binary digits
+      case HEX:
+        return digits_.size() * 4; // 1 hex digit = 4 binary digits
+      case DECIMAL:
+        return signed_ ? 31 : 32; // Assuming 32 bits for signed, 31 bits for unsigned
+    }
+  }
+  return 0; //LCOV_EXCL_LINE
+}
+
 //LCOV_EXCL_START
 std::string BasedNumber::getBaseString(Base base) {
   switch (base) {
@@ -177,6 +197,16 @@ std::string BasedNumber::getDescription() const {
 }
 //LCOV_EXCL_STOP
 
+size_t Number::getSize() const {
+  switch (value_.index()) {
+    case Type::BASED:
+      return std::get<Type::BASED>(value_).getSize();
+    case Type::UNSIGNED:
+      return sizeof(std::get<Type::UNSIGNED>(value_)) * 8; // size in bits
+  }
+  return 0; //LCOV_EXCL_LINE
+}
+
 int Number::getInt() const {
   switch (value_.index()) {
     case Type::UNSIGNED: {
@@ -188,6 +218,39 @@ int Number::getInt() const {
     }
   }
   return 0;
+}
+
+size_t Expression::getSize() const {
+  switch (value_.index()) {
+    case Type::RANGEIDENTIFIER: {
+      auto range = std::get<Type::RANGEIDENTIFIER>(value_).range_;
+      if (not range.valid_) {
+        throw VerilogException("RangeIdentifier is not valid");
+      }
+      if (range.singleValue_) {
+        return 1;
+      }
+      if (range.msb_ < range.lsb_) {
+        return range.lsb_ - range.msb_ + 1;
+      } else {
+        return range.msb_ - range.lsb_ + 1;
+      }
+    }
+    case Type::NUMBER: {
+      auto number = std::get<Type::NUMBER>(value_);
+      return number.getSize();
+    }
+    case Type::STRING:
+      throw VerilogException("String expressions do not have a size");
+    case Type::CONCATENATION: {
+      size_t totalSize = 0;
+      for (const auto& expr: std::get<Type::CONCATENATION>(value_).expressions_) {
+        totalSize += expr.getSize();
+      }
+      return totalSize;
+    }
+  }
+  return 0; //LCOV_EXCL_LINE
 }
 
 //LCOV_EXCL_START
