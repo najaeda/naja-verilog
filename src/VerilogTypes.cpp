@@ -250,7 +250,7 @@ size_t Expression::getSize() const {
       return totalSize;
     }
   }
-  return 0;
+  return 0; //LCOV_EXCL_LINE
 }
 
 //LCOV_EXCL_START
