@@ -223,7 +223,6 @@ struct Concatenation {
 };
 
 struct Expression {
-  using Expressions = std::vector<Expression>;
   Expression() = default;
   Expression(const Expression&) = default;
   /**

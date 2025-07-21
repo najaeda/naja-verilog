@@ -241,9 +241,14 @@ size_t Expression::getSize() const {
       return number.getSize();
     }
     case Type::STRING:
-      return 1;
-    case Type::CONCATENATION:
-      return std::get<Type::CONCATENATION>(value_).expressions_.size();
+      throw VerilogException("String expressions do not have a size");
+    case Type::CONCATENATION: {
+      size_t totalSize = 0;
+      for (const auto& expr: std::get<Type::CONCATENATION>(value_).expressions_) {
+        totalSize += expr.getSize();
+      }
+      return totalSize;
+    }
   }
   return 0;
 }

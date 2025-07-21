@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 
 #include "VerilogTypes.h"
+#include "VerilogException.h"
 
 TEST(NajaVerilogTestSize, testNumbersSize) {
   {
@@ -97,5 +98,67 @@ TEST(NajaVerilogTestSize, testExpressionsSize) {
     EXPECT_TRUE(expr.supported_);
     EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER, expr.value_.index());
     EXPECT_EQ(8, expr.getSize()); // Range 7:0
+  }
+
+   {
+    naja::verilog::Expression expr;
+    expr.value_ = naja::verilog::RangeIdentifier(naja::verilog::Identifier("my_signal"), naja::verilog::Range(0, 7));
+    expr.valid_ = true;
+    EXPECT_TRUE(expr.supported_);
+    EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER, expr.value_.index());
+    EXPECT_EQ(8, expr.getSize()); // Range 7:0
+  }
+
+  {
+    naja::verilog::Expression expr;
+    expr.value_ = naja::verilog::RangeIdentifier(naja::verilog::Identifier("my_signal"), naja::verilog::Range(7));
+    expr.valid_ = true;
+    EXPECT_TRUE(expr.supported_);
+    EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER, expr.value_.index());
+    EXPECT_EQ(1, expr.getSize()); // my_signal[7]
+  }
+
+  {
+    naja::verilog::RangeIdentifier rangeIdentifier;
+    rangeIdentifier.range_.valid_ = false;
+    naja::verilog::Expression expr;
+    expr.value_ = rangeIdentifier;
+    EXPECT_THROW(expr.getSize(), naja::verilog::VerilogException);
+  }
+
+  {
+    //String expression
+    naja::verilog::Expression expr;
+    expr.value_ = std::string("Hello");
+    expr.valid_ = true;
+    EXPECT_THROW(expr.getSize(), naja::verilog::VerilogException);
+  }
+
+  {
+    //Concatenation expression
+    naja::verilog::RangeIdentifier
+      rangeIdentifier0(
+        naja::verilog::Identifier("signal"),
+        naja::verilog::Range(7, 0));
+    naja::verilog::Expression expr0;
+    expr0.value_ = rangeIdentifier0;
+    expr0.valid_ = true;
+    naja::verilog::RangeIdentifier
+      rangeIdentifier1(
+        naja::verilog::Identifier("signal"),
+        naja::verilog::Range(-15));
+    naja::verilog::Expression expr1;
+    expr1.value_ = rangeIdentifier1;
+    expr1.valid_ = true;
+    naja::verilog::Concatenation::Expressions expressions{
+      expr0, expr1
+    };
+    naja::verilog::Concatenation concatenation(expressions);
+    naja::verilog::Expression expr;
+    expr.value_ = concatenation;
+    expr.valid_ = true;
+    EXPECT_TRUE(expr.supported_);
+    EXPECT_EQ(naja::verilog::Expression::Type::CONCATENATION, expr.value_.index());
+    EXPECT_EQ(9, expr.getSize()); // 8 bits from signal[7:0] and 1 bits from signal[-15]
   }
 }
