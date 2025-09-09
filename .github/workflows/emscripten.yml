@@ -2,13 +2,9 @@ name: Emscripten Tests
 
 on:
   push:
-    paths:
-      - '**.cpp'
-      - '**.h'
-      - '**CMakeLists.txt'
-      - '.github/workflows/emscripten-tests.yml'
+    branches: [ main ]
   pull_request:
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   build-and-test:
@@ -21,7 +17,7 @@ jobs:
           submodules: true
       # install dependencies
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -yq 
+        run: sudo apt-get update && sudo apt-get install -yq libfl-dev
 
       - name: Set up Emscripten
         uses: mymindstorm/setup-emsdk@v14
