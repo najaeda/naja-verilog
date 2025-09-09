@@ -28,7 +28,7 @@ jobs:
         run: |
           emcmake cmake -S . -B build-wasm \
             -DBUILD_EMSCRIPTEN=ON \
-            -DFLEX_INCLUDE_DIR=/opt/homebrew/opt/flex/include \
+            -DFLEX_INCLUDE_DIR=/usr/include \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CXX_FLAGS="-fexceptions" \
             -DCMAKE_EXE_LINKER_FLAGS="-fexceptions -sDISABLE_EXCEPTION_CATCHING=0"
