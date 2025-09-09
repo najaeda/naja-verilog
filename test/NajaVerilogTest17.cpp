@@ -21,7 +21,6 @@ TEST(NajaVerilogTest17, test) {
   VerilogConstructorTest constructor;
   std::filesystem::path test17Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("test17.v"));
   constructor.parse(test17Path);
   ASSERT_EQ(1, constructor.modules_.size());

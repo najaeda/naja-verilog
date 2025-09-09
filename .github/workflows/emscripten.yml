@@ -1,0 +1,51 @@
+name: Emscripten Tests
+
+on:
+  push:
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**CMakeLists.txt'
+      - '.github/workflows/emscripten-tests.yml'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      # install dependencies
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -yq 
+
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+
+      - name: Configure (Emscripten)
+        run: |
+          emcmake cmake -S . -B build-wasm \
+            -DBUILD_EMSCRIPTEN=ON \
+            -DFLEX_INCLUDE_DIR=/opt/homebrew/opt/flex/include \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-fexceptions" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fexceptions -sDISABLE_EXCEPTION_CATCHING=0"
+
+      - name: Build
+        run: cmake --build build-wasm -j
+
+      - name: Run tests
+        working-directory: build-wasm
+        run: |
+          if [ -f test/naja_verilog_tests.js ]; then
+            node test/naja_verilog_tests.js
+          else
+            echo "Test runner not found!"
+            exit 1
+          fi

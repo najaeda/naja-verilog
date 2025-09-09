@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 include(GNUInstallDirs)
 
+option(BUILD_EMSCRIPTEN OFF)
+
 #For Finding flex include path on MacOS with homebrew installation
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /opt/homebrew/opt/flex/include)
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /usr/local/opt/flex/include)

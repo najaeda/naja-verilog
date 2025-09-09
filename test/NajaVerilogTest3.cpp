@@ -20,7 +20,6 @@ using namespace naja::verilog;
 TEST(NajaVerilogTest3, test0) {
   std::filesystem::path test3Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("test3.v"));
   VerilogConstructorTest constructor;
   {
