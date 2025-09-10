@@ -1,6 +1,8 @@
 # naja-verilog
 
-![build](https://github.com/najaeda/naja-verilog/actions/workflows/ubuntu-build.yml/badge.svg)
+[![Join Matrix Chat →](https://img.shields.io/badge/Matrix-Join%20Chat-success?logo=matrix)](https://matrix.to/#/#naja:fossi-chat.org)
+![Ubuntu build](https://github.com/najaeda/naja-verilog/actions/workflows/ubuntu-build.yml/badge.svg)
+![MacOS Build](https://github.com/najaeda/naja-verilog/actions/workflows/macos-build.yml/badge.svg)
 [![codecov](https://codecov.io/gh/najaeda/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/najaeda/naja-verilog)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ***
