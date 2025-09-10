@@ -40,10 +40,10 @@ jobs:
         run: cmake --build build-wasm -j
 
       - name: Run tests
-        working-directory: build-wasm
+        working-directory: build-wasm/test
         run: |
-          if [ -f test/naja_verilog_tests.js ]; then
-            node test/naja_verilog_tests.js
+          if [ -f naja_verilog_tests.js ]; then
+            node naja_verilog_tests.js
           else
             echo "Test runner not found!"
             exit 1
