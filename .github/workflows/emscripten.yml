@@ -1,4 +1,4 @@
-name: Emscripten Tests
+name: Emscripten Build
 
 on:
   push:
