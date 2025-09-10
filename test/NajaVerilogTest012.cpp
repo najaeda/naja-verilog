@@ -21,7 +21,6 @@ TEST(NajaVerilogTest012, test0) {
   VerilogConstructorTest constructor;
   std::filesystem::path test0Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("test0.v"));
   constructor.parse(test0Path);
   ASSERT_EQ(6, constructor.modules_.size());
@@ -119,7 +118,6 @@ TEST(NajaVerilogTest012, test1) {
   VerilogConstructorTest constructor;
   std::filesystem::path test1Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("test1.v"));
   constructor.parse(test1Path);
   ASSERT_EQ(1, constructor.modules_.size());
@@ -131,7 +129,6 @@ TEST(NajaVerilogTest012, test2) {
   VerilogConstructorTest constructor;
   std::filesystem::path test1Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("test2.v"));
   constructor.parse(test1Path);
   ASSERT_EQ(1, constructor.modules_.size());

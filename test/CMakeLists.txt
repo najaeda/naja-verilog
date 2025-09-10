@@ -28,9 +28,20 @@ set(tests
 )
 
 add_executable(naja_verilog_tests ${tests})
-target_compile_definitions(naja_verilog_tests PRIVATE
-  NAJA_VERILOG_BENCHMARKS="${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_link_libraries(naja_verilog_tests naja_verilog gmock gtest_main)
+
+if(BUILD_EMSCRIPTEN)
+  target_compile_options(naja_verilog_tests PRIVATE -fexceptions)
+  target_link_options(naja_verilog_tests PRIVATE
+  -sEXIT_RUNTIME=1 -sASSERTIONS=0 -sVERBOSE=0
+  -sALLOW_MEMORY_GROWTH=1 -sDISABLE_EXCEPTION_CATCHING=0
+  --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks@
+  --verbose)
+  target_compile_definitions(naja_verilog_tests PRIVATE NAJA_VERILOG_BENCHMARKS="")
+else()
+  target_compile_definitions(naja_verilog_tests PRIVATE
+    NAJA_VERILOG_BENCHMARKS="${CMAKE_CURRENT_SOURCE_DIR}/benchmarks")
+endif()
 
 GTEST_DISCOVER_TESTS(naja_verilog_tests)

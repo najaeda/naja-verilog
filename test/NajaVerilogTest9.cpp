@@ -21,7 +21,6 @@ TEST(NajaVerilogTest9, test) {
   VerilogConstructorTest constructor;
   std::filesystem::path test9Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("test9.v"));
 
   constructor.setFirstPass(true);

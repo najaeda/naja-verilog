@@ -21,7 +21,6 @@ TEST(NajaVerilogTestMultipleFiles, test) {
   VerilogConstructorTest constructor;
   std::filesystem::path multipleFilesPath(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("multifiles"));
   VerilogConstructor::Paths paths;
   paths.push_back(multipleFilesPath / std::filesystem::path("mod0.v"));

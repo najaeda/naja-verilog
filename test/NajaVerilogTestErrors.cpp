@@ -27,7 +27,6 @@ TEST(NajaVerilogTestErrors, testErrorPath) {
 TEST(NajaVerilogTestErrors, test0) {
   std::filesystem::path error0Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("errors")
       / std::filesystem::path("error0.v"));
   VerilogConstructorTest constructor;
@@ -37,7 +36,6 @@ TEST(NajaVerilogTestErrors, test0) {
 TEST(NajaVerilogTestErrors, test1) {
   std::filesystem::path error1Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("errors")
       / std::filesystem::path("error1.v"));
   VerilogConstructorTest constructor;
@@ -47,7 +45,6 @@ TEST(NajaVerilogTestErrors, test1) {
 TEST(NajaVerilogTestErrors, test2) {
   std::filesystem::path error2Path(
       std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
-      / std::filesystem::path("benchmarks")
       / std::filesystem::path("errors")
       / std::filesystem::path("error2.v"));
   VerilogConstructorTest constructor;

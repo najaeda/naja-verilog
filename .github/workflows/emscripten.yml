@@ -1,0 +1,50 @@
+name: Emscripten Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      # install dependencies
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -yq libfl-dev
+
+      - name: Copy locally FlexLexer.h
+        run: mkdir -p flex_include && cp /usr/include/FlexLexer.h flex_include
+
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+
+      - name: Configure (Emscripten)
+        run: |
+          emcmake cmake -S . -B build-wasm \
+            -DBUILD_EMSCRIPTEN=ON \
+            -DFLEX_INCLUDE_DIR=$(pwd)/flex_include \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_FLAGS="-fexceptions" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fexceptions -sDISABLE_EXCEPTION_CATCHING=0"
+
+      - name: Build
+        run: cmake --build build-wasm -j
+
+      - name: Run tests
+        working-directory: build-wasm/test
+        run: |
+          if [ -f naja_verilog_tests.js ]; then
+            node naja_verilog_tests.js
+          else
+            echo "Test runner not found!"
+            exit 1
+          fi
