@@ -4,7 +4,8 @@
 
 BISON_TARGET(VerilogParser VerilogParser.yy
   ${CMAKE_CURRENT_BINARY_DIR}/VerilogParser.cpp
-  COMPILE_FLAGS "-d -v -Wcounterexamples -Wconflicts-sr -Wconflicts-rr")
+  COMPILE_FLAGS "-d -v -Wconflicts-sr -Wconflicts-rr")
+  #COMPILE_FLAGS "-d -v -Wcounterexamples -Wconflicts-sr -Wconflicts-rr")
 FLEX_TARGET(VerilogScanner VerilogScanner.ll
   ${CMAKE_CURRENT_BINARY_DIR}/VerilogScanner.cpp)
 ADD_FLEX_BISON_DEPENDENCY(VerilogScanner VerilogParser)
