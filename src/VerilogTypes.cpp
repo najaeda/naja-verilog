@@ -225,7 +225,7 @@ size_t Expression::getSize() const {
     case Type::RANGEIDENTIFIER: {
       auto range = std::get<Type::RANGEIDENTIFIER>(value_).range_;
       if (not range.valid_) {
-        throw VerilogException("RangeIdentifier is not valid");
+        return 1;
       }
       if (range.singleValue_) {
         return 1;
