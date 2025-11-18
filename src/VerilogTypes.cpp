@@ -221,6 +221,9 @@ int Number::getInt() const {
 }
 
 size_t Expression::getSize() const {
+  if (not valid_) {
+    throw VerilogException("Cannot get size of invalid expression");
+  }
   switch (value_.index()) {
     case Type::RANGEIDENTIFIER: {
       auto range = std::get<Type::RANGEIDENTIFIER>(value_).range_;
