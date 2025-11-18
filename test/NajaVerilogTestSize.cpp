@@ -127,6 +127,15 @@ TEST(NajaVerilogTestSize, testExpressionsSize) {
   }
 
   {
+    naja::verilog::Expression expr;
+    expr.value_ = naja::verilog::RangeIdentifier(naja::verilog::Identifier("my_signal"));
+    expr.valid_ = true;
+    EXPECT_TRUE(expr.supported_);
+    EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER, expr.value_.index());
+    EXPECT_EQ(1, expr.getSize()); // my_signal
+  }
+
+  {
     //String expression
     naja::verilog::Expression expr;
     expr.value_ = std::string("Hello");
