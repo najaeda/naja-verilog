@@ -2,13 +2,27 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-BISON_TARGET(VerilogParser VerilogParser.yy
-  ${CMAKE_CURRENT_BINARY_DIR}/VerilogParser.cpp
-  COMPILE_FLAGS "-d -v -Wconflicts-sr -Wconflicts-rr")
-  #COMPILE_FLAGS "-d -v -Wcounterexamples -Wconflicts-sr -Wconflicts-rr")
-FLEX_TARGET(VerilogScanner VerilogScanner.ll
-  ${CMAKE_CURRENT_BINARY_DIR}/VerilogScanner.cpp)
-ADD_FLEX_BISON_DEPENDENCY(VerilogScanner VerilogParser)
+if(WIN32)
+  message(STATUS "Using pre-generated Flex/Bison sources on Windows")
+
+  set(BISON_VerilogParser_OUTPUTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/generated/VerilogParser.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/generated/VerilogParser.hpp
+  )
+
+  set(FLEX_VerilogScanner_OUTPUTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/generated/VerilogScanner.cpp
+  )
+else()
+  BISON_TARGET(VerilogParser VerilogParser.yy
+    ${CMAKE_CURRENT_BINARY_DIR}/VerilogParser.cpp
+    COMPILE_FLAGS "-d -v -Wconflicts-sr -Wconflicts-rr")
+
+  FLEX_TARGET(VerilogScanner VerilogScanner.ll
+    ${CMAKE_CURRENT_BINARY_DIR}/VerilogScanner.cpp)
+
+  ADD_FLEX_BISON_DEPENDENCY(VerilogScanner VerilogParser)
+endif()
 
 set(SOURCES
   ${BISON_VerilogParser_OUTPUTS}
