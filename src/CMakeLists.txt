@@ -51,6 +51,11 @@ target_include_directories(naja_verilog
 target_include_directories(naja_verilog
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+if (WIN32)
+  target_include_directories(naja_verilog
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/generated)
+endif()
+
 if(PROJECT_IS_TOP_LEVEL)
   set_target_properties(naja_verilog PROPERTIES PUBLIC_HEADER "${HEADERS}")
   install(TARGETS naja_verilog
