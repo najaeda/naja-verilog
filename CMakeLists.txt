@@ -12,12 +12,14 @@ include(GNUInstallDirs)
 
 option(BUILD_EMSCRIPTEN OFF)
 
-#For Finding flex include path on MacOS with homebrew installation
-set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /opt/homebrew/opt/flex/include)
-set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /usr/local/opt/flex/include)
-
-find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
+if (NOT WIN32)
+  #For Finding flex include path on MacOS with homebrew installation
+  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /opt/homebrew/opt/flex/include)
+  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /usr/local/opt/flex/include)
+  # Flex/Bison do not work well on Windows, so we use pre-generated sources.
+  find_package(BISON REQUIRED)
+  find_package(FLEX REQUIRED)
+endif()
 
 add_library(naja_verilog_coverage_config INTERFACE)
 option(CODE_COVERAGE "Enable coverage reporting" OFF)

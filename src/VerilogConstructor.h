@@ -26,7 +26,7 @@ class VerilogConstructor {
     void parse(const std::filesystem::path& path);
 
     //LCOV_EXCL_START
-    std::string getCurrentPath() const { return currentPath_; }
+    std::string getCurrentPath() const { return currentPath_.string(); }
     struct Location {
       std::filesystem::path currentPath_  {};
       unsigned              line_         {0};
