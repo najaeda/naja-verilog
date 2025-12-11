@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-if(WIN32)
+if(PREGENERATED_PARSER_SOURCES)
   message(STATUS "Using pre-generated Flex/Bison sources on Windows")
 
   set(BISON_VerilogParser_OUTPUTS
