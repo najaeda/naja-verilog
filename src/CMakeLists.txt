@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 if(PREGENERATED_PARSER_SOURCES)
-  message(STATUS "Using pre-generated Flex/Bison sources on Windows")
+  message(STATUS "Using pre-generated Flex/Bison sources")
 
   set(BISON_VerilogParser_OUTPUTS
     ${CMAKE_CURRENT_SOURCE_DIR}/generated/VerilogParser.cpp
@@ -13,6 +13,9 @@ if(PREGENERATED_PARSER_SOURCES)
   set(FLEX_VerilogScanner_OUTPUTS
     ${CMAKE_CURRENT_SOURCE_DIR}/generated/VerilogScanner.cpp
   )
+
+  target_include_directories(naja_verilog SYSTEM BEFORE PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 else()
   BISON_TARGET(VerilogParser VerilogParser.yy
     ${CMAKE_CURRENT_BINARY_DIR}/VerilogParser.cpp
