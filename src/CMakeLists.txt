@@ -13,9 +13,6 @@ if(PREGENERATED_PARSER_SOURCES)
   set(FLEX_VerilogScanner_OUTPUTS
     ${CMAKE_CURRENT_SOURCE_DIR}/generated/VerilogScanner.cpp
   )
-
-  target_include_directories(naja_verilog SYSTEM BEFORE PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 else()
   BISON_TARGET(VerilogParser VerilogParser.yy
     ${CMAKE_CURRENT_BINARY_DIR}/VerilogParser.cpp
@@ -54,7 +51,7 @@ target_include_directories(naja_verilog
 target_include_directories(naja_verilog
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (WIN32)
+if (PREGENERATED_PARSER_SOURCES)
   target_include_directories(naja_verilog
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 endif()
