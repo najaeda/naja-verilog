@@ -17,7 +17,7 @@ TEST(NajaVerilogTestPreprocess, includeDefineIfdef) {
   std::filesystem::path testPath(
     std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
     / std::filesystem::path("preprocess_top.v"));
-  naja::verilog::VerilogConstructorTest constructor;
+  VerilogConstructorTest constructor;
   constructor.parse(testPath);
 
   ASSERT_EQ(2, constructor.modules_.size());
