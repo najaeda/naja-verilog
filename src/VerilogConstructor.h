@@ -15,6 +15,7 @@ namespace naja { namespace verilog {
 
 class VerilogScanner;
 class VerilogParser;
+class VerilogPreprocessor;
   
 class VerilogConstructor {
   friend class VerilogParser;
@@ -103,6 +104,7 @@ class VerilogConstructor {
     
     VerilogScanner*       scanner_      {nullptr};
     VerilogParser*        parser_       {nullptr};
+    VerilogPreprocessor*  preprocessor_ {nullptr};
     std::filesystem::path currentPath_  {};
     unsigned              line_         {0};
     unsigned              column_       {0};

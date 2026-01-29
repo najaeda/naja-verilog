@@ -5,7 +5,9 @@
 #include "VerilogConstructor.h"
 
 #include <fstream>
+#include <sstream>
 #include "VerilogException.h"
+#include "VerilogPreprocessor.h"
 #include "VerilogScanner.h"
 #include "VerilogParser.hpp"
 
@@ -35,9 +37,14 @@ VerilogConstructor::Location VerilogConstructor::getCurrentLocation() const {
 VerilogConstructor::~VerilogConstructor() {
   delete scanner_;
   delete parser_;
+  delete preprocessor_;
 }
 
 void VerilogConstructor::parse(const std::filesystem::path& path) {
+  if (preprocessor_ == nullptr) {
+    preprocessor_ = new VerilogPreprocessor();
+  }
+  preprocessor_->reset();
   if (not std::filesystem::exists(path)) {
     std::string reason(path.string() + " does not exist");
     throw VerilogException(reason);
@@ -50,12 +57,30 @@ void VerilogConstructor::parse(const std::filesystem::path& path) {
     throw VerilogException(reason);
   }
   //LCOV_EXCL_STOP
-  internalParse(inFile);
+  auto preprocessed = preprocessor_->preprocessFile(path);
+  std::istringstream preprocessedStream(preprocessed);
+  internalParse(preprocessedStream);
 }
 
 void VerilogConstructor::parse(const VerilogConstructor::Paths& paths) {
+  if (preprocessor_ == nullptr) {
+    preprocessor_ = new VerilogPreprocessor();
+  }
+  preprocessor_->reset();
   for (auto path: paths) {
-    parse(path);
+    if (not std::filesystem::exists(path)) {
+      std::string reason(path.string() + " does not exist");
+      throw VerilogException(reason);
+    }
+    currentPath_ = path;
+    std::ifstream inFile(path);
+    if (not inFile.good()) {
+      std::string reason(path.string() + " is not a readable file");
+      throw VerilogException(reason);
+    }
+    auto preprocessed = preprocessor_->preprocessFile(path);
+    std::istringstream preprocessedStream(preprocessed);
+    internalParse(preprocessedStream);
   }
 }
 
