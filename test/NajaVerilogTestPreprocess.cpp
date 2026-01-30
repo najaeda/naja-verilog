@@ -24,3 +24,14 @@ TEST(NajaVerilogTestPreprocess, includeDefineIfdef) {
   EXPECT_EQ("inc_mod", constructor.modules_[0]->identifier_.name_);
   EXPECT_EQ("top", constructor.modules_[1]->identifier_.name_);
 }
+
+TEST(NajaVerilogTestPreprocess, undefActiveAndInactive) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess_undef.v"));
+  VerilogConstructorTest constructor;
+  constructor.parse(testPath);
+
+  ASSERT_EQ(1, constructor.modules_.size());
+  EXPECT_EQ("undef_mod", constructor.modules_[0]->identifier_.name_);
+}
