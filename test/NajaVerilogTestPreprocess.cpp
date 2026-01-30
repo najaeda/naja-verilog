@@ -35,3 +35,15 @@ TEST(NajaVerilogTestPreprocess, undefActiveAndInactive) {
   ASSERT_EQ(1, constructor.modules_.size());
   EXPECT_EQ("undef_mod", constructor.modules_[0]->identifier_.name_);
 }
+
+TEST(NajaVerilogTestPreprocess, elsifElseBranches) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess_elsif.v"));
+  VerilogConstructorTest constructor;
+  constructor.parse(testPath);
+
+  ASSERT_EQ(2, constructor.modules_.size());
+  EXPECT_EQ("elsif_mod", constructor.modules_[0]->identifier_.name_);
+  EXPECT_EQ("else_taken", constructor.modules_[1]->identifier_.name_);
+}
