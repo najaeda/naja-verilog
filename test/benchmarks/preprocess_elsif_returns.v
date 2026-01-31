@@ -4,10 +4,10 @@
 `ifdef INNER
 module should_not_exist0 ();
 endmodule
-`endif
 `elsif INNER
 module should_not_exist1 ();
 endmodule
+`endif
 `endif
 
 `define FIRST
