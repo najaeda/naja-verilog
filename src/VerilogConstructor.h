@@ -25,6 +25,12 @@ class VerilogConstructor {
     using Paths = std::vector<std::filesystem::path>;
     void parse(const Paths& paths);
     void parse(const std::filesystem::path& path);
+    void setPreprocessEnabled(bool enabled) { preprocessEnabled_ = enabled; }
+    bool isPreprocessEnabled() const { return preprocessEnabled_; }
+    void preprocessToPath(
+      const std::filesystem::path& inputPath,
+      const std::filesystem::path& outputPath);
+    std::string preprocessToString(const std::filesystem::path& inputPath);
 
     //LCOV_EXCL_START
     std::string getCurrentPath() const { return currentPath_.string(); }
@@ -108,6 +114,7 @@ class VerilogConstructor {
     std::filesystem::path currentPath_  {};
     unsigned              line_         {0};
     unsigned              column_       {0};
+    bool                  preprocessEnabled_ {false};
 };
 
 }} // namespace verilog // namespace naja

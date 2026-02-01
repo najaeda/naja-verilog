@@ -19,6 +19,9 @@ class VerilogPreprocessor {
 
     void reset();
     std::string preprocessFile(const std::filesystem::path& path);
+    void preprocessFileToPath(
+      const std::filesystem::path& path,
+      const std::filesystem::path& outputPath);
 
   private:
     struct IfState {

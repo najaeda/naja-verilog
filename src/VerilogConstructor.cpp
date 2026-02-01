@@ -41,10 +41,6 @@ VerilogConstructor::~VerilogConstructor() {
 }
 
 void VerilogConstructor::parse(const std::filesystem::path& path) {
-  if (preprocessor_ == nullptr) {
-    preprocessor_ = new VerilogPreprocessor();
-  }
-  preprocessor_->reset();
   if (not std::filesystem::exists(path)) {
     std::string reason(path.string() + " does not exist");
     throw VerilogException(reason);
@@ -57,16 +53,26 @@ void VerilogConstructor::parse(const std::filesystem::path& path) {
     throw VerilogException(reason);
   }
   //LCOV_EXCL_STOP
-  auto preprocessed = preprocessor_->preprocessFile(path);
-  std::istringstream preprocessedStream(preprocessed);
-  internalParse(preprocessedStream);
+  if (preprocessEnabled_) {
+    if (preprocessor_ == nullptr) {
+      preprocessor_ = new VerilogPreprocessor();
+    }
+    preprocessor_->reset();
+    auto preprocessed = preprocessor_->preprocessFile(path);
+    std::istringstream preprocessedStream(preprocessed);
+    internalParse(preprocessedStream);
+  } else {
+    internalParse(inFile);
+  }
 }
 
 void VerilogConstructor::parse(const VerilogConstructor::Paths& paths) {
-  if (preprocessor_ == nullptr) {
-    preprocessor_ = new VerilogPreprocessor();
+  if (preprocessEnabled_) {
+    if (preprocessor_ == nullptr) {
+      preprocessor_ = new VerilogPreprocessor();
+    }
+    preprocessor_->reset();
   }
-  preprocessor_->reset();
   for (auto path: paths) {
     if (not std::filesystem::exists(path)) {
       std::string reason(path.string() + " does not exist");
@@ -78,10 +84,33 @@ void VerilogConstructor::parse(const VerilogConstructor::Paths& paths) {
       std::string reason(path.string() + " is not a readable file");
       throw VerilogException(reason);
     }
-    auto preprocessed = preprocessor_->preprocessFile(path);
-    std::istringstream preprocessedStream(preprocessed);
-    internalParse(preprocessedStream);
+    if (preprocessEnabled_) {
+      auto preprocessed = preprocessor_->preprocessFile(path);
+      std::istringstream preprocessedStream(preprocessed);
+      internalParse(preprocessedStream);
+    } else {
+      internalParse(inFile);
+    }
   }
+}
+
+void VerilogConstructor::preprocessToPath(
+  const std::filesystem::path& inputPath,
+  const std::filesystem::path& outputPath) {
+  if (preprocessor_ == nullptr) {
+    preprocessor_ = new VerilogPreprocessor();
+  }
+  preprocessor_->reset();
+  preprocessor_->preprocessFileToPath(inputPath, outputPath);
+}
+
+std::string VerilogConstructor::preprocessToString(
+  const std::filesystem::path& inputPath) {
+  if (preprocessor_ == nullptr) {
+    preprocessor_ = new VerilogPreprocessor();
+  }
+  preprocessor_->reset();
+  return preprocessor_->preprocessFile(inputPath);
 }
 
 void VerilogConstructor::internalParse(std::istream &stream) {

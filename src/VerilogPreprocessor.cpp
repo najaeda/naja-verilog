@@ -36,6 +36,18 @@ std::string VerilogPreprocessor::preprocessFile(
   return output;
 }
 
+void VerilogPreprocessor::preprocessFileToPath(
+  const std::filesystem::path& path,
+  const std::filesystem::path& outputPath) {
+  auto output = preprocessFile(path);
+  std::ofstream outFile(outputPath);
+  if (not outFile.good()) {
+    std::string reason(outputPath.string() + " is not a writable file");
+    throw VerilogException(reason);
+  }
+  outFile << output;
+}
+
 std::string VerilogPreprocessor::preprocessStream(
   std::istream& stream,
   const std::filesystem::path& currentPath) {
@@ -273,7 +285,7 @@ bool VerilogPreprocessor::handleDirective(
     if (!isActive()) {
       return true;
     }
-    output.append(line).push_back('\n');
+    // Consume but do not emit to keep parser-compatible output.
     return true;
   }
 
