@@ -351,3 +351,46 @@ TEST(NajaVerilogTestPreprocess, disablePreprocessBypassesMacroExpansion) {
   constructor.setPreprocessEnabled(false);
   EXPECT_THROW(constructor.parse(testPath), naja::verilog::VerilogException);
 }
+
+TEST(NajaVerilogTestPreprocess, blockCommentPassThrough) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess/preprocess_block_comment.v"));
+  naja::verilog::VerilogPreprocessor preprocessor;
+  auto output = preprocessor.preprocessFile(testPath);
+  EXPECT_NE(std::string::npos, output.find("/* start comment `MACRO_SHOULD_NOT_EXPAND"));
+  EXPECT_NE(std::string::npos, output.find("still comment */ assign o = i;"));
+}
+
+TEST(NajaVerilogTestPreprocess, includeAbsolutePathResolves) {
+  auto tempDir = std::filesystem::temp_directory_path();
+  auto absPath = tempDir / std::filesystem::path("naja_verilog_abs_include.v");
+  auto includePath = tempDir / std::filesystem::path("naja_verilog_abs_test.v");
+  {
+    std::ofstream out(absPath);
+    out << "module abs_inc(); endmodule\n";
+  }
+  {
+    std::ofstream out(includePath);
+    out << "`include \"" << absPath.string() << "\"\n";
+    out << "module abs_top(); endmodule\n";
+  }
+  naja::verilog::VerilogPreprocessor preprocessor;
+  auto output = preprocessor.preprocessFile(includePath);
+  EXPECT_NE(std::string::npos, output.find("module abs_inc"));
+  std::filesystem::remove(absPath);
+  std::filesystem::remove(includePath);
+}
+
+TEST(NajaVerilogTestPreprocess, parsePathsWithoutPreprocess) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess/preprocess_plain_parse_paths.v"));
+  VerilogConstructorTest constructor;
+  constructor.setPreprocessEnabled(false);
+  VerilogConstructorTest::Paths paths { testPath };
+  constructor.parse(paths);
+
+  ASSERT_EQ(1, constructor.modules_.size());
+  EXPECT_EQ("plain_paths", constructor.modules_[0]->identifier_.name_);
+}
