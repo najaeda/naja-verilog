@@ -122,21 +122,11 @@ As ordering of verilog modules in single or across multiple files is not preknow
 1. Parse modules, ports and parameters. Ignore instances and connectivity. Construct all interfaces.
 2. Reparse. Ignore ports and parameters. Parse instances and nets. Construct connectivity.
 
-### Preprocessing output
-
-You can generate preprocessed Verilog text (similar to `gcc -E`) through `VerilogConstructor`:
-
-```c++
-VerilogConstructor constructor;
-// Write to a file.
-constructor.preprocessToPath("input.v", "output.pre.v");
-// Or get the text directly.
-std::string preprocessed = constructor.preprocessToString("input.v");
-```
+### Preprocessing
 
 The parser pipeline now runs a lightweight preprocessor that supports the following directives:
-`define, `undef, `ifdef, `ifndef, `elsif, `else, `endif, `include, and `timescale
-(note: `timescale is consumed but not emitted to keep the parser output compatible).
+`define`, `undef`, `ifdef`, `ifndef`, `elsif`, `else`, `endif`, `include`, and `timescale`
+(note: `timescale` is consumed but not emitted to keep the parser output compatible).
 
 Preprocessing is disabled by default. Enable it when needed, or disable it to compare performance:
 
@@ -148,6 +138,18 @@ constructor.parse("input.v");
 // Or keep it disabled to parse raw sources.
 constructor.setPreprocessEnabled(false);
 constructor.parse("input.v");
+```
+
+#### Preprocessing output
+
+You can generate preprocessed Verilog text (similar to `gcc -E`) through `VerilogConstructor`:
+
+```c++
+VerilogConstructor constructor;
+// Write to a file.
+constructor.preprocessToPath("input.v", "output.pre.v");
+// Or get the text directly.
+std::string preprocessed = constructor.preprocessToString("input.v");
 ```
 
 <div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
