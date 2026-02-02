@@ -28,11 +28,13 @@ set(SOURCES
   ${BISON_VerilogParser_OUTPUTS}
   ${FLEX_VerilogScanner_OUTPUTS}
   VerilogTypes.cpp
+  VerilogPreprocessor.cpp
   VerilogConstructor.cpp
 )
 
 set(HEADERS
   VerilogTypes.h
+  VerilogPreprocessor.h
   VerilogConstructor.h
   VerilogException.h
 )
