@@ -366,6 +366,82 @@ TEST(NajaVerilogTestPreprocess, disablePreprocessBypassesMacroExpansion) {
   EXPECT_THROW(constructor.parse(testPath), naja::verilog::VerilogException);
 }
 
+TEST(NajaVerilogTestPreprocess, preprocessToStringMissingFileThrows) {
+  std::filesystem::path missingPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess/does_not_exist.v"));
+  VerilogConstructorTest constructor;
+  constructor.setPreprocessEnabled(true);
+  EXPECT_THROW(constructor.preprocessToString(missingPath), naja::verilog::VerilogException);
+}
+
+TEST(NajaVerilogTestPreprocess, preprocessToStringUnreadableFileThrows) {
+  auto tempPath = std::filesystem::temp_directory_path()
+    / std::filesystem::path("naja_verilog_preprocess_unreadable.v");
+  {
+    std::ofstream out(tempPath);
+    out << "module unreadable(); endmodule\n";
+  }
+  std::filesystem::permissions(
+    tempPath,
+    std::filesystem::perms::owner_read
+      | std::filesystem::perms::owner_write
+      | std::filesystem::perms::owner_exec,
+    std::filesystem::perm_options::remove);
+  {
+    std::ifstream probe(tempPath);
+    if (probe.good()) {
+      // Some environments (e.g., Emscripten test runners) do not enforce POSIX permissions.
+      GTEST_SKIP() << "Filesystem does not honor unreadable permission in this environment.";
+    }
+  }
+  VerilogConstructorTest constructor;
+  constructor.setPreprocessEnabled(true);
+  EXPECT_THROW(constructor.preprocessToString(tempPath), naja::verilog::VerilogException);
+
+  std::filesystem::permissions(
+    tempPath,
+    std::filesystem::perms::owner_read
+      | std::filesystem::perms::owner_write,
+    std::filesystem::perm_options::add);
+  std::filesystem::remove(tempPath);
+}
+
+TEST(NajaVerilogTestPreprocess, preprocessToPathUnwritableOutputThrows) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess/preprocess_top.v"));
+  auto outputPath = std::filesystem::temp_directory_path()
+    / std::filesystem::path("naja_verilog_preprocess_nowrite.v");
+  {
+    std::ofstream out(outputPath);
+    out << "placeholder\n";
+  }
+  std::filesystem::permissions(
+    outputPath,
+    std::filesystem::perms::owner_read
+      | std::filesystem::perms::owner_write
+      | std::filesystem::perms::owner_exec,
+    std::filesystem::perm_options::remove);
+  {
+    std::ofstream probe(outputPath, std::ios::app);
+    if (probe.good()) {
+      // Some environments (e.g., Emscripten test runners) do not enforce POSIX permissions.
+      GTEST_SKIP() << "Filesystem does not honor unwritable permission in this environment.";
+    }
+  }
+  VerilogConstructorTest constructor;
+  constructor.setPreprocessEnabled(true);
+  EXPECT_THROW(constructor.preprocessToPath(testPath, outputPath), naja::verilog::VerilogException);
+
+  std::filesystem::permissions(
+    outputPath,
+    std::filesystem::perms::owner_read
+      | std::filesystem::perms::owner_write,
+    std::filesystem::perm_options::add);
+  std::filesystem::remove(outputPath);
+}
+
 TEST(NajaVerilogTestPreprocess, blockCommentPassThrough) {
   std::filesystem::path testPath(
     std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
@@ -420,6 +496,15 @@ TEST(NajaVerilogTestPreprocess, parsePathsWithPreprocess) {
 
   ASSERT_EQ(1, constructor.modules_.size());
   EXPECT_EQ("paths_with_macro", constructor.modules_[0]->identifier_.name_);
+}
+
+TEST(NajaVerilogTestPreprocess, undefinedMacroPassesThrough) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess/preprocess_undefined_macro_passthrough.v"));
+  naja::verilog::VerilogPreprocessor preprocessor;
+  auto output = preprocessor.preprocessFile(testPath);
+  EXPECT_NE(std::string::npos, output.find("`UNDEF_MACRO"));
 }
 
 TEST(NajaVerilogTestPreprocess, includeUnterminatedThrows) {
