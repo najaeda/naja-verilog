@@ -442,6 +442,14 @@ TEST(NajaVerilogTestPreprocess, preprocessToPathUnwritableOutputThrows) {
   std::filesystem::remove(outputPath);
 }
 
+TEST(NajaVerilogTestPreprocess, preprocessorKeywordEmptyReturnsFalse) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess/preprocess_empty_directive.v"));
+  naja::verilog::VerilogPreprocessor preprocessor;
+  EXPECT_THROW(preprocessor.preprocessFile(testPath), naja::verilog::VerilogException);
+}
+
 TEST(NajaVerilogTestPreprocess, blockCommentPassThrough) {
   std::filesystem::path testPath(
     std::filesystem::path(NAJA_VERILOG_BENCHMARKS)

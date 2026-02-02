@@ -113,7 +113,10 @@ bool VerilogPreprocessor::handleDirective(
   std::string keyword;
   readToken(keyword);
   if (keyword.empty()) {
-    return false;
+    std::ostringstream reason;
+    reason << "Empty preprocessor directive at "
+           << currentPath.string() << ":" << lineNumber;
+    throw VerilogException(reason.str());
   }
 
   if (keyword == "define") {
