@@ -164,6 +164,13 @@ TEST(NajaVerilogTestPreprocess, parsePathsUnreadableFileThrows) {
       | std::filesystem::perms::owner_write
       | std::filesystem::perms::owner_exec,
     std::filesystem::perm_options::remove);
+  {
+    std::ifstream probe(tempPath);
+    if (probe.good()) {
+      // Some environments (e.g., Emscripten test runners) do not enforce POSIX permissions.
+      GTEST_SKIP() << "Filesystem does not honor unreadable permission in this environment.";
+    }
+  }
 
   VerilogConstructorTest constructor;
   constructor.setPreprocessEnabled(true);
@@ -261,6 +268,13 @@ TEST(NajaVerilogTestPreprocess, includeUnreadableThrows) {
       | std::filesystem::perms::owner_write
       | std::filesystem::perms::owner_exec,
     std::filesystem::perm_options::remove);
+  {
+    std::ifstream probe(includePath);
+    if (probe.good()) {
+      // Some environments (e.g., Emscripten test runners) do not enforce POSIX permissions.
+      GTEST_SKIP() << "Filesystem does not honor unreadable permission in this environment.";
+    }
+  }
 
   std::filesystem::path testPath(
     std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
@@ -393,4 +407,26 @@ TEST(NajaVerilogTestPreprocess, parsePathsWithoutPreprocess) {
 
   ASSERT_EQ(1, constructor.modules_.size());
   EXPECT_EQ("plain_paths", constructor.modules_[0]->identifier_.name_);
+}
+
+TEST(NajaVerilogTestPreprocess, parsePathsWithPreprocess) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess/preprocess_paths_with_macro.v"));
+  VerilogConstructorTest constructor;
+  constructor.setPreprocessEnabled(true);
+  VerilogConstructorTest::Paths paths { testPath };
+  constructor.parse(paths);
+
+  ASSERT_EQ(1, constructor.modules_.size());
+  EXPECT_EQ("paths_with_macro", constructor.modules_[0]->identifier_.name_);
+}
+
+TEST(NajaVerilogTestPreprocess, includeUnterminatedThrows) {
+  std::filesystem::path testPath(
+    std::filesystem::path(NAJA_VERILOG_BENCHMARKS)
+    / std::filesystem::path("preprocess/preprocess_include_unterminated.v"));
+  VerilogConstructorTest constructor;
+  constructor.setPreprocessEnabled(true);
+  EXPECT_THROW(constructor.parse(testPath), naja::verilog::VerilogException);
 }
