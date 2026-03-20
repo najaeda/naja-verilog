@@ -89,9 +89,9 @@ TEST(NajaVerilogTest6, test) {
     EXPECT_TRUE(expression.valid_);
     EXPECT_EQ(naja::verilog::Expression::Type::CONCATENATION, expression.value_.index());
     auto concatenation = std::get<naja::verilog::Expression::Type::CONCATENATION>(expression.value_);
-    EXPECT_EQ(3, concatenation.expressions_.size());
-    EXPECT_TRUE(concatenation.expressions_[2].valid_);
-    auto constant = concatenation.expressions_[2];
+    EXPECT_EQ(3, concatenation->expressions_.size());
+    EXPECT_TRUE(concatenation->expressions_[2].valid_);
+    auto constant = concatenation->expressions_[2];
     EXPECT_EQ(naja::verilog::Expression::NUMBER, constant.value_.index());
     auto constantValue = std::get<naja::verilog::Expression::NUMBER>(constant.value_); 
     EXPECT_TRUE(constantValue.sign_);

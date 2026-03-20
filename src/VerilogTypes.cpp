@@ -247,7 +247,7 @@ size_t Expression::getSize() const {
       throw VerilogException("String expressions do not have a size");
     case Type::CONCATENATION: {
       size_t totalSize = 0;
-      for (const auto& expr: std::get<Type::CONCATENATION>(value_).expressions_) {
+      for (const auto& expr: std::get<Type::CONCATENATION>(value_)->expressions_) {
         totalSize += expr.getSize();
       }
       return totalSize;
@@ -321,7 +321,7 @@ std::string Expression::getString() const {
     case Type::STRING:
       return std::get<Type::STRING>(value_);
     case Type::CONCATENATION:
-      return std::get<Type::CONCATENATION>(value_).getString();
+      return std::get<Type::CONCATENATION>(value_)->getString();
   }
   return std::string();
 } 
@@ -339,7 +339,7 @@ std::string Expression::getDescription() const {
       stream << std::get<Type::NUMBER>(value_).getDescription();
       break; 
     case Type::CONCATENATION:
-      stream << std::get<Type::CONCATENATION>(value_).getDescription();
+      stream << std::get<Type::CONCATENATION>(value_)->getDescription();
       break;
   }
   return stream.str();
