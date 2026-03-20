@@ -49,8 +49,7 @@ jobs:
     - name: lcov
       working-directory: ${{github.workspace}}/build
       run: |
-           lcov --directory . --capture --output-file coverage.info
-           lcov --remove coverage.info --output-file coverage.info '/usr/*' '*/naja-verilog/test/*' '*/naja-verilog/thirdparty/*'
+           lcov --directory . --capture --output-file coverage.info --exclude '/usr/*' --exclude '*/naja-verilog/test/*' --exclude '*/naja-verilog/thirdparty/*'
            lcov --list coverage.info
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
