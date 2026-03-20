@@ -52,6 +52,8 @@ jobs:
                  --exclude '.*/test/.*' \
                  --exclude '.*/thirdparty/.*' \
                  --exclude '.*/usr/.*' \
+                 --exclude-unreachable-branches \
+                 --exclude-throw-branches \
                  --lcov ${{github.workspace}}/build/coverage.info \
                  ${{github.workspace}}/build
     - name: Upload coverage to Codecov
