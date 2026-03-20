@@ -24,9 +24,9 @@ jobs:
         fetch-depth: 0
         submodules: true
 
-    - name: Install dependencies 
+    - name: Install dependencies
       # install dependencies
-      run: sudo apt-get update && sudo apt-get install -yq libfl-dev lcov
+      run: sudo apt-get update && sudo apt-get install -yq libfl-dev && pip install gcovr
 
     - name: Clean build directory
       run: rm -rf ${{github.workspace}}/build
@@ -46,12 +46,14 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -VV -C ${{env.BUILD_TYPE}}
       
-    - name: lcov
-      working-directory: ${{github.workspace}}/build
+    - name: gcovr
       run: |
-           lcov --directory . --capture --output-file coverage.info --ignore-errors mismatch --base-directory ${{github.workspace}}
-           lcov --remove coverage.info --output-file coverage.info '/usr/*' '*/naja-verilog/test/*' '*/naja-verilog/thirdparty/*'
-           lcov --list coverage.info
+           gcovr --root ${{github.workspace}} \
+                 --exclude '.*/test/.*' \
+                 --exclude '.*/thirdparty/.*' \
+                 --exclude '.*/usr/.*' \
+                 --lcov ${{github.workspace}}/build/coverage.info \
+                 ${{github.workspace}}/build
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
       env:
