@@ -51,10 +51,11 @@ jobs:
            gcovr --root ${{github.workspace}} \
                  --exclude '(^|/)test/' \
                  --exclude '(^|/)thirdparty/' \
-                 --exclude-unreachable-branches \
-                 --exclude-throw-branches \
                  --lcov ${{github.workspace}}/build/coverage.info \
                  ${{github.workspace}}/build
+           # strip branch coverage data (BRDA/BRF/BRH lines) to keep line-only coverage,
+           # matching previous lcov behavior and avoiding false partial-coverage reports
+           sed -i '/^BR/d' ${{github.workspace}}/build/coverage.info
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
       env:
