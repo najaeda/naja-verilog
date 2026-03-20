@@ -5,6 +5,7 @@
 #ifndef __VERILOG_TYPES_H_
 #define __VERILOG_TYPES_H_
 
+#include <memory>
 #include <variant>
 #include <vector>
 #include <string>
@@ -209,18 +210,7 @@ struct Number {
   Value value_  {};
 };
 
-struct Expression;
-
-struct Concatenation {
-  using Expressions = std::vector<Expression>;
-  Concatenation() = default;
-  Concatenation(const Concatenation&) = default;
-  Concatenation(const Expressions& expressions);
-  std::string getString() const;
-  std::string getDescription() const;
-
-  Expressions expressions_  {};
-};
+struct Concatenation;
 
 struct Expression {
   Expression() = default;
@@ -233,14 +223,29 @@ struct Expression {
   std::string getString() const;
   std::string getDescription() const;
 
-  enum Type { RANGEIDENTIFIER=0, NUMBER=1, STRING=2, CONCATENATION=3 }; 
-  using Value = std::variant<RangeIdentifier, Number, std::string, Concatenation>;
+  enum Type { RANGEIDENTIFIER=0, NUMBER=1, STRING=2, CONCATENATION=3 };
+  // Concatenation is stored via shared_ptr to break the mutual dependency between
+  // Expression and Concatenation (Concatenation contains std::vector<Expression>).
+  // unique_ptr would be more semantically correct but std::variant requires all
+  // alternatives to be copy-constructible, which unique_ptr is not.
+  using Value = std::variant<RangeIdentifier, Number, std::string, std::shared_ptr<Concatenation>>;
 
   bool          valid_          { false };
   //If valid_ is true and supported_ is false, then this expression construction
   //is not currently supported.
   bool          supported_      { true };
   Value         value_          {};
+};
+
+struct Concatenation {
+  using Expressions = std::vector<Expression>;
+  Concatenation() = default;
+  Concatenation(const Concatenation&) = default;
+  Concatenation(const Expressions& expressions);
+  std::string getString() const;
+  std::string getDescription() const;
+
+  Expressions expressions_  {};
 };
 
 struct ConstantExpression {

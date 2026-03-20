@@ -215,7 +215,7 @@ primary
 | identifier constant_range_expression.opt { 
   $$.valid_ = true; $$.value_ = naja::verilog::RangeIdentifier($1, $2); }
 | STRING_TK { $$.valid_ = true; $$.value_ = $1.substr(1, $1.size()-2); } 
-| concatenation { $$.valid_ = true; $$.value_ = naja::verilog::Concatenation($1); }
+| concatenation { $$.valid_ = true; $$.value_ = std::make_shared<naja::verilog::Concatenation>($1); }
 ;
 
 constant_primary

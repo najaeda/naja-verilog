@@ -164,7 +164,7 @@ TEST(NajaVerilogTestSize, testExpressionsSize) {
     };
     naja::verilog::Concatenation concatenation(expressions);
     naja::verilog::Expression expr;
-    expr.value_ = concatenation;
+    expr.value_ = std::make_unique<naja::verilog::Concatenation>(concatenation);
     expr.valid_ = true;
     EXPECT_TRUE(expr.supported_);
     EXPECT_EQ(naja::verilog::Expression::Type::CONCATENATION, expr.value_.index());

@@ -196,34 +196,34 @@ TEST(NajaVerilogTest3, test0) {
       inst3->connections_[0].expression_.value_.index());
     auto concatenation =
       std::get<naja::verilog::Expression::Type::CONCATENATION>(inst3->connections_[0].expression_.value_);
-    ASSERT_EQ(4, concatenation.expressions_.size());
+    ASSERT_EQ(4, concatenation->expressions_.size());
     EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER,
-      concatenation.expressions_[0].value_.index());
+      concatenation->expressions_[0].value_.index());
     identifier =
-      std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(concatenation.expressions_[0].value_);
+      std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(concatenation->expressions_[0].value_);
     EXPECT_FALSE(identifier.range_.valid_);
     EXPECT_EQ("net0", identifier.identifier_.name_);
 
     EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER,
-      concatenation.expressions_[1].value_.index());
+      concatenation->expressions_[1].value_.index());
     identifier =
-      std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(concatenation.expressions_[1].value_);
+      std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(concatenation->expressions_[1].value_);
     EXPECT_FALSE(identifier.range_.valid_);
     EXPECT_EQ("net1", identifier.identifier_.name_);
 
-    
+
     EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER,
-      concatenation.expressions_[2].value_.index());
+      concatenation->expressions_[2].value_.index());
     identifier =
-      std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(concatenation.expressions_[2].value_);
+      std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(concatenation->expressions_[2].value_);
     EXPECT_FALSE(identifier.range_.valid_);
     EXPECT_EQ("net2", identifier.identifier_.name_);
     EXPECT_FALSE(identifier.identifier_.escaped_);
 
     EXPECT_EQ(naja::verilog::Expression::Type::RANGEIDENTIFIER,
-      concatenation.expressions_[3].value_.index());
+      concatenation->expressions_[3].value_.index());
     identifier =
-      std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(concatenation.expressions_[3].value_);
+      std::get<naja::verilog::Expression::Type::RANGEIDENTIFIER>(concatenation->expressions_[3].value_);
     EXPECT_TRUE(identifier.range_.valid_);
     EXPECT_EQ("net5", identifier.identifier_.name_);
     EXPECT_TRUE(identifier.range_.singleValue_);
@@ -261,7 +261,7 @@ TEST(NajaVerilogTest3, test0) {
       expression.value_.index());
     concatenation =
       std::get<naja::verilog::Expression::Type::CONCATENATION>(expression.value_);
-    ASSERT_EQ(4, concatenation.expressions_.size());
+    ASSERT_EQ(4, concatenation->expressions_.size());
 
     auto inst5 = dynamic_cast<VerilogConstructorTest::ModuleInstance*>(test->instances_[5]);
     ASSERT_EQ(1, inst5->orderedConnections_.size());
