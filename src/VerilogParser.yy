@@ -109,8 +109,8 @@ static naja::verilog::Number generateNumber(
       << "  begin at line " << beginLine <<  " col " << beginColumn  << '\n' 
       << "  end   at line " << endLine <<  " col " << endColumn << "\n";
     throw naja::verilog::VerilogException(reason.str());
-    //LCOV_EXCL_STOP
   }
+  //LCOV_EXCL_STOP
 }
 
 }
