@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# Mirrors src/CMakeLists.txt's naja_verilog STATIC library.
+# Core naja-verilog library and executable targets.
 
 load("//bazel:verilog_codegen.bzl", "verilog_bison_parser", "verilog_flex_scanner")
 
@@ -54,4 +54,17 @@ cc_binary(
     name = "naja_verilog_test",
     srcs = ["src/NajaVerilogSnippet.cpp"],
     deps = [":naja_verilog"],
+)
+
+cc_test(
+    name = "naja_verilog_tests",
+    srcs = glob(["test/*.cpp"]) + ["test/VerilogConstructorTest.h"],
+    data = glob(["test/benchmarks/**"]),
+    defines = ["NAJA_VERILOG_BENCHMARKS=\\\"test/benchmarks\\\""],
+    includes = ["test"],
+    deps = [
+        ":naja_verilog",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+    ],
 )

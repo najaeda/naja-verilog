@@ -4,9 +4,7 @@
 
 """Repository rule locating a system-installed tool via PATH.
 
-Used for `bison`, `flex`, and `m4` -- the same tools CMake's
-`find_package(BISON REQUIRED)` / `find_package(FLEX REQUIRED)`
-(CMakeLists.txt) resolve against. This mirrors the pragmatic
+Used for `bison`, `flex`, and `m4`. This mirrors the pragmatic
 system-wrapping pattern naja's own Bazel migration uses for TBB/Boost
 (see internal/bazel-migration-plan.md in the naja repo) rather than
 vendoring/building these toolchains from source under Bazel.
@@ -40,11 +38,9 @@ system_tool_repository = repository_rule(
 # `#include <FlexLexer.h>` in VerilogScanner.h silently picks up whichever
 # one is first on the system include path, which can mismatch the flex
 # *binary* actually used to generate the scanner and fail with "out-of-line
-# definition ... does not match any declaration in 'yyFlexLexer'". CMake
-# sidesteps this the same way: src/CMakeLists.txt adds `${FLEX_INCLUDE_DIRS}`
-# (CMake's FindFLEX-resolved header dir for the matched flex) ahead of the
-# system default. This rule finds the FlexLexer.h that matches the `flex`
-# binary resolved on PATH the same way: sibling `../include` of its
+# definition ... does not match any declaration in 'yyFlexLexer'". This rule
+# finds the FlexLexer.h that matches the `flex` binary resolved on PATH:
+# sibling `../include` of its
 # `prefix/bin/flex` layout (true for Homebrew's `opt/flex` symlink prefix;
 # for a plain `/usr/bin/flex` this resolves to `/usr/include`, where
 # distros already ship the matching header).

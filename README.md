@@ -46,36 +46,37 @@ A comparable project can be found here: [Parser-Verilog](https://github.com/Open
 # First clone the repository and go inside it
 git clone https://github.com/najaeda/naja-verilog.git
 cd naja-verilog
-git submodule init
-git submodule update
 ```
 
 ### Dependencies
 
 Mandatory dependencies:
-1. [cmake](https://cmake.org): at least 3.22 version.
+1. [Bazel](https://bazel.build)
 2. [Bison](https://www.gnu.org/software/bison)
 3. [Flex](https://github.com/westes/flex)
+4. [GNU M4](https://www.gnu.org/software/m4/)
 
-Embedded dependencies, through git sub module: [google test](https://github.com/google/googletest).
+[GoogleTest](https://github.com/google/googletest) is resolved through the Bazel
+Central Registry.
 
 On Ubuntu:
 
 ```bash
 sudo apt-get install bison
 sudo apt-get install flex
+sudo apt-get install m4
 ```
 
 Using nix-shell:
 
 ```bash
-nix-shell -p cmake bison flex
+nix-shell -p bazel bison flex m4
 ```
 
 On macOS, using [Homebrew](https://brew.sh/):
 
 ```bash
-brew install cmake bison flex
+brew install bazelisk bison flex m4
 ```
 
 Ensure the versions of `bison` and `flex` installed via Homebrew take precedence over the macOS defaults by modifying your $PATH environment variable as follows:
@@ -85,19 +86,11 @@ export PATH="/opt/homebrew/opt/flex/bin:/opt/homebrew/opt/bison/bin:$PATH"
 ```
 
 
-### Building and Installing
+### Building and Testing
 
 ```bash
-#First define an env variable that points to the directory where you want naja-verilog to be installed:
-export NAJA_INSTALL=<path_to_installation_dir>
-# Create a build dir and go inside it
-mkdir build
-cd build
-cmake <path_to_naja_sources_dir> -DCMAKE_INSTALL_PREFIX=$NAJA_INSTALL
-#For instance: cmake ~/srcs/naja-verilog -DCMAKE_INSTALL_PREFIX=$NAJA_INSTALL
-make
-make test
-make install
+bazel build //:all
+bazel test //:naja_verilog_tests
 ```
 
 <div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>

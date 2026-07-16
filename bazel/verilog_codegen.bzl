@@ -4,10 +4,6 @@
 
 """Custom Bison/Flex codegen rules for the naja-verilog parser.
 
-Mirrors src/CMakeLists.txt's `BISON_TARGET(VerilogParser VerilogParser.yy
-... COMPILE_FLAGS "-d -v -Wconflicts-sr -Wconflicts-rr")` and
-`FLEX_TARGET(VerilogScanner VerilogScanner.ll ...)` calls exactly.
-
 Community rules (`rules_bison`/`rules_flex`) were tried first, but their
 `bison_action()` helper only declares the primary `{name}.cc`/`{name}.h`
 outputs -- it doesn't know about `location.hh`, the auxiliary header the
@@ -20,16 +16,12 @@ declared files; `naja/src/VerilogScanner.h` directly `#include
 tolerated stray sandbox garbage). `position.hh`/`stack.hh`/the report
 are unused by any naja-verilog source (grepped) and are left undeclared.
 
-Runs the system-installed `bison`/`flex` (via `system_tool.bzl`, the
-same tools CMake's `find_package(BISON REQUIRED)`/`find_package(FLEX
-REQUIRED)` resolve against) directly, so the exact set of generated
-files -- and their exact CLI flags -- match the CMake build byte-for-byte
-in behavior.
+Runs the system-installed `bison` and `flex` via `system_tool.bzl`.
 """
 
 def _verilog_bison_parser_impl(ctx):
-    # Declared under src/ (matching CMake's own output layout) so the
-    # consuming cc_library only ever needs `includes = ["src"]` -- Bazel
+    # Declared under src/ so the consuming cc_library only ever needs
+    # `includes = ["src"]` -- Bazel
     # disallows `includes = ["."]` at the workspace root as a workspace-wide
     # include-everything footgun.
     out_cpp = ctx.actions.declare_file("src/" + ctx.attr.name + ".cpp")
