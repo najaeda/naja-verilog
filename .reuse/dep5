@@ -14,3 +14,7 @@ License: Apache-2.0
 Files: test/benchmarks/*
 Copyright: 2023 The Naja verilog Authors.
 License: Apache-2.0
+
+Files: MODULE.bazel.lock
+Copyright: 2026 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+License: Apache-2.0
