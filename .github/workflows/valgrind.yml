@@ -19,7 +19,7 @@ jobs:
         disk-cache: ${{ github.workflow }}
         repository-cache: true
     - name: Install parser generators
-      run: sudo apt-get update && sudo apt-get install -yq bison flex valgrind
+      run: sudo apt-get update && sudo apt-get install -yq bison flex libfl-dev valgrind
     - name: Build
       run: bazel build //:naja_verilog_tests
     - name: Run tests with Valgrind

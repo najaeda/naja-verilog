@@ -52,7 +52,8 @@ def _flex_headers_repository_impl(repository_ctx):
     candidate = flex.dirname.dirname.get_child("include")
     if not candidate.get_child("FlexLexer.h").exists:
         fail(("Could not find FlexLexer.h alongside the resolved `flex` " +
-              "binary ({}); expected it at {}.").format(flex, candidate))
+              "binary ({}); expected it at {}. On Debian/Ubuntu, install " +
+              "the `libfl-dev` package.").format(flex, candidate))
 
     repository_ctx.symlink(candidate, "include")
     repository_ctx.file(

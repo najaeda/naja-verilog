@@ -28,7 +28,7 @@ jobs:
         disk-cache: ${{ github.workflow }}-${{ matrix.os }}-${{ matrix.compiler }}
         repository-cache: true
     - name: Install parser generators
-      run: sudo apt-get update && sudo apt-get install -yq bison flex
+      run: sudo apt-get update && sudo apt-get install -yq bison flex libfl-dev
     - name: Build
       run: bazel build //:all --repo_env=CC=${{ matrix.c_compiler }} --repo_env=CXX=${{ matrix.cxx_compiler }}
     - name: Test

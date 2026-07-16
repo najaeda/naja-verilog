@@ -19,7 +19,7 @@ jobs:
         disk-cache: ${{ github.workflow }}
         repository-cache: true
     - name: Install parser generators
-      run: sudo apt-get update && sudo apt-get install -yq bison flex lcov
+      run: sudo apt-get update && sudo apt-get install -yq bison flex libfl-dev lcov
     - name: Run tests with coverage
       run: >-
         bazel coverage

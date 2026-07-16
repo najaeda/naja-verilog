@@ -63,7 +63,7 @@ On Ubuntu:
 
 ```bash
 sudo apt-get install bison
-sudo apt-get install flex
+sudo apt-get install flex libfl-dev
 sudo apt-get install m4
 ```
 
