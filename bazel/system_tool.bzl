@@ -53,7 +53,9 @@ def _flex_headers_repository_impl(repository_ctx):
     if not candidate.get_child("FlexLexer.h").exists:
         fail(("Could not find FlexLexer.h alongside the resolved `flex` " +
               "binary ({}); expected it at {}. On Debian/Ubuntu, install " +
-              "the `libfl-dev` package.").format(flex, candidate))
+              "the `libfl-dev` package. On macOS with Homebrew, ensure " +
+              "`$(brew --prefix flex)/bin` precedes `/usr/bin` on " +
+              "PATH.").format(flex, candidate))
 
     repository_ctx.symlink(candidate, "include")
     repository_ctx.file(
