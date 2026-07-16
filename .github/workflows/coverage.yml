@@ -30,6 +30,9 @@ jobs:
       run: |
         lcov \
           --extract bazel-out/_coverage/_coverage_report.dat 'src/*' \
+          --output-file coverage.unfiltered.info
+        lcov \
+          --add-tracefile coverage.unfiltered.info \
           --filter region \
           --output-file coverage.info
         sed -i '/^BR/d' coverage.info
