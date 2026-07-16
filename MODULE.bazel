@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+"""Bazel module for naja-verilog, added so the parent naja repo's own
+Bazel migration (see internal/bazel-migration-plan.md in najaeda/naja)
+can depend on this as a real Bazel module (bazel_dep + git_override)
+instead of a non-module git_repository + placeholder overlay.
+"""
+
+module(
+    name = "naja-verilog",
+    version = "0.0.0",
+)
+
+bazel_dep(name = "rules_cc", version = "0.2.17")
+
+system_tool_repository = use_repo_rule(
+    "//bazel:system_tool.bzl",
+    "system_tool_repository",
+)
+
+system_tool_repository(name = "bison_tool", tool = "bison")
+system_tool_repository(name = "flex_tool", tool = "flex")
+system_tool_repository(name = "m4_tool", tool = "m4")
+
+flex_headers_repository = use_repo_rule(
+    "//bazel:system_tool.bzl",
+    "flex_headers_repository",
+)
+
+flex_headers_repository(name = "flex_headers")

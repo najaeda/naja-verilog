@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Mirrors src/CMakeLists.txt's naja_verilog STATIC library.
+
+load("//bazel:verilog_codegen.bzl", "verilog_bison_parser", "verilog_flex_scanner")
+
+verilog_bison_parser(
+    name = "VerilogParser",
+    src = "src/VerilogParser.yy",
+)
+
+verilog_flex_scanner(
+    name = "VerilogScanner_gen",
+    src = "src/VerilogScanner.ll",
+)
+
+filegroup(
+    name = "VerilogParser_srcs",
+    srcs = [":VerilogParser"],
+    output_group = "cc_srcs",
+)
+
+filegroup(
+    name = "VerilogParser_hdrs",
+    srcs = [":VerilogParser"],
+    output_group = "cc_hdrs",
+)
+
+cc_library(
+    name = "naja_verilog",
+    srcs = [
+        ":VerilogParser_srcs",
+        ":VerilogScanner_gen",
+        "src/VerilogTypes.cpp",
+        "src/VerilogPreprocessor.cpp",
+        "src/VerilogConstructor.cpp",
+    ],
+    hdrs = [
+        ":VerilogParser_hdrs",
+        "src/VerilogTypes.h",
+        "src/VerilogPreprocessor.h",
+        "src/VerilogConstructor.h",
+        "src/VerilogException.h",
+        "src/VerilogScanner.h",
+    ],
+    includes = ["src"],
+    deps = ["@flex_headers//:headers"],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "naja_verilog_test",
+    srcs = ["src/NajaVerilogSnippet.cpp"],
+    deps = [":naja_verilog"],
+)
