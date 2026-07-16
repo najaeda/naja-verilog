@@ -30,6 +30,7 @@ jobs:
       run: |
         lcov \
           --extract bazel-out/_coverage/_coverage_report.dat 'src/*' \
+          --exclude 'external/*' \
           --output-file coverage.unfiltered.info
         lcov \
           --add-tracefile coverage.unfiltered.info \
