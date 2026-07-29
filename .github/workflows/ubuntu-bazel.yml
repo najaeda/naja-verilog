@@ -11,7 +11,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
 
     steps:
     - uses: actions/checkout@v7
@@ -23,7 +29,7 @@ jobs:
     - uses: bazel-contrib/setup-bazel@0.19.0
       with:
         bazelisk-cache: true
-        disk-cache: ${{ github.workflow }}
+        disk-cache: ${{ github.workflow }}-${{ matrix.os }}
         repository-cache: true
 
     - name: Build
