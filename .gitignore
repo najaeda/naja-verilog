@@ -2,3 +2,9 @@ build
 install
 *~
 *.swp
+
+# Bazel
+/bazel-*
+
+# Local repository knowledge graph
+/graphify-out/

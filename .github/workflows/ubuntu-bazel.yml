@@ -1,0 +1,33 @@
+name: Ubuntu Bazel Build
+
+# CMake is the primary build system. This additive workflow only verifies
+# that the native Bazel build remains healthy.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+      # No submodules: bzlmod fetches googletest independently.
+
+    - name: Install parser generators
+      run: sudo apt-get update && sudo apt-get install -yq bison flex libfl-dev m4
+
+    - uses: bazel-contrib/setup-bazel@0.19.0
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Build
+      run: bazel build //...
+
+    - name: Test
+      run: bazel test //...

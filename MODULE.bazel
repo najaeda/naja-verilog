@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2023 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+"""Bazel module for naja-verilog.
+
+CMake remains the primary build system used by CI and installation.
+Bazel is kept as a validated smoke test and lets the parent naja module
+consume naja-verilog through bzlmod.
+
+ci/check_submodule_bazel_sync.py verifies that this file's googletest
+version still names the exact tag pinned by CMake's googletest submodule.
+"""
+
+module(
+    name = "naja-verilog",
+    version = "0.0.0",
+)
+
+bazel_dep(name = "rules_cc", version = "0.2.17")
+# Keep this version aligned with the thirdparty/googletest gitlink.
+bazel_dep(name = "googletest", version = "1.17.0")
+
+system_tool_repository = use_repo_rule(
+    "//bazel:system_tool.bzl",
+    "system_tool_repository",
+)
+
+system_tool_repository(name = "bison_tool", tool = "bison")
+system_tool_repository(name = "flex_tool", tool = "flex")
+system_tool_repository(name = "m4_tool", tool = "m4")
+
+flex_headers_repository = use_repo_rule(
+    "//bazel:system_tool.bzl",
+    "flex_headers_repository",
+)
+
+flex_headers_repository(name = "flex_headers")

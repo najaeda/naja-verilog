@@ -1,0 +1,39 @@
+name: macOS Bazel Build
+
+# CMake is the primary build system. This additive workflow only verifies
+# that the native Bazel build remains healthy.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v7
+      # No submodules: bzlmod fetches googletest independently.
+
+    - name: Install parser generators
+      run: brew install bison flex m4
+
+    - name: Set Homebrew paths
+      run: |
+        echo "$(brew --prefix flex)/bin" >> "$GITHUB_PATH"
+        echo "$(brew --prefix bison)/bin" >> "$GITHUB_PATH"
+        echo "$(brew --prefix m4)/bin" >> "$GITHUB_PATH"
+
+    - uses: bazel-contrib/setup-bazel@0.19.0
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Build
+      run: bazel build //...
+
+    - name: Test
+      run: bazel test //...

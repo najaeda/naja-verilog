@@ -1,0 +1,20 @@
+name: Dependency sync check
+
+# CMake and Bazel resolve googletest independently. Keep their pins on the
+# same upstream release so the two build systems exercise the same code.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Check googletest submodule/Bazel pin
+      run: python3 ci/check_submodule_bazel_sync.py
