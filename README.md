@@ -50,6 +50,10 @@ git submodule init
 git submodule update
 ```
 
+The googletest submodule is required by the primary CMake build. If you
+only intend to use Bazel, you can omit the two `git submodule` commands:
+bzlmod fetches googletest independently.
+
 ### Dependencies
 
 Mandatory dependencies:
@@ -99,6 +103,36 @@ make
 make test
 make install
 ```
+
+### Building and Testing with Bazel
+
+CMake remains naja-verilog's primary build system and supported installation
+path. Bazel is also available as an optional, CI-validated smoke-test build
+and for consuming naja-verilog as a bzlmod module.
+
+Install Bazel (or Bazelisk) and the parser-generation tools. On Ubuntu:
+
+```bash
+sudo apt-get install bison flex libfl-dev m4
+```
+
+On macOS:
+
+```bash
+brew install bazelisk bison flex m4
+export PATH="$(brew --prefix flex)/bin:$(brew --prefix bison)/bin:$(brew --prefix m4)/bin:$PATH"
+```
+
+Then, from the repository root:
+
+```bash
+bazel build //...
+bazel test //...
+```
+
+The Bazel build does not require git submodules: bzlmod fetches the pinned
+googletest dependency declared in `MODULE.bazel`. Use the CMake workflow
+above when installing naja-verilog.
 
 <div align="right">[ <a href="#naja-verilog">↑ Back to top ↑</a> ]</div>
 
