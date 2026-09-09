@@ -92,6 +92,9 @@ std::string Net::getString() const {
     stream << range_.getString();
   }
   stream << " " << type_.getString();
+  if (signed_) {
+    stream << " Signed";
+  }
   return stream.str();
 }
 //LCOV_EXCL_STOP

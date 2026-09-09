@@ -126,6 +126,7 @@ static naja::verilog::Number generateNumber(
 %token SUPPLY0_KW
 %token SUPPLY1_KW
 %token WIRE_KW
+%token SIGNED_KW
 %token ASSIGN_KW
 %token DEFPARAM_KW
 %token END 0 "end of file"
@@ -159,6 +160,7 @@ static naja::verilog::Number generateNumber(
 %type<naja::verilog::Ports> internal_ports_declaration
 %type<naja::verilog::Port::Direction> port_type_io
 %type<naja::verilog::Net::Type> net_type;
+%type<bool> signed.opt;
 %type<naja::verilog::Range> range;
 %type<naja::verilog::Range> range.opt
 %type<naja::verilog::Range> constant_range_expression.opt;
@@ -323,12 +325,17 @@ module_or_generate_item:
 
 module_or_generate_item_declaration: net_declaration;
 
-net_declaration: net_type range.opt list_of_identifiers ';' {
-  for (auto netIdentifier: $3) {
+net_declaration: net_type signed.opt range.opt list_of_identifiers ';' {
+  for (auto netIdentifier: $4) {
     constructor->setCurrentLocation(@$.begin.line, @$.begin.column);
-    constructor->addNet(Net(netIdentifier, $2, $1));
+    constructor->addNet(Net(netIdentifier, $3, $1, $2));
   }
 }
+
+signed.opt
+: %empty   { $$ = false; }
+| SIGNED_KW { $$ = true; }
+;
 
 list_of_identifiers
 : net_identifier {
