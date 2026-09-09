@@ -116,10 +116,15 @@ struct Net {
   Net() = default;
   Net(const Net&) = default;
   
-  Net(const Identifier& identifier, const Range& range, Type type):
+  Net(
+    const Identifier& identifier,
+    const Range& range,
+    Type type,
+    bool isSigned=false):
     identifier_(identifier),
     range_(range),
-    type_(type)
+    type_(type),
+    signed_(isSigned)
   {}
 
   bool isBus() const { return range_.valid_; }
@@ -127,6 +132,7 @@ struct Net {
   Identifier  identifier_ {};
   Range       range_      {};
   Type        type_       {};
+  bool        signed_     {false};
 
   std::string getString() const;
 };

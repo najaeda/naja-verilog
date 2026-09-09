@@ -100,6 +100,7 @@ input       { return token::INPUT_KW; }
 output      { return token::OUTPUT_KW; }
 inout       { return token::INOUT_KW; }
 wire        { return token::WIRE_KW; }
+signed      { return token::SIGNED_KW; }
 supply0     { return token::SUPPLY0_KW; }
 supply1     { return token::SUPPLY1_KW; }
 assign      { return token::ASSIGN_KW; }
