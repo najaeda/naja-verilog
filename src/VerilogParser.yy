@@ -44,6 +44,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
+#include <utility>
 
 #include "VerilogException.h"
 
@@ -303,7 +304,7 @@ list_of_net_lvalues: hierarchical_net_identifier constant_range_expression.opt {
 }
 | list_of_net_lvalues ',' hierarchical_net_identifier constant_range_expression.opt {
   $1.push_back(naja::verilog::RangeIdentifier($3, $4));
-  $$ = $1;
+  $$ = std::move($1);
 }
 
 net_assignment: net_lvalue '=' expression {
@@ -343,7 +344,7 @@ list_of_identifiers
 }
 | list_of_identifiers ',' net_identifier {
   $1.push_back($3);
-  $$ = $1;
+  $$ = std::move($1);
 }
 
 net_identifier: identifier { $$ = naja::verilog::Identifier($1); }
@@ -378,7 +379,7 @@ hierarchical_identifier
 }
 | hierarchical_identifier '.' identifier {
   $1.push_back($3);
-  $$ = $1;
+  $$ = std::move($1);
 }
 
 //only numeric values (one bit) [4] or [4:5] are supported
@@ -401,7 +402,7 @@ expression {
 }
 | list_of_expressions ',' expression {
   $1.push_back($3);
-  $$ = $1;
+  $$ = std::move($1);
 }
 
 concatenation: '{' list_of_expressions '}' { $$ = $2; }
