@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: naja-verilog 
 Upstream-Contact: Christophe Alexandre <christophe.alex@gmail.com>
-Source: https://github.com/najaeda/naja-verilog
+Source: https://github.com/keplertech/naja-verilog
 
 Files: .github/workflows/* .gitmodules .gitignore .codecov.yml
 Copyright: 2023 The Naja verilog Authors.
@@ -16,13 +16,13 @@ Copyright: 2023 The Naja verilog Authors.
 License: Apache-2.0
 
 Files: MODULE.bazel.lock
-Copyright: 2026 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+Copyright: 2026 The Naja verilog authors <https://github.com/keplertech/naja-verilog/blob/main/AUTHORS>
 License: Apache-2.0
 
 Files: .bazelversion
-Copyright: 2026 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+Copyright: 2026 The Naja verilog authors <https://github.com/keplertech/naja-verilog/blob/main/AUTHORS>
 License: Apache-2.0
 
 Files: .bazelignore
-Copyright: 2026 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+Copyright: 2026 The Naja verilog authors <https://github.com/keplertech/naja-verilog/blob/main/AUTHORS>
 License: Apache-2.0

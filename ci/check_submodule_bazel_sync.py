@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: 2026 The Naja verilog authors <https://github.com/najaeda/naja-verilog/blob/main/AUTHORS>
+# SPDX-FileCopyrightText: 2026 The Naja verilog authors <https://github.com/keplertech/naja-verilog/blob/main/AUTHORS>
 #
 # SPDX-License-Identifier: Apache-2.0
 

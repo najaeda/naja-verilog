@@ -1,9 +1,9 @@
 # naja-verilog
 
 [![Join Matrix Chat →](https://img.shields.io/badge/Matrix-Join%20Chat-success?logo=matrix)](https://matrix.to/#/#naja:fossi-chat.org)
-![Ubuntu build](https://github.com/najaeda/naja-verilog/actions/workflows/ubuntu-build.yml/badge.svg)
-![MacOS Build](https://github.com/najaeda/naja-verilog/actions/workflows/macos-build.yml/badge.svg)
-[![codecov](https://codecov.io/gh/najaeda/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/najaeda/naja-verilog)
+![Ubuntu build](https://github.com/keplertech/naja-verilog/actions/workflows/ubuntu-build.yml/badge.svg)
+![MacOS Build](https://github.com/keplertech/naja-verilog/actions/workflows/macos-build.yml/badge.svg)
+[![codecov](https://codecov.io/gh/keplertech/naja-verilog/branch/main/graph/badge.svg?token=EWV8ZI20EI)](https://codecov.io/gh/keplertech/naja-verilog)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ***
 
@@ -44,7 +44,7 @@ A comparable project can be found here: [Parser-Verilog](https://github.com/Open
 
 ```bash
 # First clone the repository and go inside it
-git clone https://github.com/najaeda/naja-verilog.git
+git clone https://github.com/keplertech/naja-verilog.git
 cd naja-verilog
 git submodule init
 git submodule update
@@ -142,12 +142,12 @@ above when installing naja-verilog.
 
 Best starting point is to copy existing examples/implementations:
 
-* [NajaVerilogSnippet](https://github.com/najaeda/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
-* [VerilogConstructorTest](https://github.com/najaeda/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
-* [Unit tests](https://github.com/najaeda/naja-verilog/blob/main/test): covers trough unit testing most of the parser aspects.
+* [NajaVerilogSnippet](https://github.com/keplertech/naja-verilog/blob/main/src/NajaVerilogSnippet.cpp): very simple snippet application verbosely printing visited objects.
+* [VerilogConstructorTest](https://github.com/keplertech/naja-verilog/blob/main/test/VerilogConstructorTest.h): Example class used in Naja-verilog unit tests: visit verilog and collect in simple data structures.
+* [Unit tests](https://github.com/keplertech/naja-verilog/blob/main/test): covers trough unit testing most of the parser aspects.
 * [SNLVRLConstructor](https://github.com/najaeda/naja/blob/main/src/snl/formats/verilog/frontend/SNLVRLConstructor.h): More concrete example showing Naja SNL (C++ gate netlist data structure) construction.
 
-The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/najaeda/naja-verilog/blob/main/src/VerilogConstructor.h) and override [callback](#callbacks) methods launched while visiting verilog source.
+The principle of the parser is straightforward: inherit from [VerilogConstructor](https://github.com/keplertech/naja-verilog/blob/main/src/VerilogConstructor.h) and override [callback](#callbacks) methods launched while visiting verilog source.
 
 ### Two passes Parsing
 
@@ -190,7 +190,7 @@ std::string preprocessed = constructor.preprocessToString("input.v");
 
 ## Callbacks
 
-Stuctures (Identifier, Net, Port, Expression) details constructed by following callbacks can be found in [VerilogType.h](https://github.com/najaeda/naja-verilog/blob/main/src/VerilogTypes.h) header.
+Stuctures (Identifier, Net, Port, Expression) details constructed by following callbacks can be found in [VerilogType.h](https://github.com/keplertech/naja-verilog/blob/main/src/VerilogTypes.h) header.
 
 An Identifier is a struct that holds the unescaped string. It also includes a boolean flag indicating whether the collected identifier was escaped or not.
 
